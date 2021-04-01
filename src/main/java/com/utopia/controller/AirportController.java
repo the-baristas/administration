@@ -26,7 +26,7 @@ public class AirportController {
 	public ResponseEntity<List<Airport>> getAllAirports() {
 			List<Airport> airports = airportService.getAllAirports();			
 			if (airports.isEmpty()) {
-				return new ResponseEntity(HttpStatus.NO_CONTENT);
+				return new ResponseEntity("No airports found in database", HttpStatus.NO_CONTENT);
 			} else {
 			    return new ResponseEntity(airports, HttpStatus.OK);
 			}
@@ -39,8 +39,10 @@ public class AirportController {
 		if (theAirport == airport.getIataId()) {
 			return new ResponseEntity(airport, HttpStatus.CREATED);
 		} else {
-			return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+			return new ResponseEntity("Failed to create airport", HttpStatus.EXPECTATION_FAILED);
 		}
+		
+		// delete an airport
 		
 	    
 	}

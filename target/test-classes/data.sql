@@ -1,0 +1,15 @@
+insert into airport(iata_id, city) values('BHM', 'Birmingham');
+insert into airport(iata_id, city) values('PHX', 'Phoenix');
+insert into airport(iata_id, city) values('LAX', 'Los Angeles');
+insert into airport(iata_id, city) values('DTW', 'Detroit');
+insert into airport(iata_id, city) values('SFO', 'San Francisco');
+insert into airport(iata_id, city) values('ORD', 'Chicago');
+insert into airport(iata_id, city) values('JFK', 'New York City');
+insert into airport(iata_id, city) values('MSY', 'New Orleans');
+insert into airport(iata_id, city) values('BOS', 'Boston');
+insert into airport(iata_id, city) values('MSP', 'Minneapolis');
+insert into airport(iata_id, city) values('LAS', 'Las Vegas');
+insert into airport(iata_id, city) values('DFW', 'Dallas');
+insert into airport(iata_id, city) values('MCO', 'Orlando');
+insert into airport(iata_id, city) values('SLC', 'Salt Lake City');
+insert into airport(iata_id, city) values('DEN', 'Denver');

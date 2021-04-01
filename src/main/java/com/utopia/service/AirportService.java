@@ -14,7 +14,7 @@ public class AirportService {
 	@Autowired
 	private AirportDao airportDao;
 	
-	public List<Airport> getAll() {
+	public List<Airport> getAllAirports() {
 		return airportDao.findAll();
 	}
 	

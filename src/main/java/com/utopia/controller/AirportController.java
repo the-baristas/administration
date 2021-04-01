@@ -24,7 +24,7 @@ public class AirportController {
 	// get all airports
 	@GetMapping("/airport")
 	public ResponseEntity<List<Airport>> getAllAirports() {
-			List<Airport> airports = airportService.getAll();			
+			List<Airport> airports = airportService.getAllAirports();			
 			if (airports.isEmpty()) {
 				return new ResponseEntity(HttpStatus.NO_CONTENT);
 			} else {
@@ -37,7 +37,7 @@ public class AirportController {
 	public ResponseEntity<String> createAirport(@RequestBody Airport airport) {
 		String theAirport = airportService.saveAirport(airport);
 		if (theAirport == airport.getIataId()) {
-			return new ResponseEntity(airport, HttpStatus.OK);
+			return new ResponseEntity(airport, HttpStatus.CREATED);
 		} else {
 			return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
 		}

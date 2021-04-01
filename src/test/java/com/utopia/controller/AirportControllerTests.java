@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -80,8 +81,7 @@ public class AirportControllerTests {
 		
 		// create list of airports, pass it to thenReturn to test that getting back list of airports
 		
-		mockMvc.perform(MockMvcRequestBuilders
-					.get("/utopia_airlines/airport")
+		mockMvc.perform(get("/utopia_airlines/airport")
 					.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$", hasSize(2)));

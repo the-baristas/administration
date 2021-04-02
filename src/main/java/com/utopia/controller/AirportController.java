@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.utopia.entity.Airport;
+import com.utopia.service.AirportNotSavedException;
 import com.utopia.service.AirportService;
 
 @RestController
@@ -53,48 +54,26 @@ public class AirportController {
 		}
 	}
 	
-	// create a new airport
+	// create a new airport, set up controller to catch exceptions from service
 	@PostMapping("/airport")
-	public ResponseEntity<String> createAirport(@RequestBody Airport airport) {
+	public ResponseEntity<String> createAirport(@RequestBody Airport airport) throws AirportNotSavedException {
 		String theAirport = airportService.saveAirport(airport);
-		if (theAirport == airport.getIataId()) {
 			return new ResponseEntity(airport, HttpStatus.OK);
-		} else {
-			return new ResponseEntity("Failed to create airport", HttpStatus.EXPECTATION_FAILED);
 		}
-	}
 	
 	// update airport
 	@PutMapping("/airport/{id}")
-	public ResponseEntity<String> updateAirport(@PathVariable String id, @RequestBody Airport airport) {
+	public ResponseEntity<String> updateAirport(@PathVariable String id, @RequestBody Airport airport) throws AirportNotSavedException {
 		String update = airportService.updateAirport(id, airport);
-		if (update == airport.getIataId()) {
 			return new ResponseEntity("Airport Updated!", HttpStatus.OK);
-		} else {
-			return new ResponseEntity("Failed to Update!", HttpStatus.EXPECTATION_FAILED);
-		}
-		
 	}
 		
 		// delete an airport
 	@DeleteMapping("/airport/{id}")
-	public ResponseEntity<String> deleteAirport(@PathVariable String id) {
+	public ResponseEntity<String> deleteAirport(@PathVariable String id) throws AirportNotSavedException {
 		String isRemoved = airportService.deleteAirport(id);
-		if (isRemoved.isBlank()) {
-			return new ResponseEntity("Failed to delete airport", HttpStatus.NOT_FOUND);
-		} else {
 			return new ResponseEntity("airport deleted", HttpStatus.OK);
-		}
 		
 	}
-		
-		
-	
-	
-//	
-//	@DeleteMapping("/airport")
-//	public Airport deleteAirport(@RequestBody Airport airport) {
-//	    return airportDao.delete(airport);
-//	}
 
 }

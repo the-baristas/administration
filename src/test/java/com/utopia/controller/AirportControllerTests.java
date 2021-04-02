@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,6 +42,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.controller.AirportController;
@@ -69,6 +72,9 @@ public class AirportControllerTests {
 	@Autowired
 	private AirportController controller;
 	
+	@Autowired
+	private WebApplicationContext webApplicationContext;
+	
 	// Airport Controller Is Not Null
 	@Test
 	public void controllerLoads() throws Exception {
@@ -95,7 +101,7 @@ public class AirportControllerTests {
 		}
 	
 	@Test
-	public void createAirport() throws Exception {
+	public void shouldCreateAirport() throws Exception {
 		Airport mockAirport = new Airport("TA4", "Test City 4", 1);
 		when(airportService.saveAirport(mockAirport)).thenReturn(mockAirport.getIataId());
 	
@@ -104,6 +110,34 @@ public class AirportControllerTests {
 				.content(asJsonString(mockAirport)))
 				.andExpect(status().isOk());
 	}
+	
+	@Test
+	public void shouldUpdateAirport() throws Exception {
+		Airport mockAirport = new Airport("TA5", "Test City 5", 1);
+		airportService.saveAirport(mockAirport);
+		Airport updatedAirport = new Airport("TA5", "Updated Test City", 2);
+		when(airportService.updateAirport(mockAirport.getIataId(), updatedAirport)).thenReturn(updatedAirport.getIataId());
+		
+		mockMvc.perform(put("/utopia_airlines/airport/TA5")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(asJsonString(updatedAirport)))
+				.andExpect(status().isOk());	
+	}
+	
+	@Test
+	public void shouldDeleteAirport() throws Exception {
+		Airport mockAirport = new Airport("TA6", "Test City 6", 1);
+		airportService.saveAirport(mockAirport);
+		when(airportService.deleteAirport(mockAirport.getIataId())).thenReturn(mockAirport.getIataId());
+		
+		mockMvc.perform(delete("/utopia_airlines/airport/TA5")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(asJsonString(mockAirport)))
+				.andExpect(status().isOk());
+	}
+	
+	
+	
 	
 	public static String asJsonString(final Object obj) {
 	    try {

@@ -21,6 +21,13 @@ import com.utopia.service.AirportService;
 @RequestMapping("/utopia_airlines")
 public class AirportController {
 	
+	//**
+	//**
+	//** Airport Controller: All Methods Work In Postman!
+	//** To Do: Fix Tests!
+	//**
+	
+	
 	@Autowired
 	private AirportService airportService;
 	
@@ -57,6 +64,7 @@ public class AirportController {
 		}
 	}
 	
+	// update airport
 	@PutMapping("/airport/{id}")
 	public ResponseEntity<String> updateAirport(@PathVariable String id, @RequestBody Airport airport) {
 		String update = airportService.updateAirport(id, airport);

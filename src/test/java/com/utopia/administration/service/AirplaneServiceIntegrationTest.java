@@ -44,7 +44,7 @@ public class AirplaneServiceIntegrationTest {
     @Test
     public void getAirplaneById_ValidId_AirplaneFound() {
         Long id = 1L;
-        Airplane airplane = airplaneService.getAirplaneById(id);
+        Airplane airplane = airplaneService.getAirplaneById(id).get();
 
         assertThat(id, is(airplane.getId()));
     }

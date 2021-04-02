@@ -21,11 +21,16 @@ public class AirplaneDaoTest {
     @Test
     public void findById_Airplane() {
         Airplane airplane = new Airplane();
-        airplane.setId(1L);
+        airplane.setFirstClassSeatsMax(0L);
+        airplane.setBusinessClassSeatsMax(0L);
+        airplane.setEconomyClassSeatsMax(0L);
         entityManager.persist(airplane);
         entityManager.flush();
 
         Airplane foundAirplane = airplaneDao.findById(airplane.getId()).get();
-        assertThat(foundAirplane.getId(), is(airplane.getId()));
+        assertThat(foundAirplane.getId(), is(1L));
+        assertThat(foundAirplane.getFirstClassSeatsMax(), is(0L));
+        assertThat(foundAirplane.getBusinessClassSeatsMax(), is(0L));
+        assertThat(foundAirplane.getEconomyClassSeatsMax(), is(0L));
     }
 }

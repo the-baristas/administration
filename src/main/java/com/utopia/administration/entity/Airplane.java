@@ -15,13 +15,13 @@ public class Airplane {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "first_max")
+    @Column(name = "max_first")
     private Long firstClassSeatsMax;
 
-    @Column(name = "business_max")
+    @Column(name = "max_business")
     private Long businessClassSeatsMax;
 
-    @Column(name = "economy_max")
+    @Column(name = "max_economy")
     private Long economyClassSeatsMax;
 
     public Long getId() {

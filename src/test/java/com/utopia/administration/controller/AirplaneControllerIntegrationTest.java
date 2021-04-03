@@ -30,11 +30,11 @@ public class AirplaneControllerIntegrationTest {
     private AirplaneService airplaneService;
 
     @Test
-    public void getAirplanes_Status200() throws Exception {
+    public void findAirplanes_Status200() throws Exception {
         Airplane airplane = new Airplane();
         airplane.setId(1L);
         List<Airplane> allAirplanes = Arrays.asList(airplane);
-        when(airplaneService.getAllAirplanes()).thenReturn(allAirplanes);
+        when(airplaneService.findAllAirplanes()).thenReturn(allAirplanes);
 
         mockMvc.perform(get("/airplanes")).andDo(print())
                 .andExpect(status().isOk());

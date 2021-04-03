@@ -40,7 +40,7 @@ public class AirplaneServiceTest {
     private AirplaneDao airplaneDao;
 
     @Test
-    public void getAllAirplanes_AirplanesFound() {
+    public void findAllAirplanes_AirplanesFound() {
         Airplane airplane = new Airplane();
         airplane.setId(1L);
         airplane.setFirstClassSeatsMax(0L);
@@ -49,12 +49,12 @@ public class AirplaneServiceTest {
         List<Airplane> airplanes = Arrays.asList(airplane);
         when(airplaneDao.findAll()).thenReturn(airplanes);
 
-        List<Airplane> foundAirplanes = airplaneService.getAllAirplanes();
+        List<Airplane> foundAirplanes = airplaneService.findAllAirplanes();
         assertEquals(airplanes, foundAirplanes);
     }
 
     @Test
-    public void getAirplaneById_ValidId_AirplaneFound() {
+    public void findAirplaneById_ValidId_AirplaneFound() {
         Airplane airplane = new Airplane();
         airplane.setId(1L);
         airplane.setFirstClassSeatsMax(0L);
@@ -65,12 +65,12 @@ public class AirplaneServiceTest {
                 .thenReturn(optionalAirplane);
 
         Airplane foundAirplane = airplaneService
-                .getAirplaneById(airplane.getId());
+                .findAirplaneById(airplane.getId());
         assertThat(airplane, is(foundAirplane));
     }
 
     @Test
-    public void addAirplane_Airplane_AirplaneSaved() {
+    public void createAirplane_Airplane_AirplaneSaved() {
         Airplane airplane = new Airplane();
         airplane.setId(1L);
         airplane.setFirstClassSeatsMax(0L);
@@ -78,7 +78,7 @@ public class AirplaneServiceTest {
         airplane.setEconomyClassSeatsMax(0L);
         when(airplaneDao.save(airplane)).thenReturn(airplane);
 
-        Airplane savedAirplane = airplaneService.addAirplane(airplane);
+        Airplane savedAirplane = airplaneService.createAirplane(airplane);
         assertThat(airplane, is(savedAirplane));
     }
 }

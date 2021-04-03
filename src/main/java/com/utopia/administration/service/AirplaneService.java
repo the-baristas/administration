@@ -14,16 +14,16 @@ public class AirplaneService {
     @Autowired
     private AirplaneDao airplaneDao;
 
-    public List<Airplane> getAllAirplanes() {
+    public List<Airplane> findAllAirplanes() {
         return airplaneDao.findAll();
     }
 
-    public Airplane getAirplaneById(Long id) {
+    public Airplane findAirplaneById(Long id) {
         return airplaneDao.findById(id)
                 .orElseThrow(() -> new AirplaneNotFoundException(id));
     }
 
-    public Airplane addAirplane(Airplane airplane) {
+    public Airplane createAirplane(Airplane airplane) {
         return airplaneDao.save(airplane);
     }
 }

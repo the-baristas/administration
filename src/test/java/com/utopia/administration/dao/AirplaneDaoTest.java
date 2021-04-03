@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 
 import com.utopia.administration.entity.Airplane;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -17,6 +18,14 @@ public class AirplaneDaoTest {
 
     @Autowired
     private AirplaneDao airplaneDao;
+
+    @AfterEach
+    public void tearDown() {
+        entityManager.getEntityManager()
+                .createNativeQuery(
+                        "alter table airplane alter id restart with 1")
+                .executeUpdate();
+    }
 
     @Test
     public void findById_Airplane() {

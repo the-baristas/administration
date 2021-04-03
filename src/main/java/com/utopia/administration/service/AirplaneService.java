@@ -1,8 +1,8 @@
 package com.utopia.administration.service;
 
 import java.util.List;
-import java.util.Optional;
 
+import com.utopia.administration.AirplaneNotFoundException;
 import com.utopia.administration.dao.AirplaneDao;
 import com.utopia.administration.entity.Airplane;
 
@@ -18,8 +18,9 @@ public class AirplaneService {
         return airplaneDao.findAll();
     }
 
-    public Optional<Airplane> getAirplaneById(Long airplaneId) {
-        return airplaneDao.findById(airplaneId);
+    public Airplane getAirplaneById(Long id) {
+        return airplaneDao.findById(id)
+                .orElseThrow(() -> new AirplaneNotFoundException(id));
     }
 
     public Airplane addAirplane(Airplane airplane) {

@@ -6,13 +6,15 @@ import com.utopia.administration.AirplaneNotFoundException;
 import com.utopia.administration.dao.AirplaneDao;
 import com.utopia.administration.entity.Airplane;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AirplaneService {
-    @Autowired
-    private AirplaneDao airplaneDao;
+    private final AirplaneDao airplaneDao;
+
+    public AirplaneService(AirplaneDao airplaneDao) {
+        this.airplaneDao = airplaneDao;
+    }
 
     public List<Airplane> findAllAirplanes() {
         return airplaneDao.findAll();

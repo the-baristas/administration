@@ -14,25 +14,11 @@ import com.utopia.administration.entity.Airplane;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
-@AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-integrationtest.properties")
 public class AirplaneServiceTest {
-    @TestConfiguration
-    public static class AirplaneServiceTestContextConfig {
-        @Bean
-        public AirplaneService aiplaneService() {
-            return new AirplaneService();
-        }
-    }
-
     @Autowired
     private AirplaneService airplaneService;
 

@@ -45,6 +45,7 @@ public class AirportService {
 	public String updateAirport(String id, Airport airport) throws AirportNotSavedException {
 		try {
 			airportDao.updateAirport(id, airport.getCity(), airport.getIsActive());
+			airportDao.save(airport);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			throw new AirportNotSavedException("ERROR! Airport not updated.");
@@ -57,6 +58,7 @@ public class AirportService {
 		try {
 			Airport theAirport = getAirportById(id);
 			airportDao.delete(theAirport);
+			airportDao.save(theAirport);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			throw new AirportNotSavedException("ERROR! Airport not deleted.");

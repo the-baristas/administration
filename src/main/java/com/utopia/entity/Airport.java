@@ -40,7 +40,7 @@ public class Airport {
 	public String getCity() {
 		return city;
 	}
-	public void setPublisherName(String city) {
+	public void setCity(String city) {
 		this.city = city;
 	}
 	public Integer getIsActive() {

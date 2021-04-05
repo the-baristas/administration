@@ -2,7 +2,7 @@ package com.utopia.administration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.utopia.administration.controller.AirplaneController;
+import com.utopia.administration.airplane.AirplaneController;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

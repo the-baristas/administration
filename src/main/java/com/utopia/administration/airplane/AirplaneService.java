@@ -1,10 +1,8 @@
-package com.utopia.administration.service;
+package com.utopia.administration.airplane;
 
 import java.util.List;
 
 import com.utopia.administration.AirplaneNotFoundException;
-import com.utopia.administration.dao.AirplaneDao;
-import com.utopia.administration.entity.Airplane;
 
 import org.springframework.stereotype.Service;
 

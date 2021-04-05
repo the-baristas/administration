@@ -1,4 +1,4 @@
-package com.utopia.administration.service;
+package com.utopia.administration.airplane;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -8,9 +8,6 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import com.utopia.administration.dao.AirplaneDao;
-import com.utopia.administration.entity.Airplane;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

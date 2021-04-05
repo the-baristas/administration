@@ -1,9 +1,6 @@
-package com.utopia.administration.controller;
+package com.utopia.administration.airplane;
 
 import java.util.Arrays;
-
-import com.utopia.administration.dao.AirplaneDao;
-import com.utopia.administration.entity.Airplane;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,7 @@
-package com.utopia.administration.dao;
+package com.utopia.administration.airplane;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-
-import com.utopia.administration.entity.Airplane;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

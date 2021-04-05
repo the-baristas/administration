@@ -1,10 +1,7 @@
-package com.utopia.administration.controller;
+package com.utopia.administration.airplane;
 
 import java.net.URI;
 import java.util.List;
-
-import com.utopia.administration.entity.Airplane;
-import com.utopia.administration.service.AirplaneService;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

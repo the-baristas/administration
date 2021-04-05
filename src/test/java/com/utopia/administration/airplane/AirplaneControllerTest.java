@@ -1,12 +1,9 @@
-package com.utopia.administration.controller;
+package com.utopia.administration.airplane;
 
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
-
-import com.utopia.administration.entity.Airplane;
-import com.utopia.administration.service.AirplaneService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

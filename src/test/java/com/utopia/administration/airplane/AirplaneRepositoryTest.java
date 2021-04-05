@@ -10,12 +10,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 @DataJpaTest
-public class AirplaneDaoTest {
+public class AirplaneRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
-    private AirplaneDao airplaneDao;
+    private AirplaneRepository airplaneRepository;
 
     @AfterEach
     public void tearDown() {
@@ -34,7 +34,8 @@ public class AirplaneDaoTest {
         entityManager.persist(airplane);
         entityManager.flush();
 
-        Airplane foundAirplane = airplaneDao.findById(airplane.getId()).get();
+        Airplane foundAirplane = airplaneRepository.findById(airplane.getId())
+                .get();
         assertThat(foundAirplane.getId(), is(1L));
         assertThat(foundAirplane.getFirstClassSeatsMax(), is(0L));
         assertThat(foundAirplane.getBusinessClassSeatsMax(), is(0L));

@@ -12,12 +12,12 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 // @TestPropertySource(locations =
 // "classpath:application-integrationtest.properties")
-public class AirplaneControllerIntegrationTest {
+public class AirplaneIntegrationTest {
     @Autowired
     private WebTestClient webClient;
 
     @Autowired
-    private AirplaneDao airplaneDao;
+    private AirplaneRepository airplaneRepository;
 
     @Test
     public void findAllAirplanes_AirplanesList() {
@@ -25,7 +25,7 @@ public class AirplaneControllerIntegrationTest {
         airplane.setFirstClassSeatsMax(0L);
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
-        airplaneDao.save(airplane);
+        airplaneRepository.save(airplane);
 
         webClient.get().uri("/airplanes").accept(MediaType.APPLICATION_JSON)
                 .exchange().expectStatus().isOk().expectHeader()
@@ -41,7 +41,7 @@ public class AirplaneControllerIntegrationTest {
         airplane.setFirstClassSeatsMax(0L);
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
-        airplaneDao.save(airplane);
+        airplaneRepository.save(airplane);
 
         webClient.get().uri("/airplanes/{id}", airplane.getId())
                 .accept(MediaType.APPLICATION_JSON).exchange().expectStatus()
@@ -56,7 +56,7 @@ public class AirplaneControllerIntegrationTest {
         airplane.setFirstClassSeatsMax(1L);
         airplane.setBusinessClassSeatsMax(1L);
         airplane.setEconomyClassSeatsMax(1L);
-        airplaneDao.save(airplane);
+        airplaneRepository.save(airplane);
 
         webClient.post().uri("/airplanes")
                 .contentType(MediaType.APPLICATION_JSON).bodyValue(airplane)

@@ -20,7 +20,7 @@ public class AirplaneServiceTest {
     private AirplaneService airplaneService;
 
     @MockBean
-    private AirplaneDao airplaneDao;
+    private AirplaneRepository airplaneRepository;
 
     @Test
     public void findAllAirplanes_AirplanesFound() {
@@ -30,7 +30,7 @@ public class AirplaneServiceTest {
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
         List<Airplane> airplanes = Arrays.asList(airplane);
-        when(airplaneDao.findAll()).thenReturn(airplanes);
+        when(airplaneRepository.findAll()).thenReturn(airplanes);
 
         List<Airplane> foundAirplanes = airplaneService.findAllAirplanes();
         assertEquals(airplanes, foundAirplanes);
@@ -44,7 +44,7 @@ public class AirplaneServiceTest {
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
         Optional<Airplane> optionalAirplane = Optional.of(airplane);
-        when(airplaneDao.findById(airplane.getId()))
+        when(airplaneRepository.findById(airplane.getId()))
                 .thenReturn(optionalAirplane);
 
         Airplane foundAirplane = airplaneService
@@ -59,7 +59,7 @@ public class AirplaneServiceTest {
         airplane.setFirstClassSeatsMax(0L);
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
-        when(airplaneDao.save(airplane)).thenReturn(airplane);
+        when(airplaneRepository.save(airplane)).thenReturn(airplane);
 
         Airplane savedAirplane = airplaneService.createAirplane(airplane);
         assertThat(airplane, is(savedAirplane));

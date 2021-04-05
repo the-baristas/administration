@@ -8,22 +8,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AirplaneService {
-    private final AirplaneDao airplaneDao;
+    private final AirplaneRepository airplaneRepository;
 
-    public AirplaneService(AirplaneDao airplaneDao) {
-        this.airplaneDao = airplaneDao;
+    public AirplaneService(AirplaneRepository airplaneRepository) {
+        this.airplaneRepository = airplaneRepository;
     }
 
     public List<Airplane> findAllAirplanes() {
-        return airplaneDao.findAll();
+        return airplaneRepository.findAll();
     }
 
     public Airplane findAirplaneById(Long id) {
-        return airplaneDao.findById(id)
+        return airplaneRepository.findById(id)
                 .orElseThrow(() -> new AirplaneNotFoundException(id));
     }
 
     public Airplane createAirplane(Airplane airplane) {
-        return airplaneDao.save(airplane);
+        return airplaneRepository.save(airplane);
     }
 }

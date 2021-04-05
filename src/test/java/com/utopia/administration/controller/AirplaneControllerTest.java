@@ -1,37 +1,37 @@
 package com.utopia.administration.controller;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.administration.entity.Airplane;
 import com.utopia.administration.service.AirplaneService;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
 @WebMvcTest(AirplaneController.class)
 public class AirplaneControllerTest {
+    private WebTestClient webTestClient;
+
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private AirplaneService airplaneService;
+
+    @BeforeEach
+    public void setUp() {
+        webTestClient = MockMvcWebTestClient.bindTo(mockMvc).build();
+    }
 
     @Test
     public void findAllAirplanes_JsonArray() throws Exception {
@@ -43,19 +43,10 @@ public class AirplaneControllerTest {
         List<Airplane> allAirplanes = Arrays.asList(airplane);
         when(airplaneService.findAllAirplanes()).thenReturn(allAirplanes);
 
-        mockMvc.perform(
-                get("/airplanes").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(airplane.getId()))
-                .andExpect(jsonPath("$[0].firstClassSeatsMax")
-                        .value(airplane.getFirstClassSeatsMax()))
-                .andExpect(jsonPath("$[0].businessClassSeatsMax")
-                        .value(airplane.getBusinessClassSeatsMax()))
-                .andExpect(jsonPath("$[0].economyClassSeatsMax")
-                        .value(airplane.getEconomyClassSeatsMax()))
-                .andDo(print());
+        webTestClient.get().uri("/airplanes").accept(MediaType.APPLICATION_JSON)
+                .exchange().expectStatus().isOk().expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(Airplane.class).hasSize(1);
     }
 
     @Test
@@ -68,12 +59,10 @@ public class AirplaneControllerTest {
         when(airplaneService.findAirplaneById(airplane.getId()))
                 .thenReturn(airplane);
 
-        mockMvc.perform(get("/airplanes/{id}", airplane.getId())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content()
-                        .json(new ObjectMapper().writeValueAsString(airplane)));
+        webTestClient.get().uri("/airplanes/{id}", airplane.getId())
+                .accept(MediaType.APPLICATION_JSON).exchange().expectStatus()
+                .isOk().expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(Airplane.class).isEqualTo(airplane);
     }
 
     @Test
@@ -85,18 +74,10 @@ public class AirplaneControllerTest {
         airplane.setEconomyClassSeatsMax(1L);
         when(airplaneService.createAirplane(airplane)).thenReturn(airplane);
 
-        String airplaneJsonString = new ObjectMapper()
-                .writeValueAsString(airplane);
-        mockMvc.perform(
-                post("/airplanes").contentType(MediaType.APPLICATION_JSON)
-                        .content(airplaneJsonString))
-                .andDo(print()).andExpect(status().isCreated())
-                .andExpect(header().string("Location",
-                        containsString("/airplanes")))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.firstClassSeatsMax").value(1L))
-                .andExpect(jsonPath("$.businessClassSeatsMax").value(1L))
-                .andExpect(jsonPath("$.economyClassSeatsMax").value(1L));
+        webTestClient.post().uri("/airplanes")
+                .contentType(MediaType.APPLICATION_JSON).bodyValue(airplane)
+                .exchange().expectStatus().isCreated().expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody(Airplane.class).isEqualTo(airplane);
     }
 }

@@ -1,5 +1,7 @@
 package com.utopia.administration.controller;
 
+import java.util.Arrays;
+
 import com.utopia.administration.dao.AirplaneDao;
 import com.utopia.administration.entity.Airplane;
 
@@ -31,7 +33,8 @@ public class AirplaneControllerIntegrationTest {
         webClient.get().uri("/airplanes").accept(MediaType.APPLICATION_JSON)
                 .exchange().expectStatus().isOk().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(Airplane.class).hasSize(1);
+                .expectBodyList(Airplane.class)
+                .isEqualTo(Arrays.asList(airplane));
     }
 
     @Test

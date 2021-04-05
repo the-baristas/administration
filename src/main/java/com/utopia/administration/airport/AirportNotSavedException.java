@@ -1,4 +1,4 @@
-package com.utopia.service;
+package com.utopia.administration.airport;
 
 public class AirportNotSavedException extends Exception {
     public AirportNotSavedException(String errorMessage) {

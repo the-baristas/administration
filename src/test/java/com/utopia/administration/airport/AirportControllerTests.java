@@ -1,4 +1,4 @@
-package com.utopia.controller;
+package com.utopia.administration.airport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.any;
@@ -45,10 +45,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.utopia.controller.AirportController;
-import com.utopia.dao.AirportDao;
-import com.utopia.entity.Airport;
-import com.utopia.service.AirportService;
+import com.utopia.administration.airport.Airport;
+import com.utopia.administration.airport.AirportController;
+import com.utopia.administration.airport.AirportDao;
+import com.utopia.administration.airport.AirportService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(AirportController.class)

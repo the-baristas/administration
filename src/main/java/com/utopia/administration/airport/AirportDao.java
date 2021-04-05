@@ -1,4 +1,4 @@
-package com.utopia.dao;
+package com.utopia.administration.airport;
 
 import javax.transaction.Transactional;
 
@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import com.utopia.entity.Airport;
 
 @Transactional
 @Repository

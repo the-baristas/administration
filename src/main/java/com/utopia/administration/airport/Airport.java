@@ -1,4 +1,4 @@
-package com.utopia.entity;
+package com.utopia.administration.airport;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

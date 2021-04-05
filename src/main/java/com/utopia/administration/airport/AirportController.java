@@ -1,4 +1,4 @@
-package com.utopia.controller;
+package com.utopia.administration.airport;
 
 import java.util.List;
 
@@ -13,10 +13,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.utopia.entity.Airport;
-import com.utopia.service.AirportNotSavedException;
-import com.utopia.service.AirportService;
 
 @RestController
 @RequestMapping("/utopia_airlines")

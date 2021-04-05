@@ -1,4 +1,4 @@
-package com.utopia.service;
+package com.utopia.administration.airport;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.utopia.dao.AirportDao;
-import com.utopia.entity.Airport;
+import com.utopia.administration.airport.Airport;
+import com.utopia.administration.airport.AirportDao;
+import com.utopia.administration.airport.AirportNotSavedException;
+import com.utopia.administration.airport.AirportService;
 
 @SpringBootTest
 public class AirportServiceTests {
@@ -41,16 +43,16 @@ public class AirportServiceTests {
     
     @Test
     public void findAirportById_FindsAirport() {
-    	Airport airport = new Airport();
-    	airport.setIataId("TA5");
-    	airport.setCity("Test City 5");
-    	airport.setIsActive(1);
+    	Optional<Airport> airport = Optional.ofNullable(new Airport());
+    	airport.get().setIataId("TA5");
+    	airport.get().setCity("Test City 5");
+    	airport.get().setIsActive(1);
     	
 
-        when(airportDao.findByIataId(airport.getIataId())).thenReturn(airport);
+        when(airportDao.findByIataId("TA5")).thenReturn(airport.get());
 
-        Airport foundAirport = airportService.getAirportById(airport.getIataId());
-        assertThat(airport, is(foundAirport));
+        Airport foundAirport = airportService.getAirportById("TA5");
+        assertThat(airport.get().getIataId(), is(foundAirport.getIataId()));
     }
     
     @Test

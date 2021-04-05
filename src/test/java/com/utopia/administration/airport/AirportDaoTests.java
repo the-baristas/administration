@@ -1,4 +1,4 @@
-package com.utopia.dao;
+package com.utopia.administration.airport;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,7 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import com.utopia.entity.Airport;
+import com.utopia.administration.airport.Airport;
+import com.utopia.administration.airport.AirportDao;
 
 @DataJpaTest
 public class AirportDaoTests {

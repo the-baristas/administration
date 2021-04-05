@@ -71,7 +71,9 @@ public class AirplaneControllerTest {
         mockMvc.perform(get("/airplanes/{id}", airplane.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content()
+                        .json(new ObjectMapper().writeValueAsString(airplane)));
     }
 
     @Test
@@ -88,14 +90,13 @@ public class AirplaneControllerTest {
         mockMvc.perform(
                 post("/airplanes").contentType(MediaType.APPLICATION_JSON)
                         .content(airplaneJsonString))
-                .andExpect(status().isCreated())
+                .andDo(print()).andExpect(status().isCreated())
                 .andExpect(header().string("Location",
                         containsString("/airplanes")))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.firstClassSeatsMax").value(1L))
                 .andExpect(jsonPath("$.businessClassSeatsMax").value(1L))
-                .andExpect(jsonPath("$.economyClassSeatsMax").value(1L))
-                .andDo(print());
+                .andExpect(jsonPath("$.economyClassSeatsMax").value(1L));
     }
 }

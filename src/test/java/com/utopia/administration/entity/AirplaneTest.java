@@ -1,4 +1,4 @@
 package com.utopia.administration.entity;
 
-public class AirplaneTests {
+public class AirplaneTest {
 }

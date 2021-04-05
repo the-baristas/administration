@@ -30,7 +30,7 @@ public class AirplaneController {
     }
 
     @GetMapping("/airplanes/{id}")
-    public Airplane finalAirplaneById(@PathVariable Long id) {
+    public Airplane findAirplaneById(@PathVariable Long id) {
         return airplaneService.findAirplaneById(id);
     }
 

@@ -18,13 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/utopia_airlines")
 public class AirportController {
 	
-	//**
-	//**
-	//** Airport Controller: All Methods Work In Postman!
-	//** To Do: Fix Tests!
-	//**
-	
-	
 	@Autowired
 	private AirportService airportService;
 	
@@ -68,8 +61,7 @@ public class AirportController {
 	@DeleteMapping("/airport/{id}")
 	public ResponseEntity<String> deleteAirport(@PathVariable String id) throws AirportNotSavedException {
 		String isRemoved = airportService.deleteAirport(id);
-			return new ResponseEntity("airport deleted", HttpStatus.OK);
-		
+			return new ResponseEntity("airport deleted", HttpStatus.OK);	
 	}
 
 }

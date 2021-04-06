@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
+<head> 
+    <title>Admin | Airport Management</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<h1>Add Airport</h1>
+    <form action="/done.html" th:action="@{/airport}" th:object="${airport}" method="post">
+    	<p>IATA ID: <input type="text" th:field="*{iataId}" /></p>
+    	<p>CITY: <input type="text" th:field="*{city}" /></p>
+        <p>ACTIVE? (Put 1 if yes, 2 if no): <input type="text" th:field="*{isActive}" /></p>
+        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+    </form>
+</body>
+</html>

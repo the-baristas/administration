@@ -8,11 +8,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class AirportService {
 	
-	//**
-	//**
-	//** Airport Service: All Methods Work In Postman!
-	//** To Do: Tests ?
-	//**
 	
 	@Autowired
 	private AirportDao airportDao;

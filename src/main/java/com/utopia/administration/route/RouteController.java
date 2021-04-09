@@ -50,8 +50,8 @@ public class RouteController {
 	// update route
 	@PutMapping("/route/{id}")
 	public ResponseEntity<String> updateRoute(@PathVariable Integer id, @RequestBody Route route) throws RouteNotSavedException {
-		Integer update = routeService.updateRoute(id, route);
-			return new ResponseEntity("Route Updated!", HttpStatus.OK);
+		routeService.updateRoute(id, route);
+        return new ResponseEntity<String>("Route Updated!", HttpStatus.OK);
 	}
 	
 	// delete a route

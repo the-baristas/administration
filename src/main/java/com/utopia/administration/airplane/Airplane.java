@@ -24,6 +24,9 @@ public class Airplane {
     @Column(name = "max_economy")
     private Long economyClassSeatsMax;
 
+    @Column(name = "model")
+    private String model;
+
     public Long getId() {
         return id;
     }
@@ -84,5 +87,13 @@ public class Airplane {
     @Override
     public String toString() {
         return "Airplane [id=" + id + "]";
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 }

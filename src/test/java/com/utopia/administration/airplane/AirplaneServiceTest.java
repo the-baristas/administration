@@ -3,6 +3,9 @@ package com.utopia.administration.airplane;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -10,17 +13,18 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class AirplaneServiceTest {
-    @Autowired
-    private AirplaneService airplaneService;
-
-    @MockBean
+    @Mock
     private AirplaneRepository airplaneRepository;
+
+    @InjectMocks
+    private AirplaneService airplaneService;
 
     @Test
     public void findAllAirplanes_AirplanesFound() {
@@ -39,13 +43,13 @@ public class AirplaneServiceTest {
     @Test
     public void findAirplaneById_ValidId_AirplaneFound() {
         Airplane airplane = new Airplane();
-        airplane.setId(1L);
+        Long id = 1L;
+        airplane.setId(id);
         airplane.setFirstClassSeatsMax(0L);
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
-        Optional<Airplane> optionalAirplane = Optional.of(airplane);
-        when(airplaneRepository.findById(airplane.getId()))
-                .thenReturn(optionalAirplane);
+        Optional<Airplane> airplaneOptional = Optional.of(airplane);
+        when(airplaneRepository.findById(id)).thenReturn(airplaneOptional);
 
         Airplane foundAirplane = airplaneService
                 .findAirplaneById(airplane.getId());
@@ -54,14 +58,49 @@ public class AirplaneServiceTest {
 
     @Test
     public void createAirplane_Airplane_AirplaneSaved() {
+        Airplane airplaneToSave = new Airplane();
+        airplaneToSave.setFirstClassSeatsMax(0L);
+        airplaneToSave.setBusinessClassSeatsMax(0L);
+        airplaneToSave.setEconomyClassSeatsMax(0L);
+        Airplane airplaneToReturn = new Airplane();
+        airplaneToReturn.setId(1L);
+        airplaneToReturn.setFirstClassSeatsMax(0L);
+        airplaneToReturn.setBusinessClassSeatsMax(0L);
+        airplaneToReturn.setEconomyClassSeatsMax(0L);
+        when(airplaneRepository.save(airplaneToSave))
+                .thenReturn(airplaneToReturn);
+
+        Airplane newAirplane = airplaneService.createAirplane(airplaneToSave);
+        assertThat(newAirplane, is(airplaneToReturn));
+    }
+
+    @Test
+    public void updateAirplane_ValidAirplaneId_AirplaneUpdated() {
+        Airplane airplane = new Airplane();
+        Long id = 1L;
+        airplane.setId(id);
+        airplane.setFirstClassSeatsMax(0L);
+        airplane.setBusinessClassSeatsMax(0L);
+        airplane.setEconomyClassSeatsMax(0L);
+        Optional<Airplane> airplaneOptional = Optional.ofNullable(airplane);
+        when(airplaneRepository.findById(id)).thenReturn(airplaneOptional);
+        when(airplaneRepository.save(airplane)).thenReturn(airplane);
+
+        Airplane updatedAirplane = airplaneService.updateAirplane(airplane);
+        assertThat(updatedAirplane, is(airplane));
+    }
+
+    @Test
+    public void deleteAirplane_ValidAirplaneId_AirplaneDeleted() {
         Airplane airplane = new Airplane();
         airplane.setId(1L);
         airplane.setFirstClassSeatsMax(0L);
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
-        when(airplaneRepository.save(airplane)).thenReturn(airplane);
+        Optional<Airplane> airplaneOptional = Optional.ofNullable(airplane);
+        when(airplaneRepository.findById(1L)).thenReturn(airplaneOptional);
 
-        Airplane savedAirplane = airplaneService.createAirplane(airplane);
-        assertThat(airplane, is(savedAirplane));
+        airplaneService.deleteAirplaneById(airplane.getId());
+        verify(airplaneRepository, times(1)).deleteById(airplane.getId());
     }
 }

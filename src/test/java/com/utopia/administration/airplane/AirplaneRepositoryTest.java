@@ -41,16 +41,4 @@ public class AirplaneRepositoryTest {
         assertThat(foundAirplane.getBusinessClassSeatsMax(), is(0L));
         assertThat(foundAirplane.getEconomyClassSeatsMax(), is(0L));
     }
-
-    @Test
-    public void createAirplane_newAirplane() {
-        Airplane airplaneToCreate = new Airplane();
-        airplaneToCreate.setFirstClassSeatsMax(0L);
-        airplaneToCreate.setBusinessClassSeatsMax(0L);
-        airplaneToCreate.setEconomyClassSeatsMax(0L);
-        entityManager.persistAndFlush(airplaneToCreate);
-
-        Airplane newAirplane = airplaneRepository.save(airplaneToCreate);
-        assertThat(airplaneToCreate, is(newAirplane));
-    }
 }

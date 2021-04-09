@@ -1,7 +1,5 @@
 package com.utopia.administration.airplane;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -78,35 +76,5 @@ public class AirplaneControllerTest {
                 .exchange().expectStatus().isCreated().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
                 .expectBody(Airplane.class).isEqualTo(airplane);
-    }
-
-    @Test
-    public void updateAirplane_ValidAirplaneId_AirplaneUpdated() {
-        Airplane airplane = new Airplane();
-        Long id = 1L;
-        airplane.setId(id);
-        airplane.setFirstClassSeatsMax(0L);
-        airplane.setBusinessClassSeatsMax(0L);
-        airplane.setEconomyClassSeatsMax(0L);
-        when(airplaneService.updateAirplane(airplane)).thenReturn(airplane);
-
-        webTestClient.put().uri("/airplanes")
-                .contentType(MediaType.APPLICATION_JSON).bodyValue(airplane)
-                .exchange().expectStatus().isOk().expectHeader()
-                .contentType(MediaType.APPLICATION_JSON)
-                .expectBody(Airplane.class).isEqualTo(airplane);
-
-    }
-
-    @Test
-    public void deleteAirplane_ValidAirplaneId_AirplaneDeleted() {
-        Airplane airplane = new Airplane();
-        airplane.setId(1L);
-        airplane.setFirstClassSeatsMax(0L);
-        airplane.setBusinessClassSeatsMax(0L);
-        airplane.setEconomyClassSeatsMax(0L);
-
-        airplaneService.deleteAirplaneById(airplane.getId());
-        verify(airplaneService, times(1)).deleteAirplaneById(airplane.getId());
     }
 }

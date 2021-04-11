@@ -7,10 +7,10 @@
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.utopia</groupId>
-    <artifactId>administration</artifactId>
+    <artifactId>flight-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>administration</name>
-    <description>Administration</description>
+    <name>flight-service</name>
+    <description>Flight Service</description>
     <properties>
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>

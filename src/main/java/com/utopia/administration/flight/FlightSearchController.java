@@ -22,7 +22,7 @@ public class FlightSearchController {
     @Autowired
     private RouteService routeService;
 
-    // get all airports
+    // get all flights
     @GetMapping("/flights")
     public ResponseEntity<List<Flight>> getAllFlights() {
         List<Flight> flights = flightService.getAllFlights();
@@ -33,7 +33,7 @@ public class FlightSearchController {
         }
     }
 
-    // get all airports based on location info
+    // get all flights based on location info
     @GetMapping("/flightsbylocation")
     public ResponseEntity<List<Flight>> getFlightsByRouteId(@RequestParam(name = "originId") String originId,
                                                             @RequestParam(name = "destinationId") String destinationId) {

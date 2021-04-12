@@ -22,6 +22,9 @@ public interface RouteDao extends JpaRepository<Route, Integer> {
 	
 	@Query("FROM route WHERE destination_id = ?1")
 	Route findByDestinationId(String destinationId);
+
+	@Query("FROM route WHERE origin_id = ?1 AND destination_id = ?2")
+	Route findByLocationInfo(String originId, String destinationId);
 	
 	@Modifying
 	@Query("UPDATE route SET origin_id = ?2, destination_id = ?3, is_active = ?4 WHERE id = ?1")

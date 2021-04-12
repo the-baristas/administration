@@ -23,7 +23,7 @@ public class RouteController {
 	private RouteService routeService;
 	
 	// get all routes
-	@GetMapping("/route")
+	@GetMapping("/routes")
 	public ResponseEntity<List<Route>> getAllRoutes() {
 			List<Route> routes = routeService.getAllRoutes();			
 			if (routes.isEmpty()) {
@@ -34,17 +34,24 @@ public class RouteController {
 	}
 	
 	// get single route
-	@GetMapping("/route/{id}")
+	@GetMapping("/routes/{id}")
 	public ResponseEntity<Route> getRoute(@PathVariable Integer id) {
 		Optional<Route> route = routeService.getRouteById(id);
 		return new ResponseEntity(route, HttpStatus.OK);
 		}
+
+	// get single route with location data
+	@GetMapping("/routes/{originId}/{destinationId}")
+	public ResponseEntity<Route> getRouteByLocationInfo(@PathVariable String originId, @PathVariable String destinationId) {
+		Route route = routeService.getRouteByLocationInfo(originId, destinationId);
+		return new ResponseEntity(route, HttpStatus.OK);
+	}
 	
 	// create a new route
-	@PostMapping("/route")
+	@PostMapping("/routes")
 	public ResponseEntity<String> createRoute(@RequestBody Route route) throws RouteNotSavedException {
 		Integer theRoute = routeService.saveRoute(route);
-			return new ResponseEntity(route, HttpStatus.OK);
+			return new ResponseEntity(route, HttpStatus.CREATED);
 		}
 	
 	// update route
@@ -58,7 +65,7 @@ public class RouteController {
 	@DeleteMapping("/route/{id}")
 	public ResponseEntity<String> deleteRoute(@PathVariable Integer id) throws RouteNotSavedException {
 		String isRemoved = routeService.deleteRoute(id);
-			return new ResponseEntity("Route deleted", HttpStatus.OK);	
+			return new ResponseEntity("Route deleted", HttpStatus.NO_CONTENT);
 	}
 
 }

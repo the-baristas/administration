@@ -5,14 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/utopia_airlines")
@@ -44,24 +38,30 @@ public class AirportController {
 	}
 	
 	// create a new airport, set up controller to catch exceptions from service
+	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/airport")
-	public ResponseEntity<String> createAirport(@RequestBody Airport airport) throws AirportNotSavedException {
-		String theAirport = airportService.saveAirport(airport);
-			return new ResponseEntity(airport, HttpStatus.OK);
+	public ResponseEntity<String> createAirport(@RequestBody Airport airport, UriComponentsBuilder builder) throws AirportNotSavedException {
+			airportService.saveAirport(airport);
+			return ResponseEntity.created(builder.path("/utopia_airlines/airport/{id}").build(airport.getIataId())).build();
 		}
-	
+
 	// update airport
 	@PutMapping("/airport/{id}")
 	public ResponseEntity<String> updateAirport(@PathVariable String id, @RequestBody Airport airport) throws AirportNotSavedException {
-		String update = airportService.updateAirport(id, airport);
-			return new ResponseEntity("Airport Updated!", HttpStatus.OK);
+		Airport foundAirport = airportService.getAirportById(id);
+		if (foundAirport != null) {
+			airportService.updateAirport(id, airport);
+			return new ResponseEntity<String>(HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		}
 	}
 		
 		// delete an airport
 	@DeleteMapping("/airport/{id}")
 	public ResponseEntity<String> deleteAirport(@PathVariable String id) throws AirportNotSavedException {
 		String isRemoved = airportService.deleteAirport(id);
-			return new ResponseEntity("airport deleted", HttpStatus.OK);	
+			return new ResponseEntity("airport deleted", HttpStatus.NO_CONTENT);
 	}
 
 }

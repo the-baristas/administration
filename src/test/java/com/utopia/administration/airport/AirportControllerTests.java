@@ -50,7 +50,6 @@ import com.utopia.administration.airport.AirportController;
 import com.utopia.administration.airport.AirportDao;
 import com.utopia.administration.airport.AirportService;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(AirportController.class)
 @AutoConfigureMockMvc
 public class AirportControllerTests {
@@ -129,10 +128,7 @@ public class AirportControllerTests {
 				.content(asJsonString(mockAirport)))
 				.andExpect(status().isOk());
 	}
-	
-	
-	
-	
+
 	public static String asJsonString(final Object obj) {
 	    try {
 	        return new ObjectMapper().writeValueAsString(obj);

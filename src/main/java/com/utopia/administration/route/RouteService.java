@@ -25,6 +25,10 @@ public class RouteService {
 	public Optional<Route> getRouteById(Integer id) {
 		return routeDao.findById(id);
 	}
+
+	public Route getRouteByLocationInfo(String originId, String destinationId) {
+		return routeDao.findByLocationInfo(originId, destinationId);
+	}
 	
 	// add a new route
 	public Integer saveRoute(Route route) throws RouteNotSavedException {

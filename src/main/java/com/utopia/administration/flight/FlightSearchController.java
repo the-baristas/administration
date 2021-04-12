@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/search")
-public class FlightController {
+public class FlightSearchController {
 
     @Autowired
     private FlightService flightService;

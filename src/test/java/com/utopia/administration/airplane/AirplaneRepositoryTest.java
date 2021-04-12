@@ -3,27 +3,20 @@ package com.utopia.administration.airplane;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.annotation.DirtiesContext;
 
 @DataJpaTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AirplaneRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
     private AirplaneRepository airplaneRepository;
-
-    @AfterEach
-    public void tearDown() {
-        entityManager.getEntityManager()
-                .createNativeQuery(
-                        "alter table airplane alter id restart with 1")
-                .executeUpdate();
-    }
 
     @Test
     public void findById_Airplane() {

@@ -24,7 +24,7 @@ public class FlightController {
     @Autowired
     private RouteService routeService;
 
-    // get all airports
+    // get all flights admin endpoint
     @GetMapping("/flights")
     public ResponseEntity<List<Flight>> getAllFlights() {
         List<Flight> flights = flightService.getAllFlights();
@@ -57,7 +57,7 @@ public class FlightController {
         return new ResponseEntity("Flight Updated!", HttpStatus.OK);
     }
 
-    // delete a route
+    // delete a flight
     @DeleteMapping("flights/{id}")
     public ResponseEntity<String> deleteFlight(@PathVariable Integer id) throws FlightNotSavedException {
         String isRemoved = flightService.deleteFlight(id);

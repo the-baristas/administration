@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.utopia.flightservice.AirplaneNotFoundException;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AirplaneService {
@@ -25,5 +27,20 @@ public class AirplaneService {
 
     public Airplane createAirplane(Airplane airplane) {
         return airplaneRepository.save(airplane);
+    }
+
+    public Airplane updateAirplane(Airplane airplane) {
+        airplaneRepository.findById(airplane.getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Could not find airplane with id = "
+                                + airplane.getId()));
+        return airplaneRepository.save(airplane);
+    }
+
+    public void deleteAirplaneById(Long id) throws ResponseStatusException {
+        airplaneRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Could not find airplane with id = " + id));
+        airplaneRepository.deleteById(id);
     }
 }

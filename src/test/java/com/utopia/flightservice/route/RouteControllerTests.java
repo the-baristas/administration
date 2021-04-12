@@ -84,12 +84,12 @@ public class RouteControllerTests {
 
     @Test
     public void shouldUpdateRoute() throws Exception {
-        Route mockRoute = new Route(28, "SFO", "JFK", 1);
-        routeService.saveRoute(mockRoute);
+        Route route = new Route(28, "SFO", "JFK", 1);
+        routeService.saveRoute(route);
         Route updatedRoute = new Route(28, "SFO", "JFK", 2);
-        when(routeService.updateRoute(mockRoute.getId(), updatedRoute)).thenReturn(updatedRoute.getId());
+        when(routeService.updateRoute(route.getId(), updatedRoute)).thenReturn(updatedRoute.getId());
 
-        mockMvc.perform(put("/utopia_airlines/airport/TA5")
+        mockMvc.perform(put("/utopia_airlines/route/28")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(updatedRoute)))
                 .andExpect(status().isOk());

@@ -1,8 +1,5 @@
 package com.utopia.flightservice.flight;
 
-import com.utopia.flightservice.route.Route;
-import com.utopia.flightservice.route.RouteService;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
@@ -15,10 +12,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import com.utopia.flightservice.route.Route;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -82,7 +80,7 @@ public class FlightControllerTests {
 
     @Test
     public void shouldCreateFlight() throws Exception, FlightNotSavedException {
-        Flight mockFlight = new Flight(101, 5, 15, LocalDateTime.parse("2021-04-21T18:30:00"), LocalDateTime.parse("2021-04-21T21:30:00"), 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
+        Flight mockFlight = new Flight(101, 7, 8, LocalDateTime.parse("2021-04-09T18:35:00"), LocalDateTime.parse("2021-04-09T21:35:00"), 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
 
         when(flightService.saveFlight(mockFlight)).thenReturn(mockFlight.getId());
 
@@ -92,6 +90,40 @@ public class FlightControllerTests {
                 .andExpect(status().isCreated());
     }
 
+    @Test
+    public void shouldUpdateFlight() throws Exception, FlightNotSavedException {
+        LocalDateTime departureTime = LocalDateTime.of(2015, Month.APRIL, 20, 6, 30);
+        LocalDateTime arrivalTime = LocalDateTime.of(2015, Month.APRIL, 20, 8, 30);
+
+        Flight flight = new Flight(101, 7, 8, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
+
+        flightService.saveFlight(flight);
+        Flight updatedFlight = new Flight(101, 7, 8, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 2 );
+
+        when(flightService.updateFlight(flight.getId(), updatedFlight)).thenReturn(updatedFlight.getId());
+
+        mockMvc.perform(put("/flights/101")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updatedFlight)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldDeleteFlight() throws Exception, FlightNotSavedException {
+        LocalDateTime departureTime = LocalDateTime.of(2015, Month.APRIL, 20, 6, 30);
+        LocalDateTime arrivalTime = LocalDateTime.of(2015, Month.APRIL, 20, 8, 30);
+
+        Flight flight = new Flight(101, 7, 8, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
+
+        flightService.saveFlight(flight);
+        when(flightService.deleteFlight(flight.getId())).thenReturn(flight.getId().toString());
+
+        mockMvc.perform(delete("/flights/101")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(flight)))
+                .andExpect(status().isNoContent());
+    }
+
     public static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);
@@ -99,6 +131,4 @@ public class FlightControllerTests {
             throw new RuntimeException(e);
         }
     }
-
-
 }

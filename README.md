@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-# Flight Service
-=======
+
 # Flight Service
 
 Somehow messing with the endpoints has broken my code. Currently changing /flightservice/flights to /flights!

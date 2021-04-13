@@ -48,13 +48,8 @@ public class AirportController {
 	// update airport
 	@PutMapping("/airport/{id}")
 	public ResponseEntity<String> updateAirport(@PathVariable String id, @RequestBody Airport airport) throws AirportNotSavedException {
-		Airport foundAirport = airportService.getAirportById(id);
-		if (foundAirport != null) {
-			airportService.updateAirport(id, airport);
-			return new ResponseEntity<String>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-		}
+		airportService.updateAirport(id, airport);
+		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 		
 		// delete an airport

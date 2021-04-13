@@ -33,7 +33,6 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(AirportController.class)
-// @AutoConfigureMockMvc
 public class AirportControllerTests {
 	
 	// import mock mvc
@@ -83,7 +82,7 @@ public class AirportControllerTests {
 		mockMvc.perform(post("/utopia_airlines/airport")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(mockAirport)))
-				.andExpect(status().isOk());
+				.andExpect(status().isCreated());
 	}
 	
 	@Test
@@ -108,7 +107,7 @@ public class AirportControllerTests {
 		mockMvc.perform(delete("/utopia_airlines/airport/TA5")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(mockAirport)))
-				.andExpect(status().isOk());
+				.andExpect(status().isNoContent());
 	}
 
 	public static String asJsonString(final Object obj) {

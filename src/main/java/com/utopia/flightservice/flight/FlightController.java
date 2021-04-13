@@ -17,9 +17,6 @@ public class FlightController {
     @Autowired
     private FlightService flightService;
 
-    @Autowired
-    private RouteService routeService;
-
     // get all flights
     @GetMapping("/flights")
     public ResponseEntity<List<Flight>> getAllFlights() {
@@ -36,7 +33,7 @@ public class FlightController {
     @PostMapping("/flights")
     public ResponseEntity<String> createFlight(@RequestBody Flight flight, UriComponentsBuilder builder) throws FlightNotSavedException {
         flightService.saveFlight(flight);
-        return ResponseEntity.created(builder.path("/flightadmin/flights/{id}").build(flight.getId())).build();
+        return ResponseEntity.created(builder.path("/flights/{id}").build(flight.getId())).build();
     }
 
     // get single flight

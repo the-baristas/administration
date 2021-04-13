@@ -17,14 +17,11 @@ public class FlightController {
     @Autowired
     private FlightService flightService;
 
-<<<<<<< HEAD:src/main/java/com/utopia/flightservice/flight/FlightController.java
     // get all flights
-=======
     @Autowired
     private RouteService routeService;
 
     // get all flights admin endpoint
->>>>>>> 8be00d0e223c2b662cafe1b58bce9ce3356d25d5:src/main/java/com/utopia/administration/flight/FlightController.java
     @GetMapping("/flights")
     public ResponseEntity<List<Flight>> getAllFlights() {
         List<Flight> flights = flightService.getAllFlights();

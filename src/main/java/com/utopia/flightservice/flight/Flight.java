@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Entity(name = "flight")
 public class Flight {
@@ -18,10 +19,10 @@ public class Flight {
     private Integer airplaneId;
 
     @Column(name = "departure_time")
-    private LocalDateTime departureTime;
+    private Timestamp departureTime;
 
     @Column(name = "arrival_time")
-    private LocalDateTime arrivalTime;
+    private Timestamp arrivalTime;
 
     @Column(name = "first_reserved")
     private Integer firstReserved;
@@ -51,8 +52,8 @@ public class Flight {
     public Flight(Integer id,
                   Integer routeId,
                   Integer airplaneId,
-                  LocalDateTime departureTime,
-                  LocalDateTime arrivalTime,
+                  Timestamp departureTime,
+                  Timestamp arrivalTime,
                   Integer firstReserved,
                   Float firstPrice,
                   Integer businessReserved,
@@ -100,19 +101,19 @@ public class Flight {
         this.airplaneId = airplaneId;
     }
 
-    public LocalDateTime getDepartureTime() {
+    public Timestamp getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(LocalDateTime departureTime) {
+    public void setDepartureTime(Timestamp departureTime) {
         this.departureTime = departureTime;
     }
 
-    public LocalDateTime getArrivalTime() {
+    public Timestamp getArrivalTime() {
         return arrivalTime;
     }
 
-    public void setArrivalTime(LocalDateTime arrivalTime) {
+    public void setArrivalTime(Timestamp arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 

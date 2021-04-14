@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
@@ -59,9 +60,14 @@ public class FlightControllerTests {
 
     @Test
     public void test_getAllFlights_statusOkAndListLength() throws Exception {
+        String str1 ="2020-09-01 09:01:15";
+        String str2 ="2020-09-01 11:01:15";
+        Timestamp departureTime = Timestamp.valueOf(str1);
+        Timestamp arrivalTime = Timestamp.valueOf(str2);
+
         List<Flight> flights = new ArrayList<>();
-        Flight flight1 = new Flight(100, 5, 15, LocalDateTime.parse("2021-04-09T18:30:00"), LocalDateTime.parse("2021-04-09T21:30:00"), 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
-        Flight flight2 = new Flight(101, 7, 8, LocalDateTime.parse("2021-04-09T18:35:00"), LocalDateTime.parse("2021-04-09T21:35:00"), 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
+        Flight flight1 = new Flight(100, 5, 15, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
+        Flight flight2 = new Flight(101, 7, 8, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
 
         flights.add(flight1);
         flights.add(flight2);
@@ -80,8 +86,26 @@ public class FlightControllerTests {
 
     @Test
     public void shouldCreateFlight() throws Exception, FlightNotSavedException {
-        Flight mockFlight = new Flight(101, 7, 8, LocalDateTime.parse("2021-04-09T18:35:00"), LocalDateTime.parse("2021-04-09T21:35:00"), 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
+        String str1 ="2020-09-01 09:01:15";
+        String str2 ="2020-09-01 11:01:15";
+        Timestamp departureTime = Timestamp.valueOf(str1);
+        Timestamp arrivalTime = Timestamp.valueOf(str2);
 
+        Flight mockFlight = new Flight();
+        mockFlight.setId(101);
+        mockFlight.setRouteId(5);
+        mockFlight.setAirplaneId(7);
+        mockFlight.setDepartureTime(departureTime);
+        mockFlight.setArrivalTime(arrivalTime);
+        mockFlight.setFirstReserved(0);
+        mockFlight.setFirstPrice(350.00f);
+        mockFlight.setBusinessReserved(0);
+        mockFlight.setBusinessPrice(300.00f);
+        mockFlight.setEconomyReserved(0);
+        mockFlight.setEconomyPrice(200.00f);
+        mockFlight.setIsActive(1);
+
+        System.out.println(mockFlight);
         when(flightService.saveFlight(mockFlight)).thenReturn(mockFlight.getId());
 
         mockMvc.perform(post("/flights")
@@ -92,8 +116,10 @@ public class FlightControllerTests {
 
     @Test
     public void shouldUpdateFlight() throws Exception, FlightNotSavedException {
-        LocalDateTime departureTime = LocalDateTime.of(2015, Month.APRIL, 20, 6, 30);
-        LocalDateTime arrivalTime = LocalDateTime.of(2015, Month.APRIL, 20, 8, 30);
+        String str1 ="2020-09-01 09:01:15";
+        String str2 ="2020-09-01 11:01:15";
+        Timestamp departureTime = Timestamp.valueOf(str1);
+        Timestamp arrivalTime = Timestamp.valueOf(str2);
 
         Flight flight = new Flight(101, 7, 8, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
 
@@ -110,8 +136,10 @@ public class FlightControllerTests {
 
     @Test
     public void shouldDeleteFlight() throws Exception, FlightNotSavedException {
-        LocalDateTime departureTime = LocalDateTime.of(2015, Month.APRIL, 20, 6, 30);
-        LocalDateTime arrivalTime = LocalDateTime.of(2015, Month.APRIL, 20, 8, 30);
+        String str1 ="2020-09-01 09:01:15";
+        String str2 ="2020-09-01 11:01:15";
+        Timestamp departureTime = Timestamp.valueOf(str1);
+        Timestamp arrivalTime = Timestamp.valueOf(str2);
 
         Flight flight = new Flight(101, 7, 8, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
 

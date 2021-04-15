@@ -25,6 +25,10 @@ public class AirplaneService {
                 .orElseThrow(() -> new AirplaneNotFoundException(id));
     }
 
+    public List<Airplane> findByModelContaining(String model) {
+        return airplaneRepository.findByModelContaining(model);
+    }
+
     public Airplane createAirplane(Airplane airplane) {
         return airplaneRepository.save(airplane);
     }

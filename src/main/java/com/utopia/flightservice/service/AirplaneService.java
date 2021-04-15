@@ -2,10 +2,10 @@ package com.utopia.flightservice.service;
 
 import java.util.List;
 
-import com.utopia.flightservice.exception.AirplaneNotFoundException;
-
 import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.exception.AirplaneNotFoundException;
 import com.utopia.flightservice.repository.AirplaneRepository;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,6 +25,10 @@ public class AirplaneService {
     public Airplane findAirplaneById(Long id) {
         return airplaneRepository.findById(id)
                 .orElseThrow(() -> new AirplaneNotFoundException(id));
+    }
+
+    public List<Airplane> findByModelContaining(String model) {
+        return airplaneRepository.findByModelContaining(model);
     }
 
     public Airplane createAirplane(Airplane airplane) {

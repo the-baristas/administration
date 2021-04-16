@@ -13,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import com.utopia.flightservice.airport.Airport;
-import com.utopia.flightservice.airport.AirportDao;
-import com.utopia.flightservice.route.Route;
-import com.utopia.flightservice.route.RouteDao;
+import com.utopia.flightservice.entity.Airport;
+import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.repository.AirportDao;
+import com.utopia.flightservice.repository.RouteDao;
 
 import java.util.Optional;
 

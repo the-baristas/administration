@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.utopia.flightservice.route.Route;
-import com.utopia.flightservice.route.RouteController;
-import com.utopia.flightservice.route.RouteService;
+import com.utopia.flightservice.controller.RouteController;
+import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.service.RouteService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

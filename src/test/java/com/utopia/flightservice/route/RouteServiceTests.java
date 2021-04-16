@@ -14,14 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.utopia.flightservice.airport.Airport;
-import com.utopia.flightservice.airport.AirportDao;
-import com.utopia.flightservice.airport.AirportNotSavedException;
-import com.utopia.flightservice.airport.AirportService;
-import com.utopia.flightservice.route.Route;
-import com.utopia.flightservice.route.RouteDao;
-import com.utopia.flightservice.route.RouteNotSavedException;
-import com.utopia.flightservice.route.RouteService;
+import com.utopia.flightservice.entity.Airport;
+import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.exception.AirportNotSavedException;
+import com.utopia.flightservice.exception.RouteNotSavedException;
+import com.utopia.flightservice.repository.AirportDao;
+import com.utopia.flightservice.repository.RouteDao;
+import com.utopia.flightservice.service.AirportService;
+import com.utopia.flightservice.service.RouteService;
 
 @SpringBootTest
 public class RouteServiceTests {

@@ -1,6 +1,5 @@
 package com.utopia.flightservice.service;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.utopia.flightservice.entity.Airplane;

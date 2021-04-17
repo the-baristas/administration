@@ -6,9 +6,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.utopia.flightservice.dto.AirplaneDto;
+import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.service.AirplaneService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -17,16 +23,15 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
-import com.utopia.flightservice.controller.AirplaneController;
-import com.utopia.flightservice.entity.Airplane;
-import com.utopia.flightservice.service.AirplaneService;
-
 @WebMvcTest(AirplaneController.class)
 public class AirplaneControllerTest {
     private WebTestClient webTestClient;
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @MockBean
     private AirplaneService airplaneService;
@@ -43,29 +48,34 @@ public class AirplaneControllerTest {
         airplane.setFirstClassSeatsMax(1L);
         airplane.setBusinessClassSeatsMax(1L);
         airplane.setEconomyClassSeatsMax(1L);
-        List<Airplane> allAirplanes = Arrays.asList(airplane);
-        when(airplaneService.findAllAirplanes()).thenReturn(allAirplanes);
+        List<Airplane> foundAirplanes = Arrays.asList(airplane);
+        when(airplaneService.findAllAirplanes()).thenReturn(foundAirplanes);
+        List<AirplaneDto> foundAirplaneDtos = foundAirplanes.stream()
+                .map((Airplane a) -> modelMapper.map(a, AirplaneDto.class))
+                .collect(Collectors.toList());
 
         webTestClient.get().uri("/airplanes").accept(MediaType.APPLICATION_JSON)
                 .exchange().expectStatus().isOk().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(Airplane.class).hasSize(1);
+                .expectBodyList(AirplaneDto.class).isEqualTo(foundAirplaneDtos);
     }
 
     @Test
     public void findAirplaneById_AirplaneFound() throws Exception {
-        Airplane airplane = new Airplane();
-        airplane.setId(1L);
-        airplane.setFirstClassSeatsMax(0L);
-        airplane.setBusinessClassSeatsMax(0L);
-        airplane.setEconomyClassSeatsMax(0L);
-        when(airplaneService.findAirplaneById(airplane.getId()))
-                .thenReturn(airplane);
+        Airplane foundAirplane = new Airplane();
+        foundAirplane.setId(1L);
+        foundAirplane.setFirstClassSeatsMax(0L);
+        foundAirplane.setBusinessClassSeatsMax(0L);
+        foundAirplane.setEconomyClassSeatsMax(0L);
+        when(airplaneService.findAirplaneById(foundAirplane.getId()))
+                .thenReturn(foundAirplane);
+        AirplaneDto foundAirplaneDto = modelMapper.map(foundAirplane,
+                AirplaneDto.class);
 
-        webTestClient.get().uri("/airplanes/{id}", airplane.getId())
+        webTestClient.get().uri("/airplanes/{id}", foundAirplane.getId())
                 .accept(MediaType.APPLICATION_JSON).exchange().expectStatus()
                 .isOk().expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(Airplane.class).isEqualTo(airplane);
+                .expectBody(AirplaneDto.class).isEqualTo(foundAirplaneDto);
     }
 
     @Test
@@ -76,12 +86,13 @@ public class AirplaneControllerTest {
         airplane.setBusinessClassSeatsMax(1L);
         airplane.setEconomyClassSeatsMax(1L);
         when(airplaneService.createAirplane(airplane)).thenReturn(airplane);
+        AirplaneDto airplaneDto = modelMapper.map(airplane, AirplaneDto.class);
 
         webTestClient.post().uri("/airplanes")
                 .contentType(MediaType.APPLICATION_JSON).bodyValue(airplane)
                 .exchange().expectStatus().isCreated().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
-                .expectBody(Airplane.class).isEqualTo(airplane);
+                .expectBody(AirplaneDto.class).isEqualTo(airplaneDto);
     }
 
     @Test
@@ -93,12 +104,13 @@ public class AirplaneControllerTest {
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
         when(airplaneService.updateAirplane(airplane)).thenReturn(airplane);
+        AirplaneDto airplaneDto = modelMapper.map(airplane, AirplaneDto.class);
 
         webTestClient.put().uri("/airplanes")
                 .contentType(MediaType.APPLICATION_JSON).bodyValue(airplane)
                 .exchange().expectStatus().isOk().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
-                .expectBody(Airplane.class).isEqualTo(airplane);
+                .expectBody(AirplaneDto.class).isEqualTo(airplaneDto);
 
     }
 

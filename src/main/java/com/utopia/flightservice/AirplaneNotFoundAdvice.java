@@ -1,5 +1,6 @@
 package com.utopia.flightservice;
 
+import com.utopia.flightservice.exception.AirplaneNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

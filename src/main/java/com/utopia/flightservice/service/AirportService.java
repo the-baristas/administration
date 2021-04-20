@@ -2,12 +2,14 @@ package com.utopia.flightservice.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.exception.AirportNotSavedException;
 import com.utopia.flightservice.repository.AirportDao;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AirportService {
@@ -20,10 +22,19 @@ public class AirportService {
 	public List<Airport> getAllAirports() {
 		return airportDao.findAll();
 	}
+
+	// find airports containing letter
+	public List<Airport> findByCityContainingLetter(String contains) { return airportDao.findByCityContaining(contains); }
 	
 	// get one airport by the iata id
 	public Airport getAirportById(String id) {
-		return airportDao.findByIataId(id);
+		try {
+			return airportDao.findByIataId(id);
+		}
+		catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+					"Could not find airport with Iata ID:" + id);
+		}
 	}
 	
 	// add a new airport
@@ -39,12 +50,14 @@ public class AirportService {
 	
 	// update an airport's information (in progress)
 	public String updateAirport(String id, Airport airport) throws AirportNotSavedException {
-		try {
-			airportDao.updateAirport(id, airport.getCity(), airport.getIsActive());
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			throw new AirportNotSavedException("ERROR! Airport not updated.");
-		}
+			try {
+				if (airportDao.findByIataId(id) != null) {
+					airportDao.updateAirport(id, airport.getCity(), airport.getIsActive());
+				}
+			} catch (Exception e) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find airport with ID:" + id);
+			}
+
 		return airport.getIataId();
 	}
 	

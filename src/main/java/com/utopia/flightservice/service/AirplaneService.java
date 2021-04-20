@@ -2,9 +2,10 @@ package com.utopia.flightservice.service;
 
 import java.util.List;
 
+import com.utopia.flightservice.exception.AirplaneNotFoundException;
+
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.repository.AirplaneRepository;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,48 +23,26 @@ public class AirplaneService {
     }
 
     public Airplane findAirplaneById(Long id) {
-        return airplaneRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Could not find airplane with id: " + id));
-    }
-
-    public List<Airplane> findByModelContaining(String model) {
-        return airplaneRepository.findByModelContaining(model);
+        return airplaneRepository.findById(id)
+                .orElseThrow(() -> new AirplaneNotFoundException(id));
     }
 
     public Airplane createAirplane(Airplane airplane) {
-        try {
-            return airplaneRepository.save(airplane);
-        } catch (IllegalArgumentException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Could not create airplane with id: " + airplane.getId(),
-                    exception);
-        }
+        return airplaneRepository.save(airplane);
     }
 
     public Airplane updateAirplane(Airplane airplane) {
         airplaneRepository.findById(airplane.getId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Could not find airplane with id: "
+                        "Could not find airplane with id = "
                                 + airplane.getId()));
-        try {
-            return airplaneRepository.save(airplane);
-        } catch (IllegalArgumentException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Could not update airplane with id: " + airplane.getId(),
-                    exception);
-        }
+        return airplaneRepository.save(airplane);
     }
 
     public void deleteAirplaneById(Long id) throws ResponseStatusException {
         airplaneRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Could not find airplane with id = " + id));
-        try {
-            airplaneRepository.deleteById(id);
-        } catch (IllegalArgumentException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Could not delete airplane with id: " + id, exception);
-        }
+        airplaneRepository.deleteById(id);
     }
 }

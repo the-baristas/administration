@@ -3,7 +3,6 @@ package com.utopia.flightservice.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,15 +11,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.repository.AirplaneRepository;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.utopia.flightservice.entity.Airplane;
-import com.utopia.flightservice.repository.AirplaneRepository;
-import com.utopia.flightservice.service.AirplaneService;
 
 @ExtendWith(MockitoExtension.class)
 public class AirplaneServiceTest {

@@ -1,7 +1,7 @@
-package com.utopia.flightservice.route;
+package com.utopia.flightservice.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -9,19 +9,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.exception.RouteNotSavedException;
+import com.utopia.flightservice.repository.RouteDao;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-import com.utopia.flightservice.entity.Airport;
-import com.utopia.flightservice.entity.Route;
-import com.utopia.flightservice.exception.AirportNotSavedException;
-import com.utopia.flightservice.exception.RouteNotSavedException;
-import com.utopia.flightservice.repository.AirportDao;
-import com.utopia.flightservice.repository.RouteDao;
-import com.utopia.flightservice.service.AirportService;
-import com.utopia.flightservice.service.RouteService;
 
 @SpringBootTest
 public class RouteServiceTests {

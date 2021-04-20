@@ -1,21 +1,17 @@
 package com.utopia.flightservice.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-
-import com.utopia.flightservice.repository.FlightDao;
-import com.utopia.flightservice.entity.Flight;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import static org.hamcrest.Matchers.is;
 
 import java.sql.Timestamp;
 import java.util.Optional;
+
+import com.utopia.flightservice.entity.Flight;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 @DataJpaTest
 public class FlightDaoTests {
@@ -115,7 +111,6 @@ public class FlightDaoTests {
 
         dao.delete(flight);
         Optional<Flight> flightFromDB = dao.findById(flight.getId());
-        assertThat(flightFromDB).isEmpty();
+        assertThat(flightFromDB.isPresent(), is(false));
     }
-
 }

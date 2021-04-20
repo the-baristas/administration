@@ -1,8 +1,8 @@
 package com.utopia.flightservice.dto;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 public class RouteDto {
 
@@ -15,6 +15,6 @@ public class RouteDto {
     @NotBlank
     private String destinationId;
 
-    @Positive
+    @PositiveOrZero
     private Integer isActive;
 }

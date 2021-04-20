@@ -3,8 +3,9 @@ package com.utopia.flightservice.service;
 import java.util.List;
 
 import com.utopia.flightservice.entity.Airport;
-import com.utopia.flightservice.repository.AirportDao;
 import com.utopia.flightservice.exception.AirportNotSavedException;
+import com.utopia.flightservice.repository.AirportDao;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,6 @@ public class AirportService {
 	public String updateAirport(String id, Airport airport) throws AirportNotSavedException {
 			try {
 				if (airportDao.findByIataId(id) != null) {
-					Airport foundAirport = airportDao.findByIataId(id);
 					airportDao.updateAirport(id, airport.getCity(), airport.getIsActive());
 				}
 			} catch (Exception e) {

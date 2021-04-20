@@ -1,36 +1,29 @@
 package com.utopia.flightservice.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.utopia.flightservice.controller.RouteController;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.service.RouteService;
+
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(RouteController.class)
 @AutoConfigureMockMvc
@@ -46,9 +39,6 @@ public class RouteControllerTests {
     // Route Controller Tests
     @Autowired
     private RouteController controller;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     // Route Controller Is Not Null
     @Test
@@ -67,7 +57,7 @@ public class RouteControllerTests {
 
         // create list of airports, pass it to thenReturn to test that getting back list of airports
 
-        mockMvc.perform(get("/utopia_airlines/routes")
+        mockMvc.perform(get("/routes")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)));
@@ -79,7 +69,7 @@ public class RouteControllerTests {
         Route mockRoute = new Route(27, "SFO", "DEN", 1);
         when(routeService.saveRoute(mockRoute)).thenReturn(mockRoute.getId());
 
-        mockMvc.perform(post("/utopia_airlines/routes")
+        mockMvc.perform(post("/routes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(mockRoute)))
                 .andExpect(status().isCreated());
@@ -92,7 +82,7 @@ public class RouteControllerTests {
         Route updatedRoute = new Route(28, "SFO", "JFK", 2);
         when(routeService.updateRoute(route.getId(), updatedRoute)).thenReturn(updatedRoute.getId());
 
-        mockMvc.perform(put("/utopia_airlines/route/28")
+        mockMvc.perform(put("/routes/28")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(updatedRoute)))
                 .andExpect(status().isOk());
@@ -104,7 +94,7 @@ public class RouteControllerTests {
         routeService.saveRoute(mockRoute);
         when(routeService.deleteRoute(mockRoute.getId())).thenReturn(mockRoute.getId().toString());
 
-        mockMvc.perform(delete("/utopia_airlines/route/29")
+        mockMvc.perform(delete("/routes/29")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(mockRoute)))
                 .andExpect(status().isNoContent());

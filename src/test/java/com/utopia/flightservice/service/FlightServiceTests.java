@@ -1,7 +1,7 @@
 package com.utopia.flightservice.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -12,9 +12,9 @@ import java.util.Optional;
 
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.exception.AirportNotSavedException;
-import com.utopia.flightservice.repository.FlightDao;
 import com.utopia.flightservice.exception.FlightNotSavedException;
-import com.utopia.flightservice.service.FlightService;
+import com.utopia.flightservice.repository.FlightDao;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,8 +31,8 @@ public class FlightServiceTests {
 
     @Test
     public void findAllFlights_FindsFlights() {
-        String str1 ="2020-09-01 09:01:15";
-        String str2 ="2020-09-01 11:01:15";
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 
@@ -58,8 +58,8 @@ public class FlightServiceTests {
 
     @Test
     public void findFlightById_FindsFlight() {
-        String str1 ="2020-09-01 09:01:15";
-        String str2 ="2020-09-01 11:01:15";
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 
@@ -81,23 +81,35 @@ public class FlightServiceTests {
 
         Optional<Flight> foundFlight = flightService.getFlightById(101);
         assertThat(flight.get().getId(), is(foundFlight.get().getId()));
-        assertThat(flight.get().getRouteId(), is(foundFlight.get().getRouteId()));
-        assertThat(flight.get().getAirplaneId(), is(foundFlight.get().getAirplaneId()));
-        assertThat(flight.get().getDepartureTime(), is(foundFlight.get().getDepartureTime()));
-        assertThat(flight.get().getArrivalTime(), is(foundFlight.get().getArrivalTime()));
-        assertThat(flight.get().getFirstReserved(), is(foundFlight.get().getFirstReserved()));
-        assertThat(flight.get().getFirstPrice(), is(foundFlight.get().getFirstPrice()));
-        assertThat(flight.get().getBusinessReserved(), is(foundFlight.get().getBusinessReserved()));
-        assertThat(flight.get().getBusinessPrice(), is(foundFlight.get().getBusinessPrice()));
-        assertThat(flight.get().getEconomyReserved(), is(foundFlight.get().getEconomyReserved()));
-        assertThat(flight.get().getEconomyPrice(), is(foundFlight.get().getEconomyPrice()));
-        assertThat(flight.get().getIsActive(), is(foundFlight.get().getIsActive()));
+        assertThat(flight.get().getRouteId(),
+                is(foundFlight.get().getRouteId()));
+        assertThat(flight.get().getAirplaneId(),
+                is(foundFlight.get().getAirplaneId()));
+        assertThat(flight.get().getDepartureTime(),
+                is(foundFlight.get().getDepartureTime()));
+        assertThat(flight.get().getArrivalTime(),
+                is(foundFlight.get().getArrivalTime()));
+        assertThat(flight.get().getFirstReserved(),
+                is(foundFlight.get().getFirstReserved()));
+        assertThat(flight.get().getFirstPrice(),
+                is(foundFlight.get().getFirstPrice()));
+        assertThat(flight.get().getBusinessReserved(),
+                is(foundFlight.get().getBusinessReserved()));
+        assertThat(flight.get().getBusinessPrice(),
+                is(foundFlight.get().getBusinessPrice()));
+        assertThat(flight.get().getEconomyReserved(),
+                is(foundFlight.get().getEconomyReserved()));
+        assertThat(flight.get().getEconomyPrice(),
+                is(foundFlight.get().getEconomyPrice()));
+        assertThat(flight.get().getIsActive(),
+                is(foundFlight.get().getIsActive()));
     }
 
     @Test
-    public void addAirport_AndSaveIt() throws AirportNotSavedException, FlightNotSavedException {
-        String str1 ="2020-09-01 09:01:15";
-        String str2 ="2020-09-01 11:01:15";
+    public void addAirport_AndSaveIt()
+            throws AirportNotSavedException, FlightNotSavedException {
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 

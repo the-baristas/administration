@@ -57,7 +57,7 @@ public class FlightService {
     public Integer updateFlight(Integer id, Flight flight) throws FlightNotSavedException {
         try {
             flightDao.updateFlight(id,
-                            flight.getRouteId(),
+                            flight.getRoute(),
                             flight.getAirplaneId(),
                             flight.getDepartureTime(),
                             flight.getArrivalTime(),

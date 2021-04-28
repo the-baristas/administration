@@ -7,6 +7,7 @@ import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.service.FlightService;
 import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.service.RouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ public class FlightController {
 
     @Autowired
     private FlightService flightService;
+
+    @Autowired
+    private RouteService routeService;
 
     // get all flights admin endpoint
     @GetMapping("/flights")
@@ -30,11 +34,19 @@ public class FlightController {
     }
 
     // create new flight
-    @PostMapping("/flights")
-    public ResponseEntity<String> createFlight(@RequestBody Flight flight) throws FlightNotSavedException {
-        flightService.saveFlight(flight);
-        return new ResponseEntity(flight, HttpStatus.CREATED);
-    }
+    @PostMapping("/routes/{routeId}/flights")
+    public ResponseEntity<String> createFlight(@PathVariable(value = "routeId") Integer routeId, @RequestBody Flight flight) throws FlightNotSavedException {
+    try{
+        Route route = routeService.getRouteById(routeId).get();
+        flight.setRoute(route);
+        Integer flightId = flightService.saveFlight(flight);
+        Flight addedFlight = flightService.getFlightById(flightId).get();
+        return new ResponseEntity(addedFlight, HttpStatus.CREATED);
+    } catch (FlightNotSavedException e) {
+                e.printStackTrace();
+                return new ResponseEntity("Flight Not Saved!", HttpStatus.BAD_REQUEST);
+            }
+        }
 
     // get single flight
     @GetMapping("/flights/{id}")

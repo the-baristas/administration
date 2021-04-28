@@ -33,6 +33,17 @@ public class FlightSearchController {
         }
     }
 
+    @GetMapping("/location-query")
+    public ResponseEntity<List<Flight>> getFlightsByLocationQuery(@RequestParam(name = "query") String query) {
+        List<Flight> flights = flightService.getFlightsByLocationQuery(query);
+
+        if (flights.isEmpty()) {
+            return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity(flights, HttpStatus.OK);
+        }
+    }
+
     // get all flights based on location info
     @GetMapping("/flightsbylocation")
     public ResponseEntity<List<Flight>> getFlightsByRouteId(@RequestParam(name = "originId") String originId,

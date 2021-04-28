@@ -25,6 +25,8 @@ public class FlightService {
 
     public List<Flight> getFlightsByRoute(Integer routeId) { return flightDao.findByRouteId(routeId); }
 
+    public List<Flight> getFlightsByLocationQuery(String query) { return flightDao.findByRouteDestinationId(query); }
+
     public List<Flight> getFlightsByRouteAndDate(Integer routeId, FlightQuery flightQuery) {
 
         Integer departureMonth = Integer.valueOf(flightQuery.getMonth());
@@ -75,10 +77,11 @@ public class FlightService {
         return flight.getId();
     }
 
-    // delete an airport
+    // delete a flight
     public String deleteFlight(Integer id) throws FlightNotSavedException {
         try {
             Optional<Flight> theFlight = getFlightById(id);
+            System.out.println(theFlight);
             if (theFlight.isPresent()) {
                 flightDao.delete(theFlight.get());
             } else {

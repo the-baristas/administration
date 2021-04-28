@@ -14,11 +14,10 @@ import java.sql.Timestamp;
 @Entity(name = "flight")
 @JsonSerialize
 @Data @NoArgsConstructor @AllArgsConstructor
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Flight {
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "airplane_id")
@@ -51,8 +50,8 @@ public class Flight {
     @Column(name = "is_active")
     private Integer isActive;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "route_id", referencedColumnName = "ID", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
+    @JoinColumn(name = "route_id", referencedColumnName = "id")
     private Route route;
 
 }

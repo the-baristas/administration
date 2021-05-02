@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.service.AirplaneService;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +61,6 @@ public class AirplaneController {
             @RequestBody Airplane airplane) throws ResponseStatusException {
         Airplane updatedAirplane = airplaneService.updateAirplane(airplane);
         return ResponseEntity.status(HttpStatus.OK).body(updatedAirplane);
-
     }
 
     @DeleteMapping("/airplanes/{id}")

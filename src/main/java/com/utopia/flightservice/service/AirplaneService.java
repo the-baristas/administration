@@ -1,11 +1,15 @@
 package com.utopia.flightservice.service;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.exception.AirplaneNotFoundException;
 import com.utopia.flightservice.repository.AirplaneRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,6 +24,23 @@ public class AirplaneService {
 
     public List<Airplane> findAllAirplanes() {
         return airplaneRepository.findAll();
+    }
+
+    // public List<Airplane> getAirplanesPage(Integer pageNumber,
+    //         Integer pageSize) {
+    //     Pageable pageable = PageRequest.of(pageNumber, pageSize);
+    //     Page<Airplane> airplanePage = airplaneRepository.findAll(pageable);
+
+    //     if (airplanePage.hasContent()) {
+    //         return airplanePage.getContent();
+    //     } else {
+    //         return Arrays.asList();
+    //     }
+    // }
+    public Page<Airplane> getAirplanesPage(Integer pageIndex,
+            Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex, pageSize);
+        return airplaneRepository.findAll(pageable);
     }
 
     public Airplane findAirplaneById(Long id) {

@@ -39,19 +39,11 @@ public class AirplaneController {
         this.modelMapper = modelMapper;
     }
 
-    @GetMapping
-    public ResponseEntity<List<AirplaneDto>> findAllAirplanes() {
-        List<Airplane> airplanes = airplaneService.findAllAirplanes();
-        List<AirplaneDto> airplaneDtos = airplanes.stream()
-                .map(this::convertToDto).collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(airplaneDtos);
-    }
-
     @GetMapping("page")
-    public ResponseEntity<Page<Airplane>> getAirplanesPage(
+    public ResponseEntity<Page<Airplane>> findAllAirplanes(
             @RequestParam("index") Integer pageIndex,
             @RequestParam("size") Integer pageSize) {
-        Page<Airplane> airplanes = airplaneService.getAirplanesPage(pageIndex,
+        Page<Airplane> airplanes = airplaneService.findAllAirplanes(pageIndex,
                 pageSize);
         return ResponseEntity.ok(airplanes);
     }
@@ -64,22 +56,23 @@ public class AirplaneController {
     }
 
     @GetMapping("search")
-    public ResponseEntity<List<AirplaneDto>> findByModelContaining(
-            @RequestParam("term") String model) {
-        List<Airplane> airplanes = airplaneService.findByModelContaining(model);
-        List<AirplaneDto> airplaneDtos = airplanes.stream()
-                .map(this::convertToDto).collect(Collectors.toList());
+    public ResponseEntity<Page<AirplaneDto>> findByModelContaining(
+            @RequestParam String term, @RequestParam("index") Integer pageIndex,
+            @RequestParam("size") Integer pageSize) {
+        Page<Airplane> airplanes = airplaneService.searchAirplanesPage(term,
+                pageIndex, pageSize);
+        Page<AirplaneDto> airplaneDtos = airplanes.map(this::convertToDto);
         return ResponseEntity.status(HttpStatus.OK).body(airplaneDtos);
     }
 
-    @GetMapping("search")
-    public ResponseEntity<List<AirplaneDto>> searchAirplanesPage(
+    @GetMapping("distinct_search")
+    public ResponseEntity<Page<AirplaneDto>> findDistinctByModelContaining(
+            @RequestParam("term") String term,
             @RequestParam("index") Integer pageIndex,
-            @RequestParam("size") Integer pageSize,
-            @RequestParam("term") String term) {
-        List<Airplane> airplanes = airplaneService.findByModelContaining(term);
-        List<AirplaneDto> airplaneDtos = airplanes.stream()
-                .map(this::convertToDto).collect(Collectors.toList());
+            @RequestParam("size") Integer pageSize) {
+        Page<Airplane> airplanes = airplaneService
+                .findDistinctByModelContaining(term, pageIndex, pageSize);
+        Page<AirplaneDto> airplaneDtos = airplanes.map(this::convertToDto);
         return ResponseEntity.status(HttpStatus.OK).body(airplaneDtos);
     }
 

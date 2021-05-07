@@ -25,21 +25,22 @@ public class AirplaneService {
         return airplaneRepository.findAll();
     }
 
-    // public List<Airplane> getAirplanesPage(Integer pageNumber,
-    //         Integer pageSize) {
-    //     Pageable pageable = PageRequest.of(pageNumber, pageSize);
-    //     Page<Airplane> airplanePage = airplaneRepository.findAll(pageable);
-
-    //     if (airplanePage.hasContent()) {
-    //         return airplanePage.getContent();
-    //     } else {
-    //         return Arrays.asList();
-    //     }
-    // }
-    public Page<Airplane> getAirplanesPage(Integer pageIndex,
+    public Page<Airplane> findAllAirplanes(Integer pageIndex,
             Integer pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         return airplaneRepository.findAll(pageable);
+    }
+
+    public Page<Airplane> searchAirplanesPage(String term, Integer pageIndex,
+            Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex, pageSize);
+        return airplaneRepository.findByModelContaining(term, pageable);
+    }
+
+    public Page<Airplane> findDistinctByModelContaining(String term, Integer pageIndex,
+            Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex, pageSize);
+        return airplaneRepository.findDistinctByModelContaining(term, pageable);
     }
 
     public Airplane findAirplaneById(Long id) {

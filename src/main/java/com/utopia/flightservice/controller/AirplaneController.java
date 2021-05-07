@@ -39,6 +39,7 @@ public class AirplaneController {
         this.modelMapper = modelMapper;
     }
 
+    @GetMapping
     public ResponseEntity<List<AirplaneDto>> findAllAirplanes() {
         List<Airplane> airplanes = airplaneService.findAllAirplanes();
         List<AirplaneDto> airplaneDtos = airplanes.stream()
@@ -55,23 +56,34 @@ public class AirplaneController {
         return ResponseEntity.ok(airplanes);
     }
 
-    @GetMapping("/airplanes/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<AirplaneDto> findAirplaneById(@PathVariable Long id) {
         AirplaneDto airplaneDto = convertToDto(
                 airplaneService.findAirplaneById(id));
         return ResponseEntity.status(HttpStatus.OK).body(airplaneDto);
     }
 
-    @GetMapping("/airplanes/")
+    @GetMapping("search")
     public ResponseEntity<List<AirplaneDto>> findByModelContaining(
-            @RequestParam String model) {
+            @RequestParam("term") String model) {
         List<Airplane> airplanes = airplaneService.findByModelContaining(model);
         List<AirplaneDto> airplaneDtos = airplanes.stream()
                 .map(this::convertToDto).collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.OK).body(airplaneDtos);
     }
 
-    @PostMapping("/airplanes")
+    @GetMapping("search")
+    public ResponseEntity<List<AirplaneDto>> searchAirplanesPage(
+            @RequestParam("index") Integer pageIndex,
+            @RequestParam("size") Integer pageSize,
+            @RequestParam("term") String term) {
+        List<Airplane> airplanes = airplaneService.findByModelContaining(term);
+        List<AirplaneDto> airplaneDtos = airplanes.stream()
+                .map(this::convertToDto).collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(airplaneDtos);
+    }
+
+    @PostMapping
     public ResponseEntity<AirplaneDto> createAirplane(
             @RequestBody AirplaneDto airplaneDto,
             UriComponentsBuilder builder) {
@@ -90,7 +102,7 @@ public class AirplaneController {
                 .headers(responseHeaders).body(convertToDto(createdAirplane));
     }
 
-    @PutMapping("/airplanes")
+    @PutMapping("{id}")
     public ResponseEntity<AirplaneDto> updateAirplane(
             @RequestBody AirplaneDto airplaneDto)
             throws ResponseStatusException {

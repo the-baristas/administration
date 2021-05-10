@@ -2,6 +2,7 @@ package com.utopia.flightservice.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,10 @@ import com.utopia.flightservice.repository.FlightDao;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.entity.FlightQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,13 +24,16 @@ public class FlightService {
     private FlightDao flightDao;
 
     // get every flight as a list
-    public List<Flight> getAllFlights() {
-        return flightDao.findAll();
+    public List<Flight> getAllFlights() { return flightDao.findAll(); }
+
+    public Page<Flight> getPagedFlights(Integer pageNo, Integer pageSize, String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        return flightDao.findAll(paging);
     }
 
     public List<Flight> getFlightsByRoute(Integer routeId) { return flightDao.findByRouteId(routeId); }
 
-    public List<Flight> getFlightsByLocationQuery(String query) { return flightDao.findByRouteDestinationId(query); }
+    public List<Flight> getFlightsByLocationQuery(String query) { return flightDao.findByRouteDestinationAirport(query); }
 
     public List<Flight> getFlightsByRouteAndDate(Integer routeId, FlightQuery flightQuery) {
 

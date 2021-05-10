@@ -48,7 +48,7 @@ public class Flight {
     private Float economyPrice;
 
     @Column(name = "is_active")
-    private Integer isActive;
+    private Boolean isActive;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
     @JoinColumn(name = "route_id", referencedColumnName = "id")

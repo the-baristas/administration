@@ -3,8 +3,10 @@ package com.utopia.flightservice.controller;
 import java.util.List;
 import java.util.Optional;
 
+import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.exception.RouteNotSavedException;
+import com.utopia.flightservice.service.AirportService;
 import com.utopia.flightservice.service.RouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,9 @@ public class RouteController {
 	
 	@Autowired
 	private RouteService routeService;
+
+	@Autowired
+	private AirportService airportService;
 	
 	// get all routes
 	@GetMapping("/routes")
@@ -50,7 +55,13 @@ public class RouteController {
 	
 	// create a new route
 	@PostMapping("/routes")
-	public ResponseEntity<String> createRoute(@RequestBody Route route) throws RouteNotSavedException {
+	public ResponseEntity<String> createRoute(@RequestBody Route route, @PathVariable String originId, @PathVariable String destinationId) throws RouteNotSavedException {
+		Airport destAirport = airportService.getAirportById(destinationId);
+		Airport originAirport = airportService.getAirportById(originId);
+
+		route.setDestinationAirport(destAirport);
+		route.setOriginAirport(originAirport);
+		System.out.println(route);
 		Integer theRoute = routeService.saveRoute(route);
 			return new ResponseEntity(route, HttpStatus.CREATED);
 		}

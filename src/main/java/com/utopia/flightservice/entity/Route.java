@@ -13,23 +13,25 @@ import java.util.List;
 
 @Entity(name = "route")
 @Data @NoArgsConstructor @AllArgsConstructor
-@JsonSerialize
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Route {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
-    
-    @Column(name = "origin_id")
-	private String originId;
-    
-    @Column(name = "destination_id")
-	private String destinationId;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
+    @JoinColumn(name = "origin_id", referencedColumnName = "iata_id")
+	private Airport originAirport;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
+    @JoinColumn(name = "destination_id", referencedColumnName = "iata_id")
+	private Airport destinationAirport;
     
     @Column(name = "is_active")
-    private Integer isActive;
+    private Boolean isActive;
 
 //    @OneToMany @JsonBackReference
 //    @JoinColumn(name = "flight_id")

@@ -2,6 +2,7 @@ package com.utopia.flightservice.repository;
 
 import javax.transaction.Transactional;
 
+import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Route;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,6 +28,6 @@ public interface RouteDao extends JpaRepository<Route, Integer> {
 	
 	@Modifying
 	@Query("UPDATE route SET origin_id = ?2, destination_id = ?3, is_active = ?4 WHERE id = ?1")
-	void updateRoute(Integer id, String originId, String destinationId, Integer isActive);
+	void updateRoute(Integer id, Airport originAirport, Airport destinationAirport, Boolean isActive);
 	
 }

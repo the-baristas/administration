@@ -9,6 +9,7 @@ import com.utopia.flightservice.service.FlightService;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.service.RouteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +23,24 @@ public class FlightController {
     @Autowired
     private RouteService routeService;
 
-    // get all flights admin endpoint
+//    // get all flights admin endpoint
+//    @GetMapping("/flights")
+//    public ResponseEntity<List<Flight>> getAllFlights() {
+//        List<Flight> flights = flightService.getAllFlights();
+//        if (flights.isEmpty()) {
+//            return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
+//        } else {
+//            return new ResponseEntity(flights, HttpStatus.OK);
+//        }
+//    }
+
+    // get flights with pagination
     @GetMapping("/flights")
-    public ResponseEntity<List<Flight>> getAllFlights() {
-        List<Flight> flights = flightService.getAllFlights();
-        if (flights.isEmpty()) {
+    public ResponseEntity<Page<Flight>> getPagedFlights(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                        @RequestParam(defaultValue = "10") Integer pageSize,
+                                                        @RequestParam(defaultValue = "id") String sortBy) {
+        Page<Flight> flights = flightService.getPagedFlights(pageNo, pageSize, sortBy);
+        if (!flights.hasContent()) {
             return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity(flights, HttpStatus.OK);
@@ -59,7 +73,7 @@ public class FlightController {
     @PutMapping("flights/{id}")
     public ResponseEntity<String> updateFlight(@PathVariable Integer id, @RequestBody Flight flight) throws FlightNotSavedException {
         Integer update = flightService.updateFlight(id, flight);
-        return new ResponseEntity("Flight Updated!", HttpStatus.OK);
+        return new ResponseEntity(update, HttpStatus.OK);
     }
 
     // delete a flight

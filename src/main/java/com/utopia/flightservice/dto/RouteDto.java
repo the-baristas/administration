@@ -10,11 +10,11 @@ public class RouteDto {
     private Integer id;
 
     @NotBlank
-    private String originId;
+    private String originAirport;
 
     @NotBlank
-    private String destinationId;
+    private String destinationAirport;
 
     @Positive
-    private Integer isActive;
+    private Boolean isActive;
 }

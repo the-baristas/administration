@@ -47,6 +47,6 @@ public class FlightDto {
     private Float economyPrice;
 
     @Positive
-    private Integer isActive;
+    private Boolean isActive;
 
 }

@@ -43,7 +43,7 @@ public class RouteService {
 	// update a route's information
 	public Integer updateRoute(Integer id, Route route) throws RouteNotSavedException {
 		try {
-			routeDao.updateRoute(id, route.getOriginId(), route.getDestinationId(), route.getIsActive());
+			routeDao.updateRoute(id, route.getOriginAirport(), route.getDestinationAirport(), route.getIsActive());
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			throw new RouteNotSavedException("ERROR! Route not updated.");

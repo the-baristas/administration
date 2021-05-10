@@ -19,7 +19,7 @@ public interface AirportDao extends JpaRepository<Airport, Integer> {
 	
 	@Modifying
 	@Query("UPDATE airport SET city = ?2, is_active = ?3 WHERE iata_id = ?1")
-	void updateAirport(String id, String city, Integer isActive);
+	void updateAirport(String id, String city, Boolean isActive);
 
 	List<Airport> findByCityContaining(String contains);
 

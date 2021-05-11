@@ -55,26 +55,21 @@ public class RouteController {
 	
 	// create a new route
 	@PostMapping("/routes")
-	public ResponseEntity<String> createRoute(@RequestBody Route route, @PathVariable String originId, @PathVariable String destinationId) throws RouteNotSavedException {
-		Airport destAirport = airportService.getAirportById(destinationId);
-		Airport originAirport = airportService.getAirportById(originId);
-
-		route.setDestinationAirport(destAirport);
-		route.setOriginAirport(originAirport);
+	public ResponseEntity<String> createRoute(@RequestBody Route route) throws RouteNotSavedException {
 		System.out.println(route);
 		Integer theRoute = routeService.saveRoute(route);
 			return new ResponseEntity(route, HttpStatus.CREATED);
 		}
 	
 	// update route
-	@PutMapping("/route/{id}")
+	@PutMapping("/routes/{id}")
 	public ResponseEntity<String> updateRoute(@PathVariable Integer id, @RequestBody Route route) throws RouteNotSavedException {
 		routeService.updateRoute(id, route);
         return new ResponseEntity<String>("Route Updated!", HttpStatus.OK);
 	}
 	
 	// delete a route
-	@DeleteMapping("/route/{id}")
+	@DeleteMapping("/routes/{id}")
 	public ResponseEntity<String> deleteRoute(@PathVariable Integer id) throws RouteNotSavedException {
 		String isRemoved = routeService.deleteRoute(id);
 			return new ResponseEntity("Route deleted", HttpStatus.NO_CONTENT);

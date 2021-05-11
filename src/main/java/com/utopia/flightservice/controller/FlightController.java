@@ -23,17 +23,6 @@ public class FlightController {
     @Autowired
     private RouteService routeService;
 
-//    // get all flights admin endpoint
-//    @GetMapping("/flights")
-//    public ResponseEntity<List<Flight>> getAllFlights() {
-//        List<Flight> flights = flightService.getAllFlights();
-//        if (flights.isEmpty()) {
-//            return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
-//        } else {
-//            return new ResponseEntity(flights, HttpStatus.OK);
-//        }
-//    }
-
     // get flights with pagination
     @GetMapping("/flights")
     public ResponseEntity<Page<Flight>> getPagedFlights(@RequestParam(defaultValue = "0") Integer pageNo,
@@ -82,6 +71,5 @@ public class FlightController {
         String isRemoved = flightService.deleteFlight(id);
         return new ResponseEntity("Flight deleted", HttpStatus.NO_CONTENT);
     }
-
 
 }

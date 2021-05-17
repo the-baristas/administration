@@ -20,8 +20,9 @@ public class Flight {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "airplane_id")
-    private Integer airplaneId;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
+    @JoinColumn(name = "airplane_id", referencedColumnName = "id")
+    private Airplane airplane;
 
     @Column(name = "departure_time")
     private Timestamp departureTime;

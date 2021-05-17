@@ -10,7 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.entity.Flight;
+import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.exception.AirportNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
 import com.utopia.flightservice.exception.FlightNotSavedException;
@@ -26,6 +28,12 @@ public class FlightServiceTests {
     @Autowired
     private FlightService flightService;
 
+    @Autowired
+    private RouteService routeService;
+
+    @Autowired
+    private AirplaneService airplaneService;
+
     @MockBean
     private FlightDao flightDao;
 
@@ -38,8 +46,12 @@ public class FlightServiceTests {
 
         Flight flight = new Flight();
         flight.setId(101);
-        flight.setRouteId(5);
-        flight.setAirplaneId(7);
+
+        Route route = routeService.getRouteById(5).get();
+        Airplane airplane = airplaneService.findAirplaneById(7L);
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
         flight.setDepartureTime(departureTime);
         flight.setArrivalTime(arrivalTime);
         flight.setFirstReserved(0);
@@ -48,7 +60,7 @@ public class FlightServiceTests {
         flight.setBusinessPrice(300.00f);
         flight.setEconomyReserved(0);
         flight.setEconomyPrice(200.00f);
-        flight.setIsActive(1);
+        flight.setIsActive(true);
         List<Flight> allFlights = Arrays.asList(flight);
         when(flightDao.findAll()).thenReturn(allFlights);
 
@@ -65,8 +77,12 @@ public class FlightServiceTests {
 
         Optional<Flight> flight = Optional.ofNullable(new Flight());
         flight.get().setId(101);
-        flight.get().setRouteId(5);
-        flight.get().setAirplaneId(7);
+
+        Route route = routeService.getRouteById(5).get();
+        Airplane airplane = airplaneService.findAirplaneById(7L);
+
+        flight.get().setRoute(route);
+        flight.get().setAirplane(airplane);
         flight.get().setDepartureTime(departureTime);
         flight.get().setArrivalTime(arrivalTime);
         flight.get().setFirstReserved(0);
@@ -75,14 +91,14 @@ public class FlightServiceTests {
         flight.get().setBusinessPrice(300.00f);
         flight.get().setEconomyReserved(0);
         flight.get().setEconomyPrice(200.00f);
-        flight.get().setIsActive(1);
+        flight.get().setIsActive(true);
 
         when(flightDao.findById(101)).thenReturn(flight);
 
         Optional<Flight> foundFlight = flightService.getFlightById(101);
         assertThat(flight.get().getId(), is(foundFlight.get().getId()));
-        assertThat(flight.get().getRouteId(), is(foundFlight.get().getRouteId()));
-        assertThat(flight.get().getAirplaneId(), is(foundFlight.get().getAirplaneId()));
+        assertThat(flight.get().getRoute(), is(foundFlight.get().getRoute()));
+        assertThat(flight.get().getAirplane(), is(foundFlight.get().getAirplane()));
         assertThat(flight.get().getDepartureTime(), is(foundFlight.get().getDepartureTime()));
         assertThat(flight.get().getArrivalTime(), is(foundFlight.get().getArrivalTime()));
         assertThat(flight.get().getFirstReserved(), is(foundFlight.get().getFirstReserved()));
@@ -103,8 +119,12 @@ public class FlightServiceTests {
 
         Flight flight = new Flight();
         flight.setId(101);
-        flight.setRouteId(5);
-        flight.setAirplaneId(7);
+
+        Route route = routeService.getRouteById(5).get();
+        Airplane airplane = airplaneService.findAirplaneById(7L);
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
         flight.setDepartureTime(departureTime);
         flight.setArrivalTime(arrivalTime);
         flight.setFirstReserved(0);
@@ -113,7 +133,7 @@ public class FlightServiceTests {
         flight.setBusinessPrice(300.00f);
         flight.setEconomyReserved(0);
         flight.setEconomyPrice(200.00f);
-        flight.setIsActive(1);
+        flight.setIsActive(true);
         when(flightDao.save(flight)).thenReturn(flight);
 
         Integer savedAirportID = flightService.saveFlight(flight);

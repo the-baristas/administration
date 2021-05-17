@@ -32,7 +32,7 @@ public class AirportServiceTests {
     	Airport airport = new Airport();
     	airport.setIataId("TA4");
     	airport.setCity("Test Aiport 4");
-    	airport.setIsActive(1);
+    	airport.setIsActive(true);
     	List<Airport> allAirports = Arrays.asList(airport);
     	when(airportDao.findAll()).thenReturn(allAirports);
     	
@@ -45,7 +45,7 @@ public class AirportServiceTests {
     	Optional<Airport> airport = Optional.ofNullable(new Airport());
     	airport.get().setIataId("TA5");
     	airport.get().setCity("Test City 5");
-    	airport.get().setIsActive(1);
+    	airport.get().setIsActive(true);
     	
 
         when(airportDao.findByIataId("TA5")).thenReturn(airport.get());
@@ -59,7 +59,7 @@ public class AirportServiceTests {
     	Airport airport = new Airport();
         airport.setIataId("TA6");
         airport.setCity("Test City 6");
-        airport.setIsActive(1);
+        airport.setIsActive(true);
         when(airportDao.save(airport)).thenReturn(airport);
 
         String savedAirportID = airportService.saveAirport(airport);

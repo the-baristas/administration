@@ -16,9 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.utopia.flightservice.controller.FlightController;
+import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.entity.Flight;
+import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.exception.FlightNotSavedException;
+import com.utopia.flightservice.service.AirplaneService;
 import com.utopia.flightservice.service.FlightService;
+import com.utopia.flightservice.service.RouteService;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -49,6 +53,15 @@ public class FlightControllerTests {
     private FlightController controller;
 
     @Autowired
+    private RouteController routeController;
+
+    @Autowired
+    private AirplaneService airplaneService;
+
+    @Autowired
+    private RouteService routeService;
+
+    @Autowired
     private WebApplicationContext webApplicationContext;
 
     @Test
@@ -63,9 +76,15 @@ public class FlightControllerTests {
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 
+        Airplane airplane = airplaneService.findAirplaneById(7L);
+        Airplane airplane2 = airplaneService.findAirplaneById(7L);
+
+        Route route = routeService.getRouteById(5).get();
+        Route route2 = routeService.getRouteById(7).get();
+
         List<Flight> flights = new ArrayList<>();
-        Flight flight1 = new Flight(100, 5, 15, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
-        Flight flight2 = new Flight(101, 7, 8, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
+        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
+        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route2);
 
         flights.add(flight1);
         flights.add(flight2);
@@ -91,8 +110,12 @@ public class FlightControllerTests {
 
         Flight mockFlight = new Flight();
         mockFlight.setId(101);
-        mockFlight.setRouteId(5);
-        mockFlight.setAirplaneId(7);
+
+        Airplane airplane = airplaneService.findAirplaneById(7L);
+        Route route = routeService.getRouteById(5).get();
+
+        mockFlight.setRoute(route);
+        mockFlight.setAirplane(airplane);
         mockFlight.setDepartureTime(departureTime);
         mockFlight.setArrivalTime(arrivalTime);
         mockFlight.setFirstReserved(0);
@@ -101,7 +124,7 @@ public class FlightControllerTests {
         mockFlight.setBusinessPrice(300.00f);
         mockFlight.setEconomyReserved(0);
         mockFlight.setEconomyPrice(200.00f);
-        mockFlight.setIsActive(1);
+        mockFlight.setIsActive(true);
 
         System.out.println(mockFlight);
         when(flightService.saveFlight(mockFlight)).thenReturn(mockFlight.getId());
@@ -119,10 +142,13 @@ public class FlightControllerTests {
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 
-        Flight flight = new Flight(101, 7, 8, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
+        Airplane airplane = airplaneService.findAirplaneById(7L);
+        Route route = routeService.getRouteById(5).get();
+
+        Flight flight = new Flight(101, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
 
         flightService.saveFlight(flight);
-        Flight updatedFlight = new Flight(101, 7, 8, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 2 );
+        Flight updatedFlight = new Flight(101, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, false, route);
 
         when(flightService.updateFlight(flight.getId(), updatedFlight)).thenReturn(updatedFlight.getId());
 
@@ -139,7 +165,11 @@ public class FlightControllerTests {
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 
-        Flight flight = new Flight(101, 7, 8, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, 1 );
+        Airplane airplane = airplaneService.findAirplaneById(7L);
+
+        Route route = routeService.getRouteById(5).get();
+
+        Flight flight = new Flight(101, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
 
         flightService.saveFlight(flight);
         when(flightService.deleteFlight(flight.getId())).thenReturn(flight.getId().toString());

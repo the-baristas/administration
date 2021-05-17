@@ -4,6 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
+import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.entity.Airport;
+import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.repository.FlightDao;
 import com.utopia.flightservice.entity.Flight;
 import org.junit.jupiter.api.Test;
@@ -26,6 +29,12 @@ public class FlightDaoTests {
     @Autowired
     private FlightDao dao;
 
+    @Autowired
+    private RouteDao routeDao;
+
+    @Autowired
+    private AirplaneRepository airplaneDao;
+
     @Test
     public void testCreateAndGetFlightById() {
         String str1 ="2020-09-01 09:01:15";
@@ -35,8 +44,12 @@ public class FlightDaoTests {
 
         Flight flight = new Flight();
         flight.setId(101);
-        flight.setRouteId(5);
-        flight.setAirplaneId(7);
+
+        Route route = routeDao.findById(5).get();
+        Airplane airplane = airplaneDao.findById(7L).get();
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
         flight.setDepartureTime(departureTime);
         flight.setArrivalTime(arrivalTime);
         flight.setFirstReserved(0);
@@ -45,16 +58,16 @@ public class FlightDaoTests {
         flight.setBusinessPrice(300.00f);
         flight.setEconomyReserved(0);
         flight.setEconomyPrice(200.00f);
-        flight.setIsActive(1);
+        flight.setIsActive(true);
         entityManager.persist(flight);
         entityManager.flush();
 
 
         Optional<Flight> flightFromDB = dao.findById(flight.getId());
         assertThat(flightFromDB.get().getId(), is(101));
-        assertThat(flightFromDB.get().getRouteId(), is(5));
-        assertThat(flightFromDB.get().getAirplaneId(), is(7));
-        assertThat(flightFromDB.get().getIsActive(), is(1));
+        assertThat(flightFromDB.get().getRoute(), is(route));
+        assertThat(flightFromDB.get().getAirplane(), is(airplane));
+        assertThat(flightFromDB.get().getIsActive(), is(true));
     }
 
     @Test
@@ -66,8 +79,12 @@ public class FlightDaoTests {
 
         Flight flight = new Flight();
         flight.setId(101);
-        flight.setRouteId(5);
-        flight.setAirplaneId(7);
+
+        Route route = routeDao.findById(5).get();
+        Airplane airplane = airplaneDao.findById(7L).get();
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
         flight.setDepartureTime(departureTime);
         flight.setArrivalTime(arrivalTime);
         flight.setFirstReserved(0);
@@ -76,17 +93,17 @@ public class FlightDaoTests {
         flight.setBusinessPrice(300.00f);
         flight.setEconomyReserved(0);
         flight.setEconomyPrice(200.00f);
-        flight.setIsActive(1);
+        flight.setIsActive(true);
         entityManager.persist(flight);
         entityManager.flush();
 
         Flight flightFromDB = dao.findById(flight.getId()).get();
-        flightFromDB.setAirplaneId(8);
+        flightFromDB.setAirplane(airplane);
         dao.save(flightFromDB);
         entityManager.persist(flightFromDB);
         entityManager.flush();
 
-        assertThat(flightFromDB.getAirplaneId(), is(8));
+        assertThat(flightFromDB.getAirplane(), is(airplane));
 
     }
 
@@ -99,8 +116,12 @@ public class FlightDaoTests {
 
         Flight flight = new Flight();
         flight.setId(101);
-        flight.setRouteId(5);
-        flight.setAirplaneId(7);
+
+        Route route = routeDao.findById(5).get();
+        Airplane airplane = airplaneDao.findById(7L).get();
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
         flight.setDepartureTime(departureTime);
         flight.setArrivalTime(arrivalTime);
         flight.setFirstReserved(0);
@@ -109,7 +130,7 @@ public class FlightDaoTests {
         flight.setBusinessPrice(300.00f);
         flight.setEconomyReserved(0);
         flight.setEconomyPrice(200.00f);
-        flight.setIsActive(1);
+        flight.setIsActive(true);
         entityManager.persist(flight);
         entityManager.flush();
 

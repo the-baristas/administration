@@ -58,8 +58,8 @@ public class AirportControllerTests {
 	@Test
 	public void test_getAllAirports_statusOkAndListLength() throws Exception {
 		List<Airport> airports = new ArrayList<>();
-		Airport airport1 = new Airport("TA3", "Test City 3", 1);
-		Airport airport2 = new Airport("TA4", "Test City 4", 1);
+		Airport airport1 = new Airport("TA3", "Test City 3", true);
+		Airport airport2 = new Airport("TA4", "Test City 4", true);
 		airports.add(airport1);
 		airports.add(airport2);
 		when(airportService.getAllAirports()).thenReturn(airports);
@@ -75,7 +75,7 @@ public class AirportControllerTests {
 	
 	@Test
 	public void shouldCreateAirport() throws Exception {
-		Airport mockAirport = new Airport("TA4", "Test City 4", 1);
+		Airport mockAirport = new Airport("TA4", "Test City 4", true);
 		when(airportService.saveAirport(mockAirport)).thenReturn(mockAirport.getIataId());
 	
 		mockMvc.perform(post("/utopia_airlines/airport")
@@ -86,9 +86,9 @@ public class AirportControllerTests {
 	
 	@Test
 	public void shouldUpdateAirport() throws Exception {
-		Airport mockAirport = new Airport("TA5", "Test City 5", 1);
+		Airport mockAirport = new Airport("TA5", "Test City 5", true);
 		airportService.saveAirport(mockAirport);
-		Airport updatedAirport = new Airport("TA5", "Updated Test City", 2);
+		Airport updatedAirport = new Airport("TA5", "Updated Test City", false);
 		when(airportService.updateAirport(mockAirport.getIataId(), updatedAirport)).thenReturn(updatedAirport.getIataId());
 		
 		mockMvc.perform(put("/utopia_airlines/airport/TA5")
@@ -99,7 +99,7 @@ public class AirportControllerTests {
 	
 	@Test
 	public void shouldDeleteAirport() throws Exception {
-		Airport mockAirport = new Airport("TA6", "Test City 6", 1);
+		Airport mockAirport = new Airport("TA6", "Test City 6", true);
 		airportService.saveAirport(mockAirport);
 		when(airportService.deleteAirport(mockAirport.getIataId())).thenReturn(mockAirport.getIataId());
 		

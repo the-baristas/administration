@@ -66,18 +66,7 @@ public class FlightService {
     // update a route's information
     public Integer updateFlight(Integer id, Flight flight) throws FlightNotSavedException {
         try {
-            flightDao.updateFlight(id,
-                            flight.getRoute(),
-                            flight.getAirplaneId(),
-                            flight.getDepartureTime(),
-                            flight.getArrivalTime(),
-                            flight.getFirstReserved(),
-                            flight.getFirstPrice(),
-                            flight.getBusinessReserved(),
-                            flight.getBusinessPrice(),
-                            flight.getEconomyReserved(),
-                            flight.getEconomyPrice(),
-                            flight.getIsActive());
+            flightDao.updateFlight(id, flight.getRoute(), flight.getAirplane(), flight.getDepartureTime(), flight.getArrivalTime(), flight.getFirstReserved(), flight.getFirstPrice(), flight.getBusinessReserved(), flight.getBusinessPrice(), flight.getEconomyReserved(), flight.getEconomyPrice(), flight.getIsActive());
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new FlightNotSavedException("ERROR! Route not updated.");

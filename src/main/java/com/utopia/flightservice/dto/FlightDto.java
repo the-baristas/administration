@@ -22,6 +22,9 @@ public class FlightDto {
     @PositiveOrZero
     private Integer airplaneId;
 
+    @PositiveOrZero
+    private Integer routeId;
+
     @NotBlank
     private Timestamp departureTime;
 

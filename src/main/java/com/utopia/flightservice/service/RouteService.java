@@ -3,6 +3,8 @@ package com.utopia.flightservice.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.utopia.flightservice.entity.Airport;
+import com.utopia.flightservice.exception.RouteNotFoundException;
 import com.utopia.flightservice.exception.RouteNotSavedException;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.repository.RouteDao;
@@ -14,6 +16,9 @@ public class RouteService {
 	
 	@Autowired
 	private RouteDao routeDao;
+
+	@Autowired
+	private AirportService airportService;
 	
 	// get every route as a list
 	public List<Route> getAllRoutes() {
@@ -27,6 +32,16 @@ public class RouteService {
 
 	public Route getRouteByLocationInfo(String originId, String destinationId) {
 		return routeDao.findByLocationInfo(originId, destinationId);
+	}
+
+	public List<Route> getByOriginAirportOrDestinationAirport(String query1, String query2) throws RouteNotFoundException {
+
+		Airport airport = airportService.getAirportById(query1);
+		try {
+			return routeDao.findByOriginAirportOrDestinationAirport(airport, airport);
+		} catch (Exception e) {
+			throw new RouteNotFoundException("ERROR! No routes found.");
+		}
 	}
 	
 	// add a new route

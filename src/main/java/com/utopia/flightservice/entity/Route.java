@@ -32,9 +32,5 @@ public class Route {
     
     @Column(name = "is_active")
     private Boolean isActive;
-
-//    @OneToMany @JsonBackReference
-//    @JoinColumn(name = "flight_id")
-//    private Integer flightId;
 	
 }

@@ -5,6 +5,7 @@ import javax.transaction.Transactional;
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,7 +19,7 @@ import java.util.List;
 public interface FlightDao extends JpaRepository<Flight, Integer> {
 
     @Query("FROM flight WHERE route_id = ?1")
-    List<Flight> findByRouteId(Integer id);
+    List<Flight> findByRouteId(Pageable paging, Integer id);
 
     @Query("FROM flight WHERE route_id = ?1 AND departure_time = ?2")
     List<Flight> findByRouteAndDate(Integer id, Timestamp departureTime);

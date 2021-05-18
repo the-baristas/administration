@@ -2,8 +2,9 @@ package com.utopia.flightservice;
 
 import java.util.Arrays;
 
-import com.utopia.flightservice.repository.AirplaneRepository;
 import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.repository.AirplaneRepository;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.utopia.flightservice.repository.AirplaneRepository;
 import com.utopia.flightservice.entity.Airplane;
-import com.utopia.flightservice.service.AirplaneService;
+import com.utopia.flightservice.repository.AirplaneRepository;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

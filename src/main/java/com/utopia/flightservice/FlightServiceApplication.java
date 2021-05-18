@@ -16,5 +16,8 @@ public class FlightServiceApplication {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 }

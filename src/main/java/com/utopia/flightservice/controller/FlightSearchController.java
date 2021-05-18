@@ -37,8 +37,8 @@ public class FlightSearchController {
     // get flight pages
     @GetMapping("/flights/page")
     public ResponseEntity<Page<Flight>> getPagedFlights(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                      @RequestParam(defaultValue = "10") Integer pageSize,
-                                                      @RequestParam(defaultValue = "id") String sortBy) {
+                                                        @RequestParam(defaultValue = "10") Integer pageSize,
+                                                        @RequestParam(defaultValue = "id") String sortBy) {
         Page<Flight> flights = flightService.getPagedFlights(pageNo, pageSize, sortBy);
 
         if (!flights.hasContent()) {
@@ -79,22 +79,22 @@ public class FlightSearchController {
         }
     }
 
-        // get all flights based on location info and date
-        @PostMapping("/flights-query")
-        public ResponseEntity<List<Flight>> getFlightsByRouteAndLocation(@RequestParam(name = "originId") String originId,
-                                                                         @RequestParam(name = "destinationId") String destinationId,
-                                                                         @RequestBody FlightQuery flightQuery) {
+    // get all flights based on location info and date
+    @PostMapping("/flights-query")
+    public ResponseEntity<List<Flight>> getFlightsByRouteAndLocation(@RequestParam(name = "originId") String originId,
+                                                                     @RequestParam(name = "destinationId") String destinationId,
+                                                                     @RequestBody FlightQuery flightQuery) {
 
 
-            Route route = routeService.getRouteByLocationInfo(originId, destinationId);
-            Integer routeId = route.getId();
+        Route route = routeService.getRouteByLocationInfo(originId, destinationId);
+        Integer routeId = route.getId();
 
-            List<Flight> flights = flightService.getFlightsByRouteAndDate(routeId, flightQuery);
-            if (flights.isEmpty()) {
-                return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
-            } else {
-                return new ResponseEntity(flights, HttpStatus.OK);
-            }
+        List<Flight> flights = flightService.getFlightsByRouteAndDate(routeId, flightQuery);
+        if (flights.isEmpty()) {
+            return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity(flights, HttpStatus.OK);
+        }
     }
 
 

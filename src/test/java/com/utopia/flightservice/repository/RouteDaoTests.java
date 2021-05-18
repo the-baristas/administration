@@ -1,21 +1,23 @@
 package com.utopia.flightservice.repository;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
+<<<<<<< HEAD
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.repository.RouteDao;
 import com.utopia.flightservice.entity.Route;
 import org.junit.jupiter.api.Test;
+=======
+import java.util.Optional;
+>>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.utopia.flightservice.entity.Route;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-
-import java.util.Optional;
 
 @DataJpaTest
 public class RouteDaoTests {
@@ -70,8 +72,11 @@ public class RouteDaoTests {
         entityManager.persist(routeFromDB.get());
         entityManager.flush();
 
+<<<<<<< HEAD
         assertThat(routeFromDB.get().getIsActive(), is(false));
 
+=======
+        assertThat(routeFromDB.get().getIsActive(), is(2));
+>>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
     }
-
 }

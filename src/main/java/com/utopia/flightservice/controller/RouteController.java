@@ -3,6 +3,7 @@ package com.utopia.flightservice.controller;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Optional;
 
 import com.utopia.flightservice.dto.RouteDto;
 import com.utopia.flightservice.dto.RouteQueryDto;
@@ -14,22 +15,17 @@ import com.utopia.flightservice.exception.RouteNotFoundException;
 import com.utopia.flightservice.exception.RouteNotSavedException;
 import com.utopia.flightservice.service.AirportService;
 import com.utopia.flightservice.service.RouteService;
-<<<<<<< HEAD
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
-=======
 
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-<<<<<<< HEAD
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.print.attribute.standard.Destination;
-=======
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,12 +35,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 
 @RestController
 @RequestMapping("/routes")
 public class RouteController {
-<<<<<<< HEAD
 	private final ModelMapper modelMapper;
 
 	@Autowired
@@ -137,63 +131,6 @@ public class RouteController {
 		String isRemoved = routeService.deleteRoute(id);
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
-=======
-
-    @Autowired
-    private RouteService routeService;
-
-    // get all routes
-    @GetMapping
-    public ResponseEntity<List<Route>> getAllRoutes() {
-        List<Route> routes = routeService.getAllRoutes();
-        if (routes.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT,
-                    "No routes found in database");
-        } else {
-            return new ResponseEntity<List<Route>>(routes, HttpStatus.OK);
-        }
-    }
-
-    // get single route
-    @GetMapping("/{id}")
-    public ResponseEntity<Route> getRoute(@PathVariable Integer id) {
-        Route route = routeService.getRouteById(id).get();
-        return new ResponseEntity<Route>(route, HttpStatus.OK);
-    }
-
-    // get single route with location data
-    @GetMapping("/{originId}/{destinationId}")
-    public ResponseEntity<Route> getRouteByLocationInfo(
-            @PathVariable String originId, @PathVariable String destinationId) {
-        Route route = routeService.getRouteByLocationInfo(originId,
-                destinationId);
-        return new ResponseEntity<Route>(route, HttpStatus.OK);
-    }
-
-    // create a new route
-    @PostMapping
-    public ResponseEntity<Route> createRoute(@RequestBody Route route)
-            throws RouteNotSavedException {
-        routeService.saveRoute(route);
-        return new ResponseEntity<Route>(route, HttpStatus.CREATED);
-    }
-
-    // update route
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateRoute(@PathVariable Integer id,
-            @RequestBody Route route) throws RouteNotSavedException {
-        routeService.updateRoute(id, route);
-        return new ResponseEntity<String>(HttpStatus.OK);
-    }
-
-    // delete a route
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRoute(@PathVariable Integer id)
-            throws RouteNotSavedException {
-        routeService.deleteRoute(id);
-        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
-    }
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 
 	private RouteDto convertToDto(Route route) {
 		return modelMapper.map(route, RouteDto.class);

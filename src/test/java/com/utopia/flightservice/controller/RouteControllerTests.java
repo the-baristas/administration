@@ -13,12 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
-<<<<<<< HEAD
 import com.utopia.flightservice.controller.RouteController;
 import com.utopia.flightservice.entity.Airport;
-=======
 import com.fasterxml.jackson.databind.ObjectMapper;
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.service.AirportService;
 import com.utopia.flightservice.service.RouteService;

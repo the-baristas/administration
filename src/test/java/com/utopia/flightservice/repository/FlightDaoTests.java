@@ -2,18 +2,14 @@ package com.utopia.flightservice.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-
-<<<<<<< HEAD
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.repository.FlightDao;
 import com.utopia.flightservice.entity.Flight;
 import org.junit.jupiter.api.Test;
-=======
 import java.sql.Timestamp;
 import java.util.Optional;
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 
 import com.utopia.flightservice.entity.Flight;
 

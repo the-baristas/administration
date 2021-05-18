@@ -14,18 +14,13 @@ import org.springframework.stereotype.Repository;
 @Transactional
 @Repository
 public interface AirportDao extends JpaRepository<Airport, Integer> {
-<<<<<<< HEAD
-	
-	@Query("FROM airport WHERE iata_id = ?1")
-	Airport findByIataId(String id);
-	
+
 	@Modifying
 	@Query("UPDATE airport SET city = ?2, is_active = ?3 WHERE iata_id = ?1")
 	void updateAirport(String id, String city, Boolean isActive);
-=======
+
     @Query("FROM airport WHERE iata_id = ?1")
     Airport findByIataId(String id);
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 
     @Modifying
     @Query("UPDATE airport SET city = ?2, is_active = ?3 WHERE iata_id = ?1")

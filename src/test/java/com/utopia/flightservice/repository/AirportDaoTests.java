@@ -16,74 +16,32 @@ public class AirportDaoTests {
 
     @Autowired
     private TestEntityManager entityManager;
-<<<<<<< HEAD
-    
-	
+
 	@Autowired
 	private AirportDao dao;
-	
-	
+
 	@Test
 	public void testCreateAndGetAirportById() {
-		Airport airport = new Airport();
-		airport.setIataId("TS6");
-		airport.setCity("Test City 6");
-		airport.setIsActive(true);
-=======
-
-    @Autowired
-    private AirportDao dao;
-
-    @Test
-    public void testCreateAndGetAirportById() {
         Airport airport = new Airport();
         airport.setIataId("TS6");
         airport.setCity("Test City 6");
-        airport.setIsActive(1);
-        entityManager.persist(airport);
-        entityManager.flush();
-
-        Airport airportFromDB = dao.findByIataId(airport.getIataId());
-        assertThat(airportFromDB.getIataId(), is("TS6"));
-        assertThat(airportFromDB.getCity(), is("Test City 6"));
-        assertThat(airportFromDB.getIsActive(), is(1));
+        airport.setIsActive(true);
     }
+
 
     @Test
     public void testUpdateAirport() {
         Airport airport = new Airport();
         airport.setIataId("TS6");
         airport.setCity("Test City 6");
-        airport.setIsActive(1);
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
+        airport.setIsActive(true);
         entityManager.persist(airport);
         entityManager.flush();
 
         Airport airportFromDB = dao.findByIataId(airport.getIataId());
-<<<<<<< HEAD
 		assertThat(airportFromDB.getIataId(), is("TS6"));
 		assertThat(airportFromDB.getCity(), is("Test City 6"));
-		assertThat(airportFromDB.getIsActive(), is(1));
-	}
-	
-	@Test
-	public void testUpdateAirport() {
-		Airport airport = new Airport();
-		airport.setIataId("TS6");
-		airport.setCity("Test City 6");
-		airport.setIsActive(true);
-		entityManager.persist(airport);
-		entityManager.flush();
-		
-		Airport airportFromDB = dao.findByIataId(airport.getIataId());
-		airportFromDB.setCity("Updated Test City");
-		dao.save(airportFromDB);
-		entityManager.persist(airportFromDB);
-		entityManager.flush();
-		
-		
-		assertThat(airportFromDB.getCity(), is("Updated Test City"));
-		
+		assertThat(airportFromDB.getIsActive(), is(true));
 	}
 	
 	@Test
@@ -94,36 +52,10 @@ public class AirportDaoTests {
 		airport.setIsActive(true);
 		entityManager.persist(airport);
 		entityManager.flush();
-		
+
 		dao.delete(airport);
-		Airport airportFromDB = dao.findByIataId(airport.getIataId());
-		assertThat(airportFromDB).isNull();
+        Airport airportFromDB = dao.findByIataId(airport.getIataId());
+		assertThat(airportFromDB, is(null));
 	}
-	
-=======
-        airportFromDB.setCity("Updated Test City");
-        dao.save(airportFromDB);
-        entityManager.persist(airportFromDB);
-        entityManager.flush();
-
-        assertThat(airportFromDB.getCity(), is("Updated Test City"));
-
-    }
-
-    @Test
-    public void testDeleteAirport() {
-        Airport airport = new Airport();
-        String iataId = "TS7";
-        airport.setIataId(iataId);
-        airport.setCity("Test City 7");
-        airport.setIsActive(1);
-        entityManager.persist(airport);
-        entityManager.flush();
-
-        dao.delete(airport);
-        Airport airportFromDB = dao.findByIataId(iataId);
-        assertThat(airportFromDB, is(nullValue()));
-    }
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 
 }

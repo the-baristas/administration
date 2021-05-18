@@ -16,27 +16,20 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-<<<<<<< HEAD
 import com.utopia.flightservice.controller.FlightController;
 import com.utopia.flightservice.entity.Airplane;
-=======
 import com.fasterxml.jackson.databind.ObjectMapper;
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.service.AirplaneService;
 import com.utopia.flightservice.service.FlightService;
-<<<<<<< HEAD
 import com.utopia.flightservice.service.RouteService;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-=======
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
+
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +38,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
 
 @WebMvcTest(FlightController.class)
 @AutoConfigureMockMvc
@@ -60,7 +54,6 @@ public class FlightControllerTests {
     @Autowired
     private FlightController controller;
 
-<<<<<<< HEAD
     @Autowired
     private RouteController routeController;
 
@@ -73,8 +66,6 @@ public class FlightControllerTests {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-=======
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
     @Test
     public void controllerLoads() throws Exception {
         assertThat(controller, is(notNullValue()));
@@ -94,15 +85,9 @@ public class FlightControllerTests {
         Route route2 = routeService.getRouteById(7).get();
 
         List<Flight> flights = new ArrayList<>();
-<<<<<<< HEAD
         Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
         Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route2);
-=======
-        Flight flight1 = new Flight(100, 5, 15, departureTime, arrivalTime, 0,
-                300.00f, 0, 250.00f, 0, 200.00f, 1);
-        Flight flight2 = new Flight(101, 7, 8, departureTime, arrivalTime, 0,
-                300.00f, 0, 250.00f, 0, 200.00f, 1);
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
+
 
         flights.add(flight1);
         flights.add(flight2);
@@ -161,7 +146,7 @@ public class FlightControllerTests {
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 
-<<<<<<< HEAD
+
         Airplane airplane = airplaneService.findAirplaneById(7L);
         Route route = routeService.getRouteById(5).get();
 
@@ -169,14 +154,6 @@ public class FlightControllerTests {
 
         flightService.saveFlight(flight);
         Flight updatedFlight = new Flight(101, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, false, route);
-=======
-        Flight flight = new Flight(101, 7, 8, departureTime, arrivalTime, 0,
-                300.00f, 0, 250.00f, 0, 200.00f, 1);
-
-        flightService.saveFlight(flight);
-        Flight updatedFlight = new Flight(101, 7, 8, departureTime, arrivalTime,
-                0, 300.00f, 0, 250.00f, 0, 200.00f, 2);
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 
         when(flightService.updateFlight(flight.getId(), updatedFlight))
                 .thenReturn(updatedFlight.getId());
@@ -194,16 +171,11 @@ public class FlightControllerTests {
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 
-<<<<<<< HEAD
         Airplane airplane = airplaneService.findAirplaneById(7L);
 
         Route route = routeService.getRouteById(5).get();
 
         Flight flight = new Flight(101, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
-=======
-        Flight flight = new Flight(101, 7, 8, departureTime, arrivalTime, 0,
-                300.00f, 0, 250.00f, 0, 200.00f, 1);
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 
         flightService.saveFlight(flight);
         when(flightService.deleteFlight(flight.getId()))

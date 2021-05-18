@@ -9,11 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-<<<<<<< HEAD
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.repository.RouteDao;
-=======
->>>>>>> 556ac07824d9ce7db5f9b680d49fbc57742bcf5d
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.exception.RouteNotSavedException;
 import com.utopia.flightservice.repository.RouteDao;

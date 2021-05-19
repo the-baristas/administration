@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.exception.AirportNotSavedException;
@@ -47,8 +48,10 @@ public class FlightServiceTests {
         Flight flight = new Flight();
         flight.setId(101);
 
-        Route route = routeService.getRouteById(5).get();
-        Airplane airplane = airplaneService.findAirplaneById(7L);
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
 
         flight.setRoute(route);
         flight.setAirplane(airplane);
@@ -78,8 +81,11 @@ public class FlightServiceTests {
         Optional<Flight> flight = Optional.ofNullable(new Flight());
         flight.get().setId(101);
 
-        Route route = routeService.getRouteById(5).get();
-        Airplane airplane = airplaneService.findAirplaneById(7L);
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
 
         flight.get().setRoute(route);
         flight.get().setAirplane(airplane);
@@ -122,8 +128,11 @@ public class FlightServiceTests {
         Flight flight = new Flight();
         flight.setId(101);
 
-        Route route = routeService.getRouteById(5).get();
-        Airplane airplane = airplaneService.findAirplaneById(7L);
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
 
         flight.setRoute(route);
         flight.setAirplane(airplane);

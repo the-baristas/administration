@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.exception.AirplaneNotFoundException;
+import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.exception.RouteNotFoundException;
 import com.utopia.flightservice.exception.RouteNotSavedException;
 import com.utopia.flightservice.repository.RouteDao;

@@ -44,7 +44,6 @@ public class AirportControllerTests {
 		assertThat(controller).isNotNull();
 	}
 
-	
 	@Test
 	public void test_getAllAirports_statusOkAndListLength() throws Exception {
 		List<Airport> airports = new ArrayList<>();

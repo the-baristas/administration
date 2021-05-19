@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/routes")
 public class RouteController {
 	private final ModelMapper modelMapper;
 

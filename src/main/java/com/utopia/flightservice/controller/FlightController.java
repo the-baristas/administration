@@ -36,7 +36,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class FlightController {
-    private final ModelMapper modelMapper;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Autowired
     private FlightService flightService;
@@ -46,11 +48,6 @@ public class FlightController {
 
     @Autowired
     private AirplaneService airplaneService;
-
-    public FlightController(FlightService flightService, ModelMapper modelMapper) {
-        this.flightService = flightService;
-        this.modelMapper = modelMapper;
-    }
 
     // get flights with pagination
     @GetMapping("/flights")
@@ -113,11 +110,11 @@ public class FlightController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
-        private FlightDto convertToDto(Flight flight) {
+        public FlightDto convertToDto(Flight flight) {
             return modelMapper.map(flight, FlightDto.class);
         }
 
-        private Flight convertToEntity(FlightDto flightDTO)
+        public Flight convertToEntity(FlightDto flightDTO)
             throws ParseException {
 
             Flight flight = modelMapper.map(flightDTO, Flight.class);

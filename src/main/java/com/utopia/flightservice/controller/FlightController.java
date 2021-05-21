@@ -77,13 +77,14 @@ public class FlightController {
                 throw new ModelMapperFailedException(e);
             }
             Integer flightID = flightService.saveFlight(flight);
+
             Flight createdFlight = flightService.getFlightById(flightID).get();
             return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(createdFlight));
         }
 
         // get single flight
         @GetMapping("/flights/{id}")
-        public ResponseEntity<Route> getFlight(@PathVariable Integer id) {
+        public ResponseEntity<Flight> getFlight(@PathVariable Integer id) {
             Optional<Flight> flight = flightService.getFlightById(id);
             return new ResponseEntity(flight, HttpStatus.OK);
         }

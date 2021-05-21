@@ -4,14 +4,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.net.URI;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -41,6 +44,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
@@ -118,90 +122,118 @@ public class FlightControllerTests {
 
     }
 
-//    @Test
-//    public void shouldCreateFlight() throws Exception, FlightNotSavedException {
-//        String str1 = "2020-09-01 09:01:15";
-//        String str2 = "2020-09-01 11:01:15";
-//        Timestamp departureTime = Timestamp.valueOf(str1);
-//        Timestamp arrivalTime = Timestamp.valueOf(str2);
-//
-//        Flight mockFlight = new Flight();
-//        mockFlight.setId(101);
-//
-//        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
-//        Airport originAirport = new Airport("TC1", "Test City 1", true);
-//        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
-//        Route route = new Route(1, originAirport, destinationAirport, true);
-//
-//        mockFlight.setRoute(route);
-//        mockFlight.setAirplane(airplane);
-//        mockFlight.setDepartureTime(departureTime);
-//        mockFlight.setArrivalTime(arrivalTime);
-//        mockFlight.setFirstReserved(0);
-//        mockFlight.setFirstPrice(350.00f);
-//        mockFlight.setBusinessReserved(0);
-//        mockFlight.setBusinessPrice(300.00f);
-//        mockFlight.setEconomyReserved(0);
-//        mockFlight.setEconomyPrice(200.00f);
-//        mockFlight.setIsActive(true);
-//
-//        System.out.println(mockFlight);
-//        FlightDto flightDTO = controller.convertToDto(mockFlight);
-//        when(flightService.saveFlight(controller.convertToEntity(flightDTO)))
-//                .thenReturn(mockFlight.getId());
-//
-//        mockMvc.perform(post("/flights").contentType(MediaType.APPLICATION_JSON)
-//                .content(asJsonString(flightDTO)))
-//                .andExpect(status().isCreated());
-//    }
+    @Test
+    public void shouldGetFlightById() throws Exception {
 
-//    @Test
-//    public void shouldUpdateFlight() throws Exception, FlightNotSavedException {
-//        String str1 = "2020-09-01 09:01:15";
-//        String str2 = "2020-09-01 11:01:15";
-//        Timestamp departureTime = Timestamp.valueOf(str1);
-//        Timestamp arrivalTime = Timestamp.valueOf(str2);
-//
-//
-//        Airplane airplane = airplaneService.findAirplaneById(7L);
-//        Route route = routeService.getRouteById(5).get();
-//
-//        Flight flight = new Flight(101, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
-//
-//        flightService.saveFlight(flight);
-//        Flight updatedFlight = new Flight(101, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, false, route);
-//
-//        when(flightService.updateFlight(flight.getId(), updatedFlight))
-//                .thenReturn(updatedFlight.getId());
-//
-//        mockMvc.perform(
-//                put("/flights/101").contentType(MediaType.APPLICATION_JSON)
-//                        .content(asJsonString(updatedFlight)))
-//                .andExpect(status().isOk());
-//    }
-//
-//    @Test
-//    public void shouldDeleteFlight() throws Exception, FlightNotSavedException {
-//        String str1 = "2020-09-01 09:01:15";
-//        String str2 = "2020-09-01 11:01:15";
-//        Timestamp departureTime = Timestamp.valueOf(str1);
-//        Timestamp arrivalTime = Timestamp.valueOf(str2);
-//
-//        Airplane airplane = airplaneService.findAirplaneById(7L);
-//
-//        Route route = routeService.getRouteById(5).get();
-//
-//        Flight flight = new Flight(101, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
-//
-//        flightService.saveFlight(flight);
-//        when(flightService.deleteFlight(flight.getId()))
-//                .thenReturn(flight.getId().toString());
-//
-//        mockMvc.perform(
-//                delete("/flights/101").contentType(MediaType.APPLICATION_JSON)
-//                        .content(asJsonString(flight)))
-//                .andExpect(status().isNoContent());
-//    }
+        Flight flight = makeFlight();
+        Optional optional = Optional.of(flight);
+
+        when(flightService.getFlightById(100)).thenReturn(optional);
+
+        mockMvc.perform(get("/flights/100")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(flight.getId()))
+                .andExpect(jsonPath("$.airplane").value(flight.getAirplane()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldCreateFlight() throws Exception, FlightNotSavedException {
+
+        Flight flight = makeFlight();
+        FlightDto flightDTO = makeFlightDTO();
+
+        when(airplaneService.findAirplaneById(Long.valueOf(flightDTO.getAirplaneId()))).thenReturn(flight.getAirplane());
+        when(routeService.getRouteById(flightDTO.getRouteId())).thenReturn(Optional.of(flight.getRoute()));
+        when(flightService.getFlightById(flight.getId())).thenReturn(Optional.of(flight));
+        when(flightService.saveFlight(flight)).thenReturn(flight.getId());
+
+        mockMvc.perform(post("/flights").contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(flightDTO)))
+                .andDo(print())
+                .andExpect(status().isCreated()); // receives 500 error bc getting null pointer exception
+
+        verify(flightService).saveFlight(flight);
+
+    }
+
+    @Test
+    public void shouldUpdateflight() throws Exception, FlightNotSavedException {
+
+            FlightDto flightDTO = makeFlightDTO();
+
+            Flight updatedFlight = makeFlight();
+            FlightDto updatedFlightDTO = makeFlightDTO();
+
+            when(airplaneService.findAirplaneById(Long.valueOf(flightDTO.getAirplaneId()))).thenReturn(updatedFlight.getAirplane());
+            when(routeService.getRouteById(flightDTO.getRouteId())).thenReturn(Optional.of(updatedFlight.getRoute()));
+            when(flightService.getFlightById(flightDTO.getId())).thenReturn(Optional.of(updatedFlight));
+            when(flightService.updateFlight(flightDTO.getId(), updatedFlight)).thenReturn(updatedFlight.getId());
+
+            mockMvc.perform(put("/flights/{id}", updatedFlightDTO.getId(), updatedFlightDTO).contentType(MediaType.APPLICATION_JSON)
+                    .content(new ObjectMapper().writeValueAsString(updatedFlightDTO))).andExpect(status().isOk());
+        }
+
+
+
+
+
+
+    // utility functions
+
+    private Flight makeFlight() {
+        Flight flight = new Flight();
+        flight.setId(100);
+
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        Timestamp departureTime = Timestamp.valueOf(str1);
+        Timestamp arrivalTime = Timestamp.valueOf(str2);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+        flight.setAirplane(airplane);
+
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        flight.setRoute(route);
+
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(300.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(200.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(100.00f);
+        flight.setIsActive(true);
+        return flight;
+    }
+
+    private FlightDto makeFlightDTO() {
+        FlightDto flightDTO = new FlightDto();
+        flightDTO.setId(100);
+
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        Timestamp departureTime = Timestamp.valueOf(str1);
+        Timestamp arrivalTime = Timestamp.valueOf(str2);
+        flightDTO.setDepartureTime(departureTime);
+        flightDTO.setArrivalTime(arrivalTime);
+
+        flightDTO.setAirplaneId(1);
+        flightDTO.setRouteId(1);
+
+        flightDTO.setFirstReserved(0);
+        flightDTO.setFirstPrice(300.00f);
+        flightDTO.setBusinessReserved(0);
+        flightDTO.setBusinessPrice(200.00f);
+        flightDTO.setEconomyReserved(0);
+        flightDTO.setEconomyPrice(100.00f);
+        flightDTO.setIsActive(true);
+
+        return flightDTO;
+    }
 
     public static String asJsonString(final Object obj) {
         try {

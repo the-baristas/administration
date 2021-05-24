@@ -4,10 +4,17 @@ import java.util.List;
 
 import com.utopia.flightservice.entity.Airplane;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AirplaneRepository extends JpaRepository<Airplane, Long> {
     List<Airplane> findByModelContaining(String model);
+
+    Page<Airplane> findByModelContaining(String model, Pageable pageable);
+
+    Page<Airplane> findDistinctByModelContaining(String model,
+            Pageable pageable);
 }

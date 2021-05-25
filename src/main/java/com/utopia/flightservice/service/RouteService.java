@@ -12,6 +12,10 @@ import com.utopia.flightservice.exception.RouteNotSavedException;
 import com.utopia.flightservice.repository.RouteDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,6 +31,11 @@ public class RouteService {
 	public List<Route> getAllRoutes() {
 		return routeDao.findAll();
 	}
+
+	public Page<Route> getPagedRoutes(Integer pageNo, Integer pageSize, String sortBy) {
+		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+		return routeDao.findAll(paging);
+	}
 	
 	// get one route by the route id
 	public Optional<Route> getRouteById(Integer id) {
@@ -37,11 +46,13 @@ public class RouteService {
 		return routeDao.findByLocationInfo(originId, destinationId);
 	}
 
-	public List<Route> getByOriginAirportOrDestinationAirport(String query1, String query2) throws RouteNotFoundException {
+	public Page<Route> getByOriginAirportOrDestinationAirport(Integer pageNo, Integer pageSize, String sortBy, String query1, String query2) throws RouteNotFoundException {
 
 		Airport airport = airportService.getAirportById(query1);
+		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
 		try {
-			return routeDao.findByOriginAirportOrDestinationAirport(airport, airport);
+			return routeDao.findByOriginAirportOrDestinationAirport(airport, airport, paging);
 		} catch (Exception e) {
 			throw new RouteNotFoundException("ERROR! No routes found.");
 		}

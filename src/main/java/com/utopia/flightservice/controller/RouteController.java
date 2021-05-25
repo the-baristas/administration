@@ -8,6 +8,7 @@ import java.util.Optional;
 import com.utopia.flightservice.dto.RouteDto;
 import com.utopia.flightservice.dto.RouteQueryDto;
 import com.utopia.flightservice.entity.Airport;
+import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.entity.RouteQuery;
 import com.utopia.flightservice.exception.ModelMapperFailedException;
@@ -19,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +54,6 @@ public class RouteController {
 	}
 
 	// get all routes
-	@GetMapping("/routes")
 	public ResponseEntity<List<Route>> getAllRoutes() {
 			List<Route> routes = routeService.getAllRoutes();			
 			if (routes.isEmpty()) {
@@ -61,7 +62,19 @@ public class RouteController {
 			    return new ResponseEntity(routes, HttpStatus.OK);
 			}
 	}
-	
+
+	@GetMapping("/routes")
+	public ResponseEntity<Page<Route>> getPagedRoutes(@RequestParam(defaultValue = "0") Integer pageNo,
+													  @RequestParam(defaultValue = "10") Integer pageSize,
+													  @RequestParam(defaultValue = "id") String sortBy) {
+		Page<Route> routes = routeService.getPagedRoutes(pageNo, pageSize, sortBy);
+		if (!routes.hasContent()) {
+			return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
+		} else {
+			return new ResponseEntity(routes, HttpStatus.OK);
+		}
+	}
+
 	// get single route
 	@GetMapping("/routes/{id}")
 	public ResponseEntity<Route> getRoute(@PathVariable Integer id) {
@@ -78,8 +91,12 @@ public class RouteController {
 
 	// get routes where origin or destination match query
 	@GetMapping("/routes-query")
-	public ResponseEntity<List<Route>> getRoutesWithQuery(@RequestParam String query) throws RouteNotFoundException {
-		List<Route> routes = routeService.getByOriginAirportOrDestinationAirport(query, query);
+	public ResponseEntity<Page<Route>> getRoutesWithQuery(@RequestParam String query,
+														  @RequestParam(defaultValue = "0") Integer pageNo,
+														  @RequestParam(defaultValue = "10") Integer pageSize,
+														  @RequestParam(defaultValue = "id") String sortBy
+														  ) throws RouteNotFoundException {
+		Page<Route> routes = routeService.getByOriginAirportOrDestinationAirport(pageNo, pageSize, sortBy, query, query);
 		if (routes.isEmpty()) {
 			return new ResponseEntity("No routes found in database matching this query!", HttpStatus.NO_CONTENT);
 		} else {

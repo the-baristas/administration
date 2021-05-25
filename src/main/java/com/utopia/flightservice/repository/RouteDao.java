@@ -4,6 +4,8 @@ import javax.transaction.Transactional;
 
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Route;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,7 +26,7 @@ public interface RouteDao extends JpaRepository<Route, Integer> {
     @Query("FROM route WHERE origin_id = ?1 AND destination_id = ?2")
     Route findByLocationInfo(String originId, String destinationId);
 
-	List<Route> findByOriginAirportOrDestinationAirport(Airport query1, Airport query2);
+	Page<Route> findByOriginAirportOrDestinationAirport(Airport query1, Airport query2, Pageable paging);
 
     @Modifying
     @Query("UPDATE route SET origin_id = ?2, destination_id = ?3, is_active = ?4 WHERE id = ?1")

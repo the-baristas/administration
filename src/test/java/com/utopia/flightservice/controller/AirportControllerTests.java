@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.utopia.flightservice.dto.AirplaneDto;
+import com.utopia.flightservice.dto.AirportDto;
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.service.AirportService;
 
@@ -52,14 +54,13 @@ public class AirportControllerTests {
 		airports.add(airport1);
 		airports.add(airport2);
 		when(airportService.getAllAirports()).thenReturn(airports);
-		
+
 		// create list of airports, pass it to thenReturn to test that getting back list of airports
 		
 		mockMvc.perform(get("/airports")
 					.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$", hasSize(2)));
-		
 		}
 	
 	@Test

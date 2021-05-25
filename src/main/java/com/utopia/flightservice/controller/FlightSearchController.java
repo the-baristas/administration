@@ -23,17 +23,6 @@ public class FlightSearchController {
     @Autowired
     private RouteService routeService;
 
-    // get all flights, no pages
-    @GetMapping("/flights")
-    public ResponseEntity<List<Flight>> getAllFlights() {
-        List<Flight> flights = flightService.getAllFlights();
-        if (flights.isEmpty()) {
-            return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity(flights, HttpStatus.OK);
-        }
-    }
-
     // get flight pages
     @GetMapping("/flights/page")
     public ResponseEntity<Page<Flight>> getPagedFlights(@RequestParam(defaultValue = "0") Integer pageNo,
@@ -62,7 +51,7 @@ public class FlightSearchController {
 
     // get all flights based on location info
     @GetMapping("/flightsbylocation")
-    public ResponseEntity<List<Flight>> getFlightsByRouteId(@RequestParam(name = "originId") String originId,
+    public ResponseEntity<Page<Flight>> getFlightsByRouteId(@RequestParam(name = "originId") String originId,
                                                             @RequestParam(name = "destinationId") String destinationId,
                                                             @RequestParam(defaultValue = "0") Integer pageNo,
                                                             @RequestParam(defaultValue = "10") Integer pageSize,

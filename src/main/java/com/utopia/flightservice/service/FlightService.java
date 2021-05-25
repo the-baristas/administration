@@ -33,7 +33,8 @@ public class FlightService {
 
     public Page<Flight> getFlightsByRoute(Integer pageNo, Integer pageSize, String sortBy, Integer routeId) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return flightDao.findAllByRoute(paging, routeId);
+        System.out.println(paging);
+        return flightDao.findAllByRouteId(routeId, paging);
     }
 
     public List<Flight> getFlightsByLocationQuery(String query) { return flightDao.findByRouteDestinationAirport(query); }

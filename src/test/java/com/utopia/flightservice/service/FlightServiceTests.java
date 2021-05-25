@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.utopia.flightservice.dto.FlightDto;
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Flight;
@@ -19,12 +20,17 @@ import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
-public class FlightServiceTests {
+class FlightServiceTests {
 
     @Autowired
     private FlightService flightService;
@@ -39,7 +45,7 @@ public class FlightServiceTests {
     private FlightDao flightDao;
 
     @Test
-    public void findAllFlights_FindsFlights() {
+    void findAllFlights_FindsFlights() {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
         Timestamp departureTime = Timestamp.valueOf(str1);
@@ -72,7 +78,7 @@ public class FlightServiceTests {
     }
 
     @Test
-    public void findFlightById_FindsFlight() {
+    void findFlightById_FindsFlight() {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
         Timestamp departureTime = Timestamp.valueOf(str1);
@@ -118,8 +124,8 @@ public class FlightServiceTests {
 
 
     @Test
-    public void addAirport_AndSaveIt()
-            throws AirportNotSavedException, FlightNotSavedException {
+    void addAirport_AndSaveIt()
+            throws FlightNotSavedException {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
         Timestamp departureTime = Timestamp.valueOf(str1);
@@ -150,5 +156,7 @@ public class FlightServiceTests {
         Integer savedAirportID = flightService.saveFlight(flight);
         assertThat(flight.getId(), is(savedAirportID));
     }
+
+
 
 }

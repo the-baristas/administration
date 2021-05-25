@@ -30,7 +30,7 @@ pipeline {
             steps {
                 echo 'Deploying....'
                 // sh "aws ecr ........."
-                sh "docker build --tag booking-service:$COMMIT_HASH ."
+                sh "docker build --tag flight-service:$COMMIT_HASH ."
                 // sh "docker tag MicroServiceName:$COMMIT_HASH $AWS_ID/ECR Repo/MicroServiceName:$COMMIT_HASH"
                 // sh "docker push $AWS_ID/ECR Repo/MicroServiceName:$COMMIT_HASH"
             }

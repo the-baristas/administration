@@ -60,7 +60,7 @@ public class AirplaneController {
     @DeleteMapping("/airplanes/{id}")
     public ResponseEntity<String> deleteAirplane(@PathVariable Long id)
             throws ResponseStatusException {
-        airplaneService.deleteAirplaneById(id);
+        String delete = airplaneService.deleteAirplaneById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -20,7 +20,7 @@ import java.util.List;
 public interface FlightDao extends JpaRepository<Flight, Integer> {
 
 
-    Page<Flight> findAllByRoute(Pageable paging, Integer id);
+    Page<Flight> findAllByRouteId(Integer id, Pageable paging);
 
     @Query("FROM flight WHERE route_id = ?1 AND departure_time = ?2")
     List<Flight> findByRouteAndDate(Integer id, Timestamp departureTime);

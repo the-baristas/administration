@@ -13,8 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-// @TestPropertySource(locations =
-// "classpath:application-integrationtest.properties")
 public class AirplaneIntegrationTest {
     @Autowired
     private WebTestClient webClient;

@@ -2,10 +2,13 @@ package com.utopia.flightservice.service;
 
 import java.util.List;
 
-import com.utopia.flightservice.exception.AirplaneNotFoundException;
-
 import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.exception.AirplaneNotFoundException;
 import com.utopia.flightservice.repository.AirplaneRepository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,9 +25,31 @@ public class AirplaneService {
         return airplaneRepository.findAll();
     }
 
+    public Page<Airplane> findAllAirplanes(Integer pageIndex,
+            Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex, pageSize);
+        return airplaneRepository.findAll(pageable);
+    }
+
+    public Page<Airplane> searchAirplanesPage(String term, Integer pageIndex,
+            Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex, pageSize);
+        return airplaneRepository.findByModelContaining(term, pageable);
+    }
+
+    public Page<Airplane> findDistinctByModelContaining(String term, Integer pageIndex,
+            Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex, pageSize);
+        return airplaneRepository.findDistinctByModelContaining(term, pageable);
+    }
+
     public Airplane findAirplaneById(Long id) {
         return airplaneRepository.findById(id)
                 .orElseThrow(() -> new AirplaneNotFoundException(id));
+    }
+
+    public List<Airplane> findByModelContaining(String model) {
+        return airplaneRepository.findByModelContaining(model);
     }
 
     public Airplane createAirplane(Airplane airplane) {

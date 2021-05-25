@@ -16,6 +16,7 @@ import java.util.List;
 import com.utopia.flightservice.controller.RouteController;
 import com.utopia.flightservice.entity.Airport;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.service.AirportService;
 import com.utopia.flightservice.service.RouteService;
@@ -25,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -65,14 +68,17 @@ public class RouteControllerTests {
         Route route2 = new Route(26, originAirport2, destinationAirport2, true);
         routes.add(route1);
         routes.add(route2);
-        when(routeService.getAllRoutes()).thenReturn(routes);
+
+        Page<Route> routePage = new PageImpl<Route>(routes);
+
+        when(routeService.getPagedRoutes(0, 10, "id")).thenReturn(routePage);
 
         // create list of airports, pass it to thenReturn to test that getting back list of airports
 
         mockMvc.perform(get("/routes")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)));
+                .andExpect(jsonPath("$.content", hasSize(2)));
 
     }
 

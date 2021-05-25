@@ -1,7 +1,8 @@
 package com.utopia.flightservice.controller;
 
-import static java.nio.file.Files.delete;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,22 +12,16 @@ import com.utopia.flightservice.dto.AirplaneDto;
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.service.AirplaneService;
 
-import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Mono;
 
 @WebMvcTest(AirplaneController.class)
 public class AirplaneControllerTest {
@@ -127,24 +122,7 @@ public class AirplaneControllerTest {
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
 
-        when(airplaneService.deleteAirplaneById(airplane.getId())).thenReturn("Airplane Deleted!");
         airplaneService.deleteAirplaneById(airplane.getId());
-
-        webTestClient.delete().uri("/airplanes/1")
-                .exchange().expectStatus().isNoContent();
+        verify(airplaneService, times(1)).deleteAirplaneById(airplane.getId());
     }
-
-    @Test
-    public void deleteAirplane_NotValidAirplaneId_ThrowsException() {
-
-        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Could not find airplane with id = " + 99)).when(airplaneService).deleteAirplaneById(99L);
-
-        webTestClient
-                .method(HttpMethod.DELETE)
-                .uri("/flights/99")
-                .exchange().expectStatus().isNotFound();
-
-    }
-
 }

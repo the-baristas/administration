@@ -20,6 +20,7 @@ import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.service.AirportService;
 
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,6 +36,9 @@ public class AirportControllerTests {
 	
 	@MockBean
 	AirportService airportService;
+
+	@Autowired
+	private ModelMapper modelMapper;
     
 	// Airport Controller Tests
 	@Autowired
@@ -97,6 +101,39 @@ public class AirportControllerTests {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(mockAirport)))
 				.andExpect(status().isNoContent());
+	}
+
+	@Test
+	public void shouldGetSingleAirport_ById() throws Exception {
+		Airport airport = new Airport("TA6", "Test City 6", true);
+		when(airportService.getAirportById("TA6")).thenReturn(airport);
+
+		mockMvc.perform(get("/airports/TA6")
+				.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+
+	}
+
+	@Test
+	public void shouldFindAirport_ContainingLetter() throws Exception {
+		List<Airport> airports = new ArrayList<>();
+		Airport airport1 = new Airport("TA6", "Test City 6A", true);
+		Airport airport2 = new Airport("TA6", "Test City 6B", true);
+		airports.add(airport1);
+		airports.add(airport2);
+
+		String contains = "6";
+
+		when(airportService
+				.findByCityContainingLetter(contains)).thenReturn(airports);
+
+		AirportDto foundAirportDto = modelMapper.map(airport1,
+				AirportDto.class);
+
+		mockMvc.perform(get("/airports-containing?contains=6")
+				.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+
 	}
 
 	public static String asJsonString(final Object obj) {

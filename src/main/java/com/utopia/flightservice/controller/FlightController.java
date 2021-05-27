@@ -62,6 +62,42 @@ public class FlightController {
         }
     }
 
+    // get all flights based on location info
+    @GetMapping("search/flightsbylocation")
+    public ResponseEntity<Page<Flight>> getFlightsByRouteId(@RequestParam(name = "originId") String originId,
+                                                            @RequestParam(name = "destinationId") String destinationId,
+                                                            @RequestParam(defaultValue = "0") Integer pageNo,
+                                                            @RequestParam(defaultValue = "10") Integer pageSize,
+                                                            @RequestParam(defaultValue = "id") String sortBy) {
+        Route route = routeService.getRouteByLocationInfo(originId, destinationId);
+        Integer routeId = route.getId();
+
+        Page<Flight> flights = flightService.getFlightsByRoute(pageNo, pageSize, sortBy, routeId);
+        if (flights.isEmpty()) {
+            return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity(flights, HttpStatus.OK);
+        }
+    }
+
+    // get all flights based on location info and date
+//    @PostMapping("/flights-query")
+//    public ResponseEntity<List<Flight>> getFlightsByRouteAndLocation(@RequestParam(name = "originId") String originId,
+//                                                                     @RequestParam(name = "destinationId") String destinationId,
+//                                                                     @RequestBody FlightQuery flightQuery) {
+//
+//
+//        Route route = routeService.getRouteByLocationInfo(originId, destinationId);
+//        Integer routeId = route.getId();
+//
+//        List<Flight> flights = flightService.getFlightsByRouteAndDate(routeId, flightQuery);
+//        if (flights.isEmpty()) {
+//            return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
+//        } else {
+//            return new ResponseEntity(flights, HttpStatus.OK);
+//        }
+//    }
+
         // create new flight
         @PostMapping("/flights")
         public ResponseEntity<FlightDto> createFlight(@RequestBody FlightDto flightDTO, UriComponentsBuilder builder) throws FlightNotSavedException {

@@ -6,18 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 import com.utopia.flightservice.dto.RouteDto;
-import com.utopia.flightservice.dto.RouteQueryDto;
-import com.utopia.flightservice.entity.Airport;
-import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
-import com.utopia.flightservice.entity.RouteQuery;
 import com.utopia.flightservice.exception.ModelMapperFailedException;
 import com.utopia.flightservice.exception.RouteNotFoundException;
 import com.utopia.flightservice.exception.RouteNotSavedException;
 import com.utopia.flightservice.service.AirportService;
 import com.utopia.flightservice.service.RouteService;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,16 +22,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.print.attribute.standard.Destination;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class RouteController {
@@ -107,7 +99,6 @@ public class RouteController {
 	// create a new route
 	@PostMapping("/routes")
 	public ResponseEntity<RouteDto> createRoute(@RequestBody RouteDto routeDTO, UriComponentsBuilder builder) throws RouteNotSavedException {
-		System.out.println(routeDTO);
 		HttpHeaders responseHeaders = new HttpHeaders();
 		URI location = builder.path("/routes/{id}").buildAndExpand(routeDTO.getId()).toUri();
 		responseHeaders.setLocation(location);

@@ -2,7 +2,7 @@ package com.utopia.flightservice.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,14 +10,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.utopia.flightservice.controller.RouteController;
+import com.utopia.flightservice.dto.FlightDto;
+import com.utopia.flightservice.dto.RouteDto;
 import com.utopia.flightservice.entity.Airport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.exception.RouteNotSavedException;
 import com.utopia.flightservice.service.AirportService;
 import com.utopia.flightservice.service.RouteService;
 
@@ -28,6 +33,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -82,40 +88,51 @@ public class RouteControllerTests {
 
     }
 
-//    @Test
-//    public void shouldCreateRoute() throws Exception {
-//        Airport originAirport = new Airport("TC1", "Test City 1", true);
-//        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
-//
-//        Route mockRoute = new Route(27, originAirport, destinationAirport, true);
-//        when(routeService.saveRoute(mockRoute)).thenReturn(mockRoute.getId());
-//
-//        mockMvc.perform(post("/routes")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(asJsonString(mockRoute)))
-//                .andExpect(status().isCreated());
-//    }
+    @Test
+    public void shouldCreateRoute() throws Exception {
+        RouteDto routeDTO = makeRouteDTO();
+        Route mockRoute = makeRoute();
+        Airport origin = new Airport("TA1", "Test City 1", true);
+        Airport destination = new Airport("TA2", "Test City 2", true);
 
-//    @Test
-//    public void shouldUpdateRoute() throws Exception {
-//        Airport originAirport1 = airportService.getAirportById("SFO");
-//        Airport destinationAirport2 = airportService.getAirportById("JFK");
-//
-//        Route route = new Route(28, originAirport1, destinationAirport2, true);
-//        routeService.saveRoute(route);
-//        Route updatedRoute = new Route(28, originAirport1, destinationAirport2, false);
-//        when(routeService.updateRoute(route.getId(), updatedRoute)).thenReturn(updatedRoute.getId());
-//
-//        mockMvc.perform(put("/routes/28")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(asJsonString(updatedRoute)))
-//                .andExpect(status().isOk());
-//    }
+
+        when(airportService.getAirportById(routeDTO.getOriginId())).thenReturn(mockRoute.getOriginAirport());
+        when(airportService.getAirportById(routeDTO.getDestinationId())).thenReturn(mockRoute.getDestinationAirport());
+        when(routeService.getRouteById(mockRoute.getId())).thenReturn(Optional.of(mockRoute));
+        when(routeService.saveRoute(mockRoute)).thenReturn(mockRoute.getId());
+
+
+        mockMvc.perform(post("/routes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(routeDTO)))
+                .andExpect(status().isCreated());
+
+        verify(routeService).saveRoute(mockRoute);
+
+    }
+
+    @Test
+    public void shouldUpdateRoute() throws Exception {
+        Airport originAirport1 = airportService.getAirportById("SFO");
+        Airport destinationAirport2 = airportService.getAirportById("JFK");
+
+        Route route = new Route(28, originAirport1, destinationAirport2, true);
+        routeService.saveRoute(route);
+        Route updatedRoute = new Route(28, originAirport1, destinationAirport2, false);
+
+        when(routeService.updateRoute(route.getId(), updatedRoute)).thenReturn(updatedRoute.getId());
+        Optional<Route> opt = Optional.of(updatedRoute);
+        when(routeService.getRouteById(28)).thenReturn(opt);
+
+        mockMvc.perform(put("/routes/28")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updatedRoute)))
+                .andExpect(status().isOk());
+    }
 
     @Test
     public void shouldDeleteRoute() throws Exception {
         Airport originAirport1 = airportService.getAirportById("SFO");
-
         Airport destinationAirport1 = airportService.getAirportById("LAX");
 
         Route mockRoute = new Route(29, originAirport1, destinationAirport1, true);
@@ -127,6 +144,31 @@ public class RouteControllerTests {
                 .content(asJsonString(mockRoute)))
                 .andExpect(status().isNoContent());
     }
+
+
+    private RouteDto makeRouteDTO() {
+            RouteDto routeDTO = new RouteDto();
+            routeDTO.setId(100);
+            routeDTO.setOriginId("TA1");
+            routeDTO.setDestinationId("TA2");
+            routeDTO.setIsActive(true);
+            return routeDTO;
+        }
+
+    private Route makeRoute() {
+        Route route = new Route();
+        route.setId(100);
+
+        Airport origin = new Airport("TA1", "Test City 1", true);
+        Airport destination = new Airport("TA2", "Test City 2", true);
+
+        route.setOriginAirport(origin);
+        route.setDestinationAirport(destination);
+
+        route.setIsActive(true);
+        return route;
+    }
+
 
     public static String asJsonString(final Object obj) {
         try {

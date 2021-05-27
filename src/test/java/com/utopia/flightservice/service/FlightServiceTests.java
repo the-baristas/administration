@@ -3,6 +3,7 @@ package com.utopia.flightservice.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.sql.Timestamp;
@@ -26,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -124,7 +126,7 @@ class FlightServiceTests {
 
 
     @Test
-    void addAirport_AndSaveIt()
+    void addFlight_AndSaveIt()
             throws FlightNotSavedException {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
@@ -155,6 +157,76 @@ class FlightServiceTests {
 
         Integer savedAirportID = flightService.saveFlight(flight);
         assertThat(flight.getId(), is(savedAirportID));
+    }
+
+    @Test
+    void findAllFlightPages() {
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        Timestamp departureTime = Timestamp.valueOf(str1);
+        Timestamp arrivalTime = Timestamp.valueOf(str2);
+
+        Flight flight = new Flight();
+        flight.setId(101);
+
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+        List<Flight> allFlights = Arrays.asList(flight);
+        Pageable paging = PageRequest.of(0, 10, Sort.by("id"));
+        Page<Flight> flightPage = new PageImpl<Flight>(allFlights);
+        when(flightDao.findAll(paging)).thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getPagedFlights(0, 10, "id");
+        assertEquals(flightPage, foundFlights);
+    }
+
+    @Test
+    void shouldGetFlight_ByRouteId() {
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        Timestamp departureTime = Timestamp.valueOf(str1);
+        Timestamp arrivalTime = Timestamp.valueOf(str2);
+
+        Flight flight = new Flight();
+        flight.setId(101);
+
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+        List<Flight> allFlights = Arrays.asList(flight);
+        Pageable paging = PageRequest.of(0, 10, Sort.by("id"));
+        Page<Flight> flightPage = new PageImpl<Flight>(allFlights);
+        when(flightDao.findAllByRouteId(1, paging)).thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getFlightsByRoute(0, 10, "id", 1);
+        assertEquals(flightPage, foundFlights);
     }
 
 

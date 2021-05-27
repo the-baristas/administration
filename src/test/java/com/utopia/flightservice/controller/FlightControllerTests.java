@@ -159,6 +159,7 @@ public class FlightControllerTests {
 
     }
 
+
     @Test
     public void shouldUpdateflight() throws Exception, FlightNotSavedException {
 
@@ -175,10 +176,6 @@ public class FlightControllerTests {
             mockMvc.perform(put("/flights/{id}", updatedFlightDTO.getId(), updatedFlightDTO).contentType(MediaType.APPLICATION_JSON)
                     .content(new ObjectMapper().writeValueAsString(updatedFlightDTO))).andExpect(status().isOk());
         }
-
-
-
-
 
 
     // utility functions

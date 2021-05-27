@@ -2,8 +2,6 @@ package com.utopia.flightservice.controller;
 
 import java.net.URI;
 import java.text.ParseException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.utopia.flightservice.dto.AirplaneDto;
 import com.utopia.flightservice.entity.Airplane;

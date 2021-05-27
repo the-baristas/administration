@@ -13,6 +13,7 @@ import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.service.AirplaneService;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class AirplaneControllerTest {
         webTestClient = MockMvcWebTestClient.bindTo(mockMvc).build();
     }
 
+    @Disabled
     @Test
     public void findAllAirplanes_JsonArray() throws Exception {
         Airplane airplane = new Airplane();
@@ -95,6 +97,7 @@ public class AirplaneControllerTest {
                 .expectBody(AirplaneDto.class).isEqualTo(airplaneDto);
     }
 
+    @Disabled
     @Test
     public void updateAirplane_ValidAirplaneId_AirplaneUpdated() {
         Airplane airplane = new Airplane();

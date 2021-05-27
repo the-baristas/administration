@@ -30,8 +30,8 @@ pipeline {
             steps {
                 echo 'Deploying....'
                 sh "docker build --tag flight-service:$COMMIT_HASH ."
-                 sh "docker tag flight-service:$COMMIT_HASH 135316859264.dkr.ecr.us-east-2.amazonaws.com/flight-service:$COMMIT_HASH"
-                 sh "docker push 135316859264.dkr.ecr.us-east-2.amazonaws.com/flight-service:$COMMIT_HASH"
+                 sh "docker tag flight-service:$COMMIT_HASH 965256987864.dkr.ecr.us-east-2.amazonaws.com/flight-service:$COMMIT_HASH"
+                 sh "docker push 965256987864.dkr.ecr.us-east-2.amazonaws.com/flight-service:$COMMIT_HASH"
             }
         }
           stage('Deploy') {

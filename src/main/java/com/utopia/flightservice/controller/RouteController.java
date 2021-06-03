@@ -119,7 +119,6 @@ public class RouteController {
 	// update route
 	@PutMapping("/routes/{id}")
 	public ResponseEntity<RouteDto> updateRoute(@PathVariable Integer id, @RequestBody RouteDto routeDTO, UriComponentsBuilder builder) throws RouteNotSavedException {
-		System.out.println(routeDTO);
 		Route route;
 
 		try {

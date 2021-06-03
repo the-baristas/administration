@@ -1,11 +1,14 @@
 package com.utopia.flightservice.service;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import com.utopia.flightservice.entity.Flight;
+import com.utopia.flightservice.entity.FlightQuery;
 import com.utopia.flightservice.repository.FlightDao;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class FlightService {
@@ -34,20 +39,27 @@ public class FlightService {
         return flightDao.findAllByRouteId(routeId, paging);
     }
 
-//    public List<Flight> getFlightsByLocationQuery(String query) { return flightDao.findByRouteDestinationAirport(query); }
+    public List<Flight> getFlightsByRouteAndDate(Integer routeId, FlightQuery flightQuery) {
 
-//    public List<Flight> getFlightsByRouteAndDate(Integer routeId, FlightQuery flightQuery) {
-//
-//        Integer departureMonth = Integer.valueOf(flightQuery.getMonth());
-//        Integer departureDate = Integer.valueOf(flightQuery.getDate());
-//        Integer departureYear = Integer.valueOf(flightQuery.getYear());
-//        Integer departureHour = Integer.valueOf(flightQuery.getHour());
-//        Integer departureMinutes = Integer.valueOf(flightQuery.getMinutes());
-//
-//        Timestamp departureTime = Timestamp.valueOf(LocalDateTime.of(departureYear, departureMonth, departureDate, departureHour, departureMinutes));
-//
-//        return flightDao.findByRouteAndDate(routeId, departureTime);
-//    }
+
+            Integer month = Integer.valueOf(flightQuery.getMonth());
+            Integer date = Integer.valueOf(flightQuery.getDate());
+            Integer year = Integer.valueOf(flightQuery.getYear());
+
+            LocalDateTime dateQuery = LocalDateTime.of(year, month, date, 00, 00);
+            LocalDateTime queryHelper = LocalDateTime.of(year, month, date + 1, 00, 00);
+
+            Timestamp departure = Timestamp.valueOf(dateQuery);
+            Timestamp departureHelper = Timestamp.valueOf(queryHelper);
+
+        try {
+            List<Flight> flights = flightDao.findByRouteAndDate(routeId, departure, departureHelper);
+            System.out.println(flights);
+            return flights;
+        } catch (NullPointerException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights for those locations/dates. Try again.");
+        }
+    }
 
     // get one flight by the flight id
     public Optional<Flight> getFlightById(Integer id) {
@@ -56,10 +68,9 @@ public class FlightService {
 
     public Integer saveFlight(Flight flight) throws FlightNotSavedException {
         try {
-            flightDao.save(flight);
-            return flight.getId();
+            Flight savedFlight = flightDao.save(flight);
+            return savedFlight.getId();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             throw new FlightNotSavedException("ERROR! Flight not saved.");
         }
     }
@@ -69,7 +80,6 @@ public class FlightService {
         try {
             flightDao.updateFlight(id, flight.getRoute(), flight.getAirplane(), flight.getDepartureTime(), flight.getArrivalTime(), flight.getFirstReserved(), flight.getFirstPrice(), flight.getBusinessReserved(), flight.getBusinessPrice(), flight.getEconomyReserved(), flight.getEconomyPrice(), flight.getIsActive());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             throw new FlightNotSavedException("ERROR! Route not updated.");
         }
         return flight.getId();
@@ -79,7 +89,6 @@ public class FlightService {
     public String deleteFlight(Integer id) throws FlightNotSavedException {
         try {
             Optional<Flight> theFlight = getFlightById(id);
-            System.out.println(theFlight);
             if (theFlight.isPresent()) {
                 flightDao.delete(theFlight.get());
             } else {

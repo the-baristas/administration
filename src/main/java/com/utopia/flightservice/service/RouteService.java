@@ -64,7 +64,6 @@ public class RouteService {
 			routeDao.save(route);
 			return route.getId();
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			throw new RouteNotSavedException("ERROR! Route not saved.");
 		}
 	}
@@ -74,7 +73,6 @@ public class RouteService {
 		try {
 			routeDao.updateRoute(id, route.getOriginAirport(), route.getDestinationAirport(), route.getIsActive());
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			throw new RouteNotSavedException("ERROR! Route not updated.");
 		}
 		return route.getId();
@@ -90,7 +88,6 @@ public class RouteService {
 				return "Route not found!";
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			throw new RouteNotSavedException("ERROR! Route not deleted.");
 		}
 		return "Route Deleted!";

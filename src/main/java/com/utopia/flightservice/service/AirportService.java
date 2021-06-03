@@ -43,7 +43,6 @@ public class AirportService {
 			airportDao.save(airport);
 			return airport.getIataId();
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			throw new AirportNotSavedException("ERROR! Airport not saved.");
 		}
 	}
@@ -67,7 +66,6 @@ public class AirportService {
 			Airport theAirport = getAirportById(id);
 			airportDao.delete(theAirport);
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			throw new AirportNotSavedException("ERROR! Airport not deleted.");
 		}
 		return "Airport Deleted!";

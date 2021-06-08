@@ -43,12 +43,15 @@ public class RouteService {
 	}
 
 	public Route getRouteByLocationInfo(String originId, String destinationId) {
-		return routeDao.findByLocationInfo(originId, destinationId);
+		Airport query1 = airportService.getAirportByIdOrCity(originId);
+		Airport query2 = airportService.getAirportByIdOrCity(destinationId);
+
+		return routeDao.findByOriginAirportAndDestinationAirport(query1, query2);
 	}
 
 	public Page<Route> getByOriginAirportOrDestinationAirport(Integer pageNo, Integer pageSize, String sortBy, String query1, String query2) throws RouteNotFoundException {
 
-		Airport airport = airportService.getAirportById(query1);
+		Airport airport = airportService.getAirportByIdOrCity(query1);
 		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 
 		try {

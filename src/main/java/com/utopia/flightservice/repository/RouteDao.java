@@ -23,8 +23,7 @@ public interface RouteDao extends JpaRepository<Route, Integer> {
     @Query("FROM route WHERE destination_id = ?1")
     Route findByDestinationId(String destinationId);
 
-    @Query("FROM route WHERE origin_id = ?1 AND destination_id = ?2")
-    Route findByLocationInfo(String originId, String destinationId);
+    Route findByOriginAirportAndDestinationAirport(Airport query1, Airport query2);
 
 	Page<Route> findByOriginAirportOrDestinationAirport(Airport query1, Airport query2, Pageable paging);
 

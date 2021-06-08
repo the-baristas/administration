@@ -88,6 +88,7 @@ public class RouteController {
 														  @RequestParam(defaultValue = "10") Integer pageSize,
 														  @RequestParam(defaultValue = "id") String sortBy
 														  ) throws RouteNotFoundException {
+
 		Page<Route> routes = routeService.getByOriginAirportOrDestinationAirport(pageNo, pageSize, sortBy, query, query);
 		if (routes.isEmpty()) {
 			return new ResponseEntity("No routes found in database matching this query!", HttpStatus.NO_CONTENT);

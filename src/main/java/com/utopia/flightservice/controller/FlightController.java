@@ -76,6 +76,8 @@ public class FlightController {
                                                             @RequestParam(defaultValue = "0") Integer pageNo,
                                                             @RequestParam(defaultValue = "10") Integer pageSize,
                                                             @RequestParam(defaultValue = "id") String sortBy) {
+
+
         Route route = routeService.getRouteByLocationInfo(originId, destinationId);
         Integer routeId = route.getId();
 

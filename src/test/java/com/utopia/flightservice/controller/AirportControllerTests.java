@@ -14,13 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.utopia.flightservice.dto.AirplaneDto;
-import com.utopia.flightservice.dto.AirportDto;
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.service.AirportService;
 
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -36,9 +33,6 @@ public class AirportControllerTests {
 	
 	@MockBean
 	AirportService airportService;
-
-	@Autowired
-	private ModelMapper modelMapper;
     
 	// Airport Controller Tests
 	@Autowired
@@ -50,26 +44,28 @@ public class AirportControllerTests {
 		assertThat(controller).isNotNull();
 	}
 
+	
 	@Test
 	public void test_getAllAirports_statusOkAndListLength() throws Exception {
 		List<Airport> airports = new ArrayList<>();
-		Airport airport1 = new Airport("TA3", "Test City 3", true);
-		Airport airport2 = new Airport("TA4", "Test City 4", true);
+		Airport airport1 = new Airport("TA3", "Test City 3", 1);
+		Airport airport2 = new Airport("TA4", "Test City 4", 1);
 		airports.add(airport1);
 		airports.add(airport2);
 		when(airportService.getAllAirports()).thenReturn(airports);
-
+		
 		// create list of airports, pass it to thenReturn to test that getting back list of airports
 		
 		mockMvc.perform(get("/airports")
 					.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$", hasSize(2)));
+		
 		}
 	
 	@Test
 	public void shouldCreateAirport() throws Exception {
-		Airport mockAirport = new Airport("TA4", "Test City 4", true);
+		Airport mockAirport = new Airport("TA4", "Test City 4", 1);
 		when(airportService.saveAirport(mockAirport)).thenReturn(mockAirport.getIataId());
 	
 		mockMvc.perform(post("/airports/{id}", mockAirport.getIataId())
@@ -80,9 +76,9 @@ public class AirportControllerTests {
 	
 	@Test
 	public void shouldUpdateAirport() throws Exception {
-		Airport mockAirport = new Airport("TA5", "Test City 5", true);
+		Airport mockAirport = new Airport("TA5", "Test City 5", 1);
 		airportService.saveAirport(mockAirport);
-		Airport updatedAirport = new Airport("TA5", "Updated Test City", false);
+		Airport updatedAirport = new Airport("TA5", "Updated Test City", 2);
 		when(airportService.updateAirport(mockAirport.getIataId(), updatedAirport)).thenReturn(updatedAirport.getIataId());
 		
 		mockMvc.perform(put("/airports/TA5")
@@ -93,7 +89,7 @@ public class AirportControllerTests {
 	
 	@Test
 	public void shouldDeleteAirport() throws Exception {
-		Airport mockAirport = new Airport("TA6", "Test City 6", true);
+		Airport mockAirport = new Airport("TA6", "Test City 6", 1);
 		airportService.saveAirport(mockAirport);
 		when(airportService.deleteAirport(mockAirport.getIataId())).thenReturn(mockAirport.getIataId());
 		
@@ -101,39 +97,6 @@ public class AirportControllerTests {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(mockAirport)))
 				.andExpect(status().isNoContent());
-	}
-
-	@Test
-	public void shouldGetSingleAirport_ById() throws Exception {
-		Airport airport = new Airport("TA6", "Test City 6", true);
-		when(airportService.getAirportById("TA6")).thenReturn(airport);
-
-		mockMvc.perform(get("/airports/TA6")
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk());
-
-	}
-
-	@Test
-	public void shouldFindAirport_ContainingLetter() throws Exception {
-		List<Airport> airports = new ArrayList<>();
-		Airport airport1 = new Airport("TA6", "Test City 6A", true);
-		Airport airport2 = new Airport("TA6", "Test City 6B", true);
-		airports.add(airport1);
-		airports.add(airport2);
-
-		String contains = "6";
-
-		when(airportService
-				.findByCityContainingLetter(contains)).thenReturn(airports);
-
-		AirportDto foundAirportDto = modelMapper.map(airport1,
-				AirportDto.class);
-
-		mockMvc.perform(get("/airports-containing?contains=6")
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk());
-
 	}
 
 	public static String asJsonString(final Object obj) {

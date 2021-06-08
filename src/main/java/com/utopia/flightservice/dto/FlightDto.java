@@ -1,7 +1,5 @@
 package com.utopia.flightservice.dto;
 
-import com.utopia.flightservice.entity.Route;
-import com.utopia.flightservice.service.RouteService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,10 +18,10 @@ public class FlightDto {
     private Integer id;
 
     @PositiveOrZero
-    private Integer airplaneId;
+    private Integer routeId;
 
     @PositiveOrZero
-    private Integer routeId;
+    private Integer airplaneId;
 
     @NotBlank
     private Timestamp departureTime;
@@ -50,6 +48,7 @@ public class FlightDto {
     private Float economyPrice;
 
     @Positive
-    private Boolean isActive;
+    private Integer isActive;
+
 
 }

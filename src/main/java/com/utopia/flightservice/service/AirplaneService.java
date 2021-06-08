@@ -64,11 +64,10 @@ public class AirplaneService {
         return airplaneRepository.save(airplane);
     }
 
-    public String deleteAirplaneById(Long id) throws ResponseStatusException {
+    public void deleteAirplaneById(Long id) throws ResponseStatusException {
         airplaneRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Could not find airplane with id = " + id));
         airplaneRepository.deleteById(id);
-        return "Airplane Deleted!";
     }
 }

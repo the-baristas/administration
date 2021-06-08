@@ -1,28 +1,23 @@
 package com.utopia.flightservice.entity;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.utopia.flightservice.service.RouteService;
 import lombok.*;
 
-import com.utopia.flightservice.repository.RouteDao;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity(name = "flight")
-@JsonSerialize
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Flight {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
-    @JoinColumn(name = "airplane_id", referencedColumnName = "id")
-    private Airplane airplane;
+    @Column(name = "route_id")
+    private Integer routeId;
+
+    @Column(name = "airplane_id")
+    private Integer airplaneId;
 
     @Column(name = "departure_time")
     private Timestamp departureTime;
@@ -49,10 +44,5 @@ public class Flight {
     private Float economyPrice;
 
     @Column(name = "is_active")
-    private Boolean isActive;
-
-    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
-    @JoinColumn(name = "route_id", referencedColumnName = "id")
-    private Route route;
-
+    private Integer isActive;
 }

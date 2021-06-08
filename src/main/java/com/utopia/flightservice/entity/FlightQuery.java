@@ -7,6 +7,4 @@ public class FlightQuery {
     private String month;
     private String date;
     private String year;
-    private String hour;
-    private String minutes;
 }

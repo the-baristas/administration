@@ -10,4 +10,7 @@ public class ModelMapperFailedException extends ResponseStatusException {
         super(HttpStatus.FAILED_DEPENDENCY, "ModelMapper dependency failed.",
                 cause);
     }
+
 }
+
+

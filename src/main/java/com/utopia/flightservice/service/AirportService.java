@@ -26,14 +26,25 @@ public class AirportService {
 	// find airports containing letter
 	public List<Airport> findByCityContainingLetter(String contains) { return airportDao.findByCityContaining(contains); }
 	
-	// get one airport by the iata id
-	public Airport getAirportById(String id) {
+	// get one airport by the iata id or city
+	public Airport getAirportByIdOrCity(String query) {
 		try {
-			return airportDao.findByIataId(id);
+			return airportDao.findByIataIdContainingOrCityContaining(query, query);
 		}
 		catch(Exception e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-					"Could not find airport with Iata ID:" + id);
+					"Could not find airport with Iata ID:" + query);
+		}
+	}
+
+	// get one airport by the iata id
+	public Airport getAirportById(String query) {
+		try {
+			return airportDao.findByIataId(query);
+		}
+		catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+					"Could not find airport with Iata ID:" + query);
 		}
 	}
 	
@@ -43,7 +54,6 @@ public class AirportService {
 			airportDao.save(airport);
 			return airport.getIataId();
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			throw new AirportNotSavedException("ERROR! Airport not saved.");
 		}
 	}
@@ -67,7 +77,6 @@ public class AirportService {
 			Airport theAirport = getAirportById(id);
 			airportDao.delete(theAirport);
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			throw new AirportNotSavedException("ERROR! Airport not deleted.");
 		}
 		return "Airport Deleted!";

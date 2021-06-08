@@ -26,19 +26,19 @@ public class AirplaneService {
     }
 
     public Page<Airplane> findAllAirplanes(Integer pageIndex,
-            Integer pageSize) {
+                                           Integer pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         return airplaneRepository.findAll(pageable);
     }
 
     public Page<Airplane> searchAirplanesPage(String term, Integer pageIndex,
-            Integer pageSize) {
+                                              Integer pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         return airplaneRepository.findByModelContaining(term, pageable);
     }
 
     public Page<Airplane> findDistinctByModelContaining(String term, Integer pageIndex,
-            Integer pageSize) {
+                                                        Integer pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         return airplaneRepository.findDistinctByModelContaining(term, pageable);
     }
@@ -64,11 +64,10 @@ public class AirplaneService {
         return airplaneRepository.save(airplane);
     }
 
-    public String deleteAirplaneById(Long id) throws ResponseStatusException {
+    public void deleteAirplaneById(Long id) throws ResponseStatusException {
         airplaneRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Could not find airplane with id = " + id));
         airplaneRepository.deleteById(id);
-        return "Airplane Deleted!";
     }
 }

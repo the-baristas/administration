@@ -9,8 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.utopia.flightservice.entity.Airport;
-import com.utopia.flightservice.repository.RouteDao;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.exception.RouteNotSavedException;
 import com.utopia.flightservice.repository.RouteDao;
@@ -26,9 +24,6 @@ public class RouteServiceTests {
     @Autowired
     private RouteService routeService;
 
-    @Autowired
-    private AirportService airportService;
-
     @MockBean
     private RouteDao routeDao;
 
@@ -36,13 +31,9 @@ public class RouteServiceTests {
     public void findAllRoutes_FindsRoutes() {
         Route route = new Route();
         route.setId(28);
-
-        Airport airport = airportService.getAirportById("SFO");
-        Airport airport2 = airportService.getAirportById("LAX");
-
-        route.setOriginAirport(airport);
-        route.setDestinationAirport(airport2);
-        route.setIsActive(true);
+        route.setOriginId("SFO");
+        route.setOriginId("LAX");
+        route.setIsActive(1);
         List<Route> allRoutes = Arrays.asList(route);
         when(routeDao.findAll()).thenReturn(allRoutes);
 
@@ -54,12 +45,9 @@ public class RouteServiceTests {
     public void findRouteById_FindsRoute() {
         Optional<Route> route = Optional.ofNullable(new Route());
         route.get().setId(28);
-        Airport airport = airportService.getAirportById("SFO");
-        Airport airport2 = airportService.getAirportById("LAX");
-
-        route.get().setOriginAirport(airport);
-        route.get().setDestinationAirport(airport2);
-        route.get().setIsActive(true);
+        route.get().setOriginId("SFO");
+        route.get().setDestinationId("JFK");
+        route.get().setIsActive(1);
 
 
         when(routeDao.findById(28)).thenReturn(route);
@@ -72,12 +60,9 @@ public class RouteServiceTests {
     public void addRoute_AndSaveIt() throws RouteNotSavedException {
         Route route = new Route();
         route.setId(28);
-        Airport airport = airportService.getAirportById("SFO");
-        Airport airport2 = airportService.getAirportById("LAX");
-
-        route.setOriginAirport(airport);
-        route.setDestinationAirport(airport2);
-        route.setIsActive(true);
+        route.setOriginId("SFO");
+        route.setDestinationId("JFK");
+        route.setIsActive(1);
         when(routeDao.save(route)).thenReturn(route);
 
         Integer savedRouteID = routeService.saveRoute(route);

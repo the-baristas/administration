@@ -2,7 +2,6 @@ package com.utopia.flightservice.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,10 +10,6 @@ import com.utopia.flightservice.repository.FlightDao;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.entity.FlightQuery;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,19 +19,11 @@ public class FlightService {
     private FlightDao flightDao;
 
     // get every flight as a list
-    public List<Flight> getAllFlights() { return flightDao.findAll(); }
-
-    public Page<Flight> getPagedFlights(Integer pageNo, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return flightDao.findAll(paging);
+    public List<Flight> getAllFlights() {
+        return flightDao.findAll();
     }
 
-    public Page<Flight> getFlightsByRoute(Integer pageNo, Integer pageSize, String sortBy, Integer routeId) {
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return flightDao.findAllByRoute(paging, routeId);
-    }
-
-    public List<Flight> getFlightsByLocationQuery(String query) { return flightDao.findByRouteDestinationAirport(query); }
+    public List<Flight> getFlightsByRoute(Integer routeId) { return flightDao.findByRouteId(routeId); }
 
     public List<Flight> getFlightsByRouteAndDate(Integer routeId, FlightQuery flightQuery) {
 
@@ -69,7 +56,18 @@ public class FlightService {
     // update a route's information
     public Integer updateFlight(Integer id, Flight flight) throws FlightNotSavedException {
         try {
-            flightDao.updateFlight(id, flight.getRoute(), flight.getAirplane(), flight.getDepartureTime(), flight.getArrivalTime(), flight.getFirstReserved(), flight.getFirstPrice(), flight.getBusinessReserved(), flight.getBusinessPrice(), flight.getEconomyReserved(), flight.getEconomyPrice(), flight.getIsActive());
+            flightDao.updateFlight(id,
+                            flight.getRouteId(),
+                            flight.getAirplaneId(),
+                            flight.getDepartureTime(),
+                            flight.getArrivalTime(),
+                            flight.getFirstReserved(),
+                            flight.getFirstPrice(),
+                            flight.getBusinessReserved(),
+                            flight.getBusinessPrice(),
+                            flight.getEconomyReserved(),
+                            flight.getEconomyPrice(),
+                            flight.getIsActive());
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new FlightNotSavedException("ERROR! Route not updated.");
@@ -77,11 +75,10 @@ public class FlightService {
         return flight.getId();
     }
 
-    // delete a flight
+    // delete an airport
     public String deleteFlight(Integer id) throws FlightNotSavedException {
         try {
             Optional<Flight> theFlight = getFlightById(id);
-            System.out.println(theFlight);
             if (theFlight.isPresent()) {
                 flightDao.delete(theFlight.get());
             } else {

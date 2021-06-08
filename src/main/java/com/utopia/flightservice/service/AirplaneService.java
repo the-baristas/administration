@@ -37,8 +37,8 @@ public class AirplaneService {
         return airplaneRepository.findByModelContaining(term, pageable);
     }
 
-    public Page<Airplane> findDistinctByModelContaining(String term, Integer pageIndex,
-            Integer pageSize) {
+    public Page<Airplane> findDistinctByModelContaining(String term,
+            Integer pageIndex, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         return airplaneRepository.findDistinctByModelContaining(term, pageable);
     }

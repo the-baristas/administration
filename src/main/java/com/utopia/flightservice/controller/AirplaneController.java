@@ -110,7 +110,7 @@ public class AirplaneController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteAirplane(@PathVariable Long id)
+    public ResponseEntity<Void> deleteAirplane(@PathVariable Long id)
             throws ResponseStatusException {
         airplaneService.deleteAirplaneById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

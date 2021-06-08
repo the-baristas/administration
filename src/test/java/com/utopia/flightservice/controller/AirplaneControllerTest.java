@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.dto.AirplaneDto;
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.service.AirplaneService;
@@ -59,7 +60,8 @@ public class AirplaneControllerTest {
         webTestClient.get().uri("/airplanes").accept(MediaType.APPLICATION_JSON)
                 .exchange().expectStatus().isOk().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(AirplaneDto.class).isEqualTo(foundAirplaneDtos);
+                .expectBody(String.class).isEqualTo(new ObjectMapper()
+                        .writeValueAsString(foundAirplaneDtos));
     }
 
     @Test
@@ -91,7 +93,7 @@ public class AirplaneControllerTest {
         AirplaneDto airplaneDto = modelMapper.map(airplane, AirplaneDto.class);
 
         webTestClient.post().uri("/airplanes")
-                .contentType(MediaType.APPLICATION_JSON).bodyValue(airplane)
+                .contentType(MediaType.APPLICATION_JSON).bodyValue(airplaneDto)
                 .exchange().expectStatus().isCreated().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
                 .expectBody(AirplaneDto.class).isEqualTo(airplaneDto);
@@ -114,7 +116,6 @@ public class AirplaneControllerTest {
                 .exchange().expectStatus().isOk().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
                 .expectBody(AirplaneDto.class).isEqualTo(airplaneDto);
-
     }
 
     @Test

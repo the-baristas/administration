@@ -1,18 +1,10 @@
 package com.utopia.flightservice.entity;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity(name = "airport")
-
-@Data @NoArgsConstructor @AllArgsConstructor
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-
 public class Airport {
 	
     @Id
@@ -21,8 +13,48 @@ public class Airport {
     
     @Column(name = "city")
 	private String city;
-
+    
     @Column(name = "is_active")
-	private Boolean isActive;
+	private Integer isActive;
+    
+    // constructor
+    
+    public Airport() {}
+    
+	public Airport(String iataId, String city, Integer isActive) {
+		super();
+		this.iataId = iataId;
+		this.city = city;
+		this.isActive = isActive;
+	}
+    
+ 
+    // getters and setters
+	public String getIataId() {
+		return iataId;
+	}
+
+	public void setIataId(String iataId) {
+		this.iataId = iataId;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public Integer getIsActive() {
+		return isActive;
+	}
+	public void setIsActive(Integer isActive) {
+		this.isActive = isActive;
+	}
+	
+	// to string
+	@Override
+	public String toString() {
+		return "Airport [iataId=" + iataId + ", city=" + city + ", isActive=" + isActive + "]";
+	}
+	
 
 }

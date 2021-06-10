@@ -5,5 +5,4 @@ public class FlightNotSavedException extends Throwable {
 
     public FlightNotSavedException(String s) {
     }
-
 }

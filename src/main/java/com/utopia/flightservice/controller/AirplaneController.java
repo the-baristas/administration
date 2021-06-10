@@ -2,8 +2,6 @@ package com.utopia.flightservice.controller;
 
 import java.net.URI;
 import java.text.ParseException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.utopia.flightservice.dto.AirplaneDto;
 import com.utopia.flightservice.entity.Airplane;
@@ -112,7 +110,7 @@ public class AirplaneController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteAirplane(@PathVariable Long id)
+    public ResponseEntity<Void> deleteAirplane(@PathVariable Long id)
             throws ResponseStatusException {
         airplaneService.deleteAirplaneById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

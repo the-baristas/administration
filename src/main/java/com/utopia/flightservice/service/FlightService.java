@@ -54,7 +54,6 @@ public class FlightService {
 
         try {
             List<Flight> flights = flightDao.findByRouteAndDate(routeId, departure, departureHelper);
-            System.out.println(flights);
             return flights;
         } catch (NullPointerException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights for those locations/dates. Try again.");

@@ -23,9 +23,9 @@ public interface RouteDao extends JpaRepository<Route, Integer> {
     @Query("FROM route WHERE destination_id = ?1")
     Route findByDestinationId(String destinationId);
 
-    Route findByOriginAirportAndDestinationAirport(Airport query1, Airport query2);
+    Route findByOriginAirportInAndDestinationAirportIn(List<Airport> query1, List<Airport> query2);
 
-	Page<Route> findByOriginAirportOrDestinationAirport(Airport query1, Airport query2, Pageable paging);
+	Page<Route> findByOriginAirportInOrDestinationAirportIn(List<Airport> query1, List<Airport> query2, Pageable paging);
 
     @Modifying
     @Query("UPDATE route SET origin_id = ?2, destination_id = ?3, is_active = ?4 WHERE id = ?1")

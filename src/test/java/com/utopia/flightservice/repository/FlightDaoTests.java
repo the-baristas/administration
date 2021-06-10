@@ -6,8 +6,11 @@ import static org.hamcrest.Matchers.is;
 import java.sql.Timestamp;
 import java.util.Optional;
 
+import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Flight;
 
+import com.utopia.flightservice.entity.Route;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -29,10 +32,16 @@ public class FlightDaoTests {
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route1 = new Route(1, originAirport, destinationAirport, true);
+
+        Airplane airplane = new Airplane(1L, 200L, 100L, 50L, "Boeing 787");
+
         Flight flight = new Flight();
         flight.setId(101);
-        flight.setRouteId(5);
-        flight.setAirplaneId(7);
+        flight.setRoute(route1);
+        flight.setAirplane(airplane);
         flight.setDepartureTime(departureTime);
         flight.setArrivalTime(arrivalTime);
         flight.setFirstReserved(0);
@@ -41,15 +50,15 @@ public class FlightDaoTests {
         flight.setBusinessPrice(300.00f);
         flight.setEconomyReserved(0);
         flight.setEconomyPrice(200.00f);
-        flight.setIsActive(1);
+        flight.setIsActive(true);
         entityManager.persist(flight);
         entityManager.flush();
 
 
         Optional<Flight> flightFromDB = dao.findById(flight.getId());
         assertThat(flightFromDB.get().getId(), is(101));
-        assertThat(flightFromDB.get().getRouteId(), is(5));
-        assertThat(flightFromDB.get().getAirplaneId(), is(7));
+        assertThat(flightFromDB.get().getRoute(), is(route1));
+        assertThat(flightFromDB.get().getAirplane(), is(airplane));
         assertThat(flightFromDB.get().getIsActive(), is(1));
     }
 
@@ -60,10 +69,17 @@ public class FlightDaoTests {
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route1 = new Route(1, originAirport, destinationAirport, true);
+
+        Airplane airplane = new Airplane(1L, 200L, 100L, 50L, "Boeing 787");
+
+
         Flight flight = new Flight();
         flight.setId(101);
-        flight.setRouteId(5);
-        flight.setAirplaneId(7);
+        flight.setRoute(route1);
+        flight.setAirplane(airplane);
         flight.setDepartureTime(departureTime);
         flight.setArrivalTime(arrivalTime);
         flight.setFirstReserved(0);
@@ -72,17 +88,17 @@ public class FlightDaoTests {
         flight.setBusinessPrice(300.00f);
         flight.setEconomyReserved(0);
         flight.setEconomyPrice(200.00f);
-        flight.setIsActive(1);
+        flight.setIsActive(true);
         entityManager.persist(flight);
         entityManager.flush();
 
         Flight flightFromDB = dao.findById(flight.getId()).get();
-        flightFromDB.setAirplaneId(8);
+        flightFromDB.setAirplane(airplane);
         dao.save(flightFromDB);
         entityManager.persist(flightFromDB);
         entityManager.flush();
 
-        assertThat(flightFromDB.getAirplaneId(), is(8));
+        assertThat(flightFromDB.getAirplane(), is(airplane));
 
     }
 
@@ -93,10 +109,17 @@ public class FlightDaoTests {
         Timestamp departureTime = Timestamp.valueOf(str1);
         Timestamp arrivalTime = Timestamp.valueOf(str2);
 
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route1 = new Route(1, originAirport, destinationAirport, true);
+
+        Airplane airplane = new Airplane(1L, 200L, 100L, 50L, "Boeing 787");
+
+
         Flight flight = new Flight();
         flight.setId(101);
-        flight.setRouteId(5);
-        flight.setAirplaneId(7);
+        flight.setRoute(route1);
+        flight.setAirplane(airplane);
         flight.setDepartureTime(departureTime);
         flight.setArrivalTime(arrivalTime);
         flight.setFirstReserved(0);
@@ -105,7 +128,7 @@ public class FlightDaoTests {
         flight.setBusinessPrice(300.00f);
         flight.setEconomyReserved(0);
         flight.setEconomyPrice(200.00f);
-        flight.setIsActive(1);
+        flight.setIsActive(true);
         entityManager.persist(flight);
         entityManager.flush();
 

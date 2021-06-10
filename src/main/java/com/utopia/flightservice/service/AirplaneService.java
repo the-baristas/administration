@@ -26,19 +26,19 @@ public class AirplaneService {
     }
 
     public Page<Airplane> findAllAirplanes(Integer pageIndex,
-            Integer pageSize) {
+                                           Integer pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         return airplaneRepository.findAll(pageable);
     }
 
     public Page<Airplane> searchAirplanesPage(String term, Integer pageIndex,
-            Integer pageSize) {
+                                              Integer pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         return airplaneRepository.findByModelContaining(term, pageable);
     }
 
-    public Page<Airplane> findDistinctByModelContaining(String term,
-            Integer pageIndex, Integer pageSize) {
+    public Page<Airplane> findDistinctByModelContaining(String term, Integer pageIndex,
+                                                        Integer pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         return airplaneRepository.findDistinctByModelContaining(term, pageable);
     }

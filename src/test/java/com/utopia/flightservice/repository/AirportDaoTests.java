@@ -25,7 +25,7 @@ public class AirportDaoTests {
         Airport airport = new Airport();
         airport.setIataId("TS6");
         airport.setCity("Test City 6");
-        airport.setIsActive(1);
+        airport.setIsActive(true);
         entityManager.persist(airport);
         entityManager.flush();
 
@@ -40,7 +40,7 @@ public class AirportDaoTests {
         Airport airport = new Airport();
         airport.setIataId("TS6");
         airport.setCity("Test City 6");
-        airport.setIsActive(1);
+        airport.setIsActive(true);
         entityManager.persist(airport);
         entityManager.flush();
 
@@ -60,7 +60,7 @@ public class AirportDaoTests {
         String iataId = "TS7";
         airport.setIataId(iataId);
         airport.setCity("Test City 7");
-        airport.setIsActive(1);
+        airport.setIsActive(true);
         entityManager.persist(airport);
         entityManager.flush();
 

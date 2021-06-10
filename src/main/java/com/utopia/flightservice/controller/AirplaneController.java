@@ -2,6 +2,8 @@ package com.utopia.flightservice.controller;
 
 import java.net.URI;
 import java.text.ParseException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.utopia.flightservice.dto.AirplaneDto;
 import com.utopia.flightservice.entity.Airplane;
@@ -32,12 +34,12 @@ public class AirplaneController {
     private final ModelMapper modelMapper;
 
     public AirplaneController(AirplaneService airplaneService,
-            ModelMapper modelMapper) {
+                              ModelMapper modelMapper) {
         this.airplaneService = airplaneService;
         this.modelMapper = modelMapper;
     }
 
-    @GetMapping("page")
+    @GetMapping("/page")
     public ResponseEntity<Page<Airplane>> findAllAirplanes(
             @RequestParam("index") Integer pageIndex,
             @RequestParam("size") Integer pageSize) {
@@ -46,14 +48,14 @@ public class AirplaneController {
         return ResponseEntity.ok(airplanes);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<AirplaneDto> findAirplaneById(@PathVariable Long id) {
         AirplaneDto airplaneDto = convertToDto(
                 airplaneService.findAirplaneById(id));
         return ResponseEntity.status(HttpStatus.OK).body(airplaneDto);
     }
 
-    @GetMapping("search")
+    @GetMapping("/search")
     public ResponseEntity<Page<AirplaneDto>> findByModelContaining(
             @RequestParam String term, @RequestParam("index") Integer pageIndex,
             @RequestParam("size") Integer pageSize) {
@@ -63,7 +65,7 @@ public class AirplaneController {
         return ResponseEntity.status(HttpStatus.OK).body(airplaneDtos);
     }
 
-    @GetMapping("distinct_search")
+    @GetMapping("/distinct_search")
     public ResponseEntity<Page<AirplaneDto>> findDistinctByModelContaining(
             @RequestParam("term") String term,
             @RequestParam("index") Integer pageIndex,
@@ -93,7 +95,7 @@ public class AirplaneController {
                 .headers(responseHeaders).body(convertToDto(createdAirplane));
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<AirplaneDto> updateAirplane(
             @RequestBody AirplaneDto airplaneDto)
             throws ResponseStatusException {
@@ -109,8 +111,8 @@ public class AirplaneController {
 
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteAirplane(@PathVariable Long id)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteAirplane(@PathVariable Long id)
             throws ResponseStatusException {
         airplaneService.deleteAirplaneById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

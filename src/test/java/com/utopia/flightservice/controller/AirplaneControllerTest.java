@@ -8,13 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.dto.AirplaneDto;
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.service.AirplaneService;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +41,6 @@ public class AirplaneControllerTest {
         webTestClient = MockMvcWebTestClient.bindTo(mockMvc).build();
     }
 
-    @Disabled
     @Test
     public void findAllAirplanes_JsonArray() throws Exception {
         Airplane airplane = new Airplane();
@@ -60,8 +57,7 @@ public class AirplaneControllerTest {
         webTestClient.get().uri("/airplanes").accept(MediaType.APPLICATION_JSON)
                 .exchange().expectStatus().isOk().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
-                .expectBody(String.class).isEqualTo(new ObjectMapper()
-                        .writeValueAsString(foundAirplaneDtos));
+                .expectBodyList(AirplaneDto.class).isEqualTo(foundAirplaneDtos);
     }
 
     @Test
@@ -93,13 +89,12 @@ public class AirplaneControllerTest {
         AirplaneDto airplaneDto = modelMapper.map(airplane, AirplaneDto.class);
 
         webTestClient.post().uri("/airplanes")
-                .contentType(MediaType.APPLICATION_JSON).bodyValue(airplaneDto)
+                .contentType(MediaType.APPLICATION_JSON).bodyValue(airplane)
                 .exchange().expectStatus().isCreated().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
                 .expectBody(AirplaneDto.class).isEqualTo(airplaneDto);
     }
 
-    @Disabled
     @Test
     public void updateAirplane_ValidAirplaneId_AirplaneUpdated() {
         Airplane airplane = new Airplane();
@@ -116,6 +111,7 @@ public class AirplaneControllerTest {
                 .exchange().expectStatus().isOk().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
                 .expectBody(AirplaneDto.class).isEqualTo(airplaneDto);
+
     }
 
     @Test

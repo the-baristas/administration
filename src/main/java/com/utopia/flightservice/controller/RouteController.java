@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/routes")
 public class RouteController {
 	private final ModelMapper modelMapper;
 
@@ -46,6 +47,7 @@ public class RouteController {
 	}
 
 	// get all routes
+	@GetMapping("/all")
 	public ResponseEntity<List<Route>> getAllRoutes() {
 			List<Route> routes = routeService.getAllRoutes();			
 			if (routes.isEmpty()) {
@@ -55,7 +57,7 @@ public class RouteController {
 			}
 	}
 
-	@GetMapping("/routes")
+	@GetMapping("")
 	public ResponseEntity<Page<Route>> getPagedRoutes(@RequestParam(defaultValue = "0") Integer pageNo,
 													  @RequestParam(defaultValue = "10") Integer pageSize,
 													  @RequestParam(defaultValue = "id") String sortBy) {
@@ -68,14 +70,14 @@ public class RouteController {
 	}
 
 	// get single route
-	@GetMapping("/routes/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<Route> getRoute(@PathVariable Integer id) {
 		Optional<Route> route = routeService.getRouteById(id);
 		return new ResponseEntity(route, HttpStatus.OK);
 		}
 
 	// get single route with location data
-	@GetMapping("/routes/{originId}/{destinationId}")
+	@GetMapping("/{originId}/{destinationId}")
 	public ResponseEntity<Route> getRouteByLocationInfo(@PathVariable String originId, @PathVariable String destinationId) {
 		Route route = routeService.getRouteByLocationInfo(originId, destinationId);
 		return new ResponseEntity(route, HttpStatus.OK);
@@ -98,7 +100,7 @@ public class RouteController {
 	}
 	
 	// create a new route
-	@PostMapping("/routes")
+	@PostMapping("")
 	public ResponseEntity<RouteDto> createRoute(@RequestBody RouteDto routeDTO, UriComponentsBuilder builder) throws RouteNotSavedException {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		URI location = builder.path("/routes/{id}").buildAndExpand(routeDTO.getId()).toUri();
@@ -118,7 +120,7 @@ public class RouteController {
 			}
 	
 	// update route
-	@PutMapping("/routes/{id}")
+	@PutMapping("/{id}")
 	public ResponseEntity<RouteDto> updateRoute(@PathVariable Integer id, @RequestBody RouteDto routeDTO, UriComponentsBuilder builder) throws RouteNotSavedException {
 		Route route;
 
@@ -133,7 +135,7 @@ public class RouteController {
 	}
 	
 	// delete a route
-	@DeleteMapping("/routes/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteRoute(@PathVariable Integer id) throws RouteNotSavedException {
 		String isRemoved = routeService.deleteRoute(id);
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

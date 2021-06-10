@@ -40,7 +40,7 @@ public class FlightService {
         return flightDao.findAllByRouteIn(routes, paging);
     }
 
-    public List<Flight> getFlightsByRouteAndDate(Integer pageNo, Integer pageSize, String sortBy, List<Route> routes, FlightQuery flightQuery) {
+    public List<Flight> getFlightsByRouteAndDate(List<Route> routes, FlightQuery flightQuery) {
 
 
             Integer month = Integer.valueOf(flightQuery.getMonth());
@@ -54,8 +54,8 @@ public class FlightService {
             Timestamp departureHelper = Timestamp.valueOf(queryHelper);
 
         try {
-            Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-            return flightDao.findByRouteInAndDate(paging, routes, departure, departureHelper);
+            List<Flight> flights = flightDao.findByRouteInAndDate(routes, departure, departureHelper);
+            return flights;
         } catch (NullPointerException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights for those locations/dates. Try again.");
         }

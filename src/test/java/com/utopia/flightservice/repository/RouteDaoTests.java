@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Optional;
 
-import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Route;
 
 import org.junit.jupiter.api.Test;
@@ -25,41 +24,33 @@ public class RouteDaoTests {
     @Test
     public void testCreateAndGetRouteById() {
         Route route = new Route();
-
-        Airport originAirport = new Airport("TC1", "Test City 1", true);
-        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
-
         route.setId(28);
-        route.setOriginAirport(originAirport);
-        route.setDestinationAirport(destinationAirport);
-        route.setIsActive(true);
+        route.setOriginId("SFO");
+        route.setDestinationId("JFK");
+        route.setIsActive(1);
         entityManager.persist(route);
         entityManager.flush();
 
 
-        Optional<Route> routeFromDB = dao.findById(route.getId());
+       Optional<Route> routeFromDB = dao.findById(route.getId());
         assertThat(routeFromDB.get().getId(), is(28));
-        assertThat(routeFromDB.get().getOriginAirport(), is("SFO"));
-        assertThat(routeFromDB.get().getDestinationAirport(), is("JFK"));
+        assertThat(routeFromDB.get().getOriginId(), is("SFO"));
+        assertThat(routeFromDB.get().getDestinationId(), is("JFK"));
         assertThat(routeFromDB.get().getIsActive(), is(1));
     }
 
     @Test
     public void testUpdateRoute() {
         Route route = new Route();
-
-        Airport originAirport = new Airport("TC1", "Test City 1", true);
-        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
-
         route.setId(28);
-        route.setOriginAirport(originAirport);
-        route.setDestinationAirport(destinationAirport);
-        route.setIsActive(true);
+        route.setOriginId("SFO");
+        route.setDestinationId("JFK");
+        route.setIsActive(1);
         entityManager.persist(route);
         entityManager.flush();
 
         Optional<Route> routeFromDB = dao.findById(route.getId());
-        routeFromDB.get().setIsActive(false);
+        routeFromDB.get().setIsActive(2);
         dao.save(routeFromDB.get());
         entityManager.persist(routeFromDB.get());
         entityManager.flush();

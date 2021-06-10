@@ -71,7 +71,7 @@ public class AirportController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/airports/{id}")
     public ResponseEntity<String> createAirport(@RequestBody Airport airport,
-                                                UriComponentsBuilder builder) throws AirportNotSavedException {
+            UriComponentsBuilder builder) throws AirportNotSavedException {
         airportService.saveAirport(airport);
         return ResponseEntity
                 .created(builder.path("/airports/{id}")
@@ -82,7 +82,7 @@ public class AirportController {
     // update airport
     @PutMapping("/airports/{id}")
     public ResponseEntity<String> updateAirport(@PathVariable String id,
-                                                @RequestBody Airport airport) throws AirportNotSavedException {
+            @RequestBody Airport airport) throws AirportNotSavedException {
         airportService.updateAirport(id, airport);
         return ResponseEntity.ok().build();
     }

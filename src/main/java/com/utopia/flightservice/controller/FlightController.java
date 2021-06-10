@@ -92,12 +92,15 @@ public class FlightController {
     @PostMapping("/query")
     public ResponseEntity<List<Flight>> getFlightsByRouteAndLocation(@RequestParam(name = "originId") String originId,
                                                                      @RequestParam(name = "destinationId") String destinationId,
-                                                                     @RequestBody FlightQuery flightQuery) throws ResponseStatusException {
+                                                                     @RequestBody FlightQuery flightQuery,
+                                                                     @RequestParam(defaultValue = "0") Integer pageNo,
+                                                                     @RequestParam(defaultValue = "10") Integer pageSize,
+                                                                     @RequestParam(defaultValue = "id") String sortBy) throws ResponseStatusException {
 
             List<Route> routes = routeService.getRouteByLocationInfo(originId, destinationId);
 
             try {
-                List<Flight> flights = flightService.getFlightsByRouteAndDate(routes, flightQuery);
+                Page<Flight> flights = flightService.getFlightsByRoute(pageNo, pageSize, sortBy, routes);
                 return new ResponseEntity(flights, HttpStatus.OK);
             } catch (NullPointerException e) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights for those locations/dates. Try again.");

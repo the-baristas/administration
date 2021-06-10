@@ -78,10 +78,9 @@ public class FlightController {
                                                             @RequestParam(defaultValue = "id") String sortBy) {
 
 
-        Route route = routeService.getRouteByLocationInfo(originId, destinationId);
-        Integer routeId = route.getId();
+        List<Route> routes = routeService.getRouteByLocationInfo(originId, destinationId);
 
-        Page<Flight> flights = flightService.getFlightsByRoute(pageNo, pageSize, sortBy, routeId);
+        Page<Flight> flights = flightService.getFlightsByRoute(pageNo, pageSize, sortBy, routes);
         if (flights.isEmpty()) {
             return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
         } else {
@@ -95,11 +94,10 @@ public class FlightController {
                                                                      @RequestParam(name = "destinationId") String destinationId,
                                                                      @RequestBody FlightQuery flightQuery) throws ResponseStatusException {
 
-            Route route = routeService.getRouteByLocationInfo(originId, destinationId);
-            Integer routeId = route.getId();
+            List<Route> routes = routeService.getRouteByLocationInfo(originId, destinationId);
 
             try {
-                List<Flight> flights = flightService.getFlightsByRouteAndDate(routeId, flightQuery);
+                List<Flight> flights = flightService.getFlightsByRouteAndDate(routes, flightQuery);
                 return new ResponseEntity(flights, HttpStatus.OK);
             } catch (NullPointerException e) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights for those locations/dates. Try again.");

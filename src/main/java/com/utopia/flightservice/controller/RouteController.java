@@ -79,8 +79,8 @@ public class RouteController {
 	// get single route with location data
 	@GetMapping("/{originId}/{destinationId}")
 	public ResponseEntity<Route> getRouteByLocationInfo(@PathVariable String originId, @PathVariable String destinationId) {
-		Route route = routeService.getRouteByLocationInfo(originId, destinationId);
-		return new ResponseEntity(route, HttpStatus.OK);
+		List<Route> routes = routeService.getRouteByLocationInfo(originId, destinationId);
+		return new ResponseEntity(routes, HttpStatus.OK);
 	}
 
 	// get routes where origin or destination match query

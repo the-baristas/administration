@@ -42,7 +42,7 @@ public class RouteService {
 		return routeDao.findById(id);
 	}
 
-	public Route getRouteByLocationInfo(String originId, String destinationId) {
+	public List<Route> getRouteByLocationInfo(String originId, String destinationId) {
 		List<Airport> query1 = airportService.getAirportByIdOrCity(originId);
 		List<Airport> query2 = airportService.getAirportByIdOrCity(destinationId);
 

@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.FlightQuery;
+import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.repository.FlightDao;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +35,12 @@ public class FlightService {
         return flightDao.findAll(paging);
     }
 
-    public Page<Flight> getFlightsByRoute(Integer pageNo, Integer pageSize, String sortBy, Integer routeId) {
+    public Page<Flight> getFlightsByRoute(Integer pageNo, Integer pageSize, String sortBy, List<Route> routes) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return flightDao.findAllByRouteId(routeId, paging);
+        return flightDao.findAllByRouteIn(routes, paging);
     }
 
-    public List<Flight> getFlightsByRouteAndDate(Integer routeId, FlightQuery flightQuery) {
+    public List<Flight> getFlightsByRouteAndDate(List<Route> routes, FlightQuery flightQuery) {
 
 
             Integer month = Integer.valueOf(flightQuery.getMonth());
@@ -53,7 +54,7 @@ public class FlightService {
             Timestamp departureHelper = Timestamp.valueOf(queryHelper);
 
         try {
-            List<Flight> flights = flightDao.findByRouteAndDate(routeId, departure, departureHelper);
+            List<Flight> flights = flightDao.findByRouteInAndDate(routes, departure, departureHelper);
             return flights;
         } catch (NullPointerException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights for those locations/dates. Try again.");

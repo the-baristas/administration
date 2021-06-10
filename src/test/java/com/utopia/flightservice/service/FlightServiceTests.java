@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -206,10 +207,19 @@ class FlightServiceTests {
 
         Airport originAirport = new Airport("TC1", "Test City 1", true);
         Airport destinationAirport = new Airport("TC2", "Test City 2", true);
-        Route route = new Route(1, originAirport, destinationAirport, true);
+
+        List<Route> routes = new ArrayList<Route>();
+        Route route1 = new Route(1, originAirport, destinationAirport, true);
+        Route route2 = new Route(2, originAirport, destinationAirport, true);
+        Route route3 = new Route(3, originAirport, destinationAirport, true);
+        routes.add(route1);
+        routes.add(route2);
+        routes.add(route3);
+
+
         Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
 
-        flight.setRoute(route);
+        flight.setRoute(route1);
         flight.setAirplane(airplane);
         flight.setDepartureTime(departureTime);
         flight.setArrivalTime(arrivalTime);
@@ -223,9 +233,10 @@ class FlightServiceTests {
         List<Flight> allFlights = Arrays.asList(flight);
         Pageable paging = PageRequest.of(0, 10, Sort.by("id"));
         Page<Flight> flightPage = new PageImpl<Flight>(allFlights);
-        when(flightDao.findAllByRouteId(1, paging)).thenReturn(flightPage);
 
-        Page<Flight> foundFlights = flightService.getFlightsByRoute(0, 10, "id", 1);
+        when(flightDao.findAllByRouteIn(routes, paging)).thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getFlightsByRoute(0, 10, "id", routes);
         assertEquals(flightPage, foundFlights);
     }
 

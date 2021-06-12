@@ -13,7 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+@Disabled
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+// @TestPropertySource(locations =
+// "classpath:application-integrationtest.properties")
 public class AirplaneIntegrationTest {
     @Autowired
     private WebTestClient webClient;
@@ -21,7 +24,6 @@ public class AirplaneIntegrationTest {
     @Autowired
     private AirplaneRepository airplaneRepository;
 
-    @Disabled
     @Test
     public void findAllAirplanes_AirplanesList() {
         Airplane airplane = new Airplane();

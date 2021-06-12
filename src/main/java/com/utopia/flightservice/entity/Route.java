@@ -1,73 +1,36 @@
 package com.utopia.flightservice.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.*;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity(name = "route")
+@Data @NoArgsConstructor @AllArgsConstructor
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Route {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
-    
-    @Column(name = "origin_id")
-	private String originId;
-    
-    @Column(name = "destination_id")
-	private String destinationId;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
+    @JoinColumn(name = "origin_id", referencedColumnName = "iata_id")
+	private Airport originAirport;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
+    @JoinColumn(name = "destination_id", referencedColumnName = "iata_id")
+	private Airport destinationAirport;
     
     @Column(name = "is_active")
-    private Integer isActive;
-    
-    // constructor
-    
-    public Route() {}
-    
-	public Route(Integer id, String originId, String destinationId, Integer isActive) {
-		super();
-		this.id = id;
-		this.originId = originId;
-		this.destinationId = destinationId;
-		this.isActive = isActive;
-	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getOriginId() {
-		return originId;
-	}
-
-	public void setOriginId(String originId) {
-		this.originId = originId;
-	}
-
-	public String getDestinationId() {
-		return destinationId;
-	}
-
-	public void setDestinationId(String destinationId) {
-		this.destinationId = destinationId;
-	}
-
-	public Integer getIsActive() {
-		return isActive;
-	}
-
-	public void setIsActive(Integer isActive) {
-		this.isActive = isActive;
-	}
-
-	@Override
-	public String toString() {
-		return "Route [id=" + id + ", originId=" + originId + ", destinationId=" + destinationId + ", isActive="
-				+ isActive + "]";
-	}
+    private Boolean isActive;
 	
 }

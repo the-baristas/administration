@@ -19,7 +19,7 @@ public class AirportDto {
     private String city;
 
     @Positive
-    private Integer isActive;
+    private Boolean isActive;
 
 
 }

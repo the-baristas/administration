@@ -1,12 +1,27 @@
 package com.utopia.flightservice.controller;
 
+import java.net.URI;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+import com.utopia.flightservice.dto.FlightDto;
+import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.entity.Flight;
+import com.utopia.flightservice.entity.FlightQuery;
+import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.exception.FlightNotSavedException;
+import com.utopia.flightservice.exception.ModelMapperFailedException;
+import com.utopia.flightservice.service.AirplaneService;
 import com.utopia.flightservice.service.FlightService;
+import com.utopia.flightservice.service.RouteService;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,55 +30,151 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
+@RequestMapping("/flights")
 public class FlightController {
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Autowired
     private FlightService flightService;
 
-    // get all flights admin endpoint
-    @GetMapping("/flights")
-    public ResponseEntity<List<Flight>> getAllFlights() {
-        List<Flight> flights = flightService.getAllFlights();
-        if (flights.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT,
-                    "No flights found in database.");
+    @Autowired
+    private RouteService routeService;
+
+    @Autowired
+    private AirplaneService airplaneService;
+
+    @GetMapping("/health")
+    public String checkHealth() {
+        return "In the words of the poet SZA, 'I be looking good, I've been feeling nice, working on my aura.'";
+    }
+
+    // get flights with pagination
+    @GetMapping("")
+    public ResponseEntity<Page<Flight>> getPagedFlights(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy) {
+        Page<Flight> flights = flightService.getPagedFlights(pageNo, pageSize,
+                sortBy);
+        if (!flights.hasContent()) {
+            return new ResponseEntity("No flights found in database.",
+                    HttpStatus.NO_CONTENT);
         } else {
-            return new ResponseEntity<List<Flight>>(flights, HttpStatus.OK);
+            return new ResponseEntity(flights, HttpStatus.OK);
+        }
+    }
+
+    // get all flights based on location info
+    @GetMapping("/search")
+    public ResponseEntity<Page<Flight>> getFlightsByRouteId(
+            @RequestParam(name = "originId") String originId,
+            @RequestParam(name = "destinationId") String destinationId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy) {
+
+        List<Route> routes = routeService.getRouteByLocationInfo(originId,
+                destinationId);
+
+        Page<Flight> flights = flightService.getFlightsByRoute(pageNo, pageSize,
+                sortBy, routes);
+        if (flights.isEmpty()) {
+            return new ResponseEntity("No flights found in database.",
+                    HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity(flights, HttpStatus.OK);
+        }
+    }
+
+    // get all flights based on location info and date
+    @PostMapping("/query")
+    public ResponseEntity<Page<Flight>> getFlightsByRouteAndLocation(
+            @RequestParam(name = "originId") String originId,
+            @RequestParam(name = "destinationId") String destinationId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestBody FlightQuery flightQuery)
+            throws ResponseStatusException {
+
+        List<Route> routes = routeService.getRouteByLocationInfo(originId,
+                destinationId);
+
+        try {
+            Page<Flight> flights = flightService.getFlightsByRoute(pageNo,
+                    pageSize, sortBy, routes);
+            return ResponseEntity.ok(flights);
+        } catch (NullPointerException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Could not find flights for those locations/dates. Try again.");
         }
     }
 
     // create new flight
-    @PostMapping("/flights")
-    public ResponseEntity<Flight> createFlight(@RequestBody Flight flight)
+    @PostMapping("")
+    public ResponseEntity<FlightDto> createFlight(
+            @RequestBody FlightDto flightDTO, UriComponentsBuilder builder)
             throws FlightNotSavedException {
-        flightService.saveFlight(flight);
-        return new ResponseEntity<Flight>(flight, HttpStatus.CREATED);
+
+        Flight flight = convertToEntity(flightDTO);
+        Airplane airplane = airplaneService
+                .findAirplaneById(Long.valueOf(flightDTO.getAirplaneId()));
+        Route route = routeService.getRouteById(flightDTO.getRouteId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND));
+        flight.setAirplane(airplane);
+        flight.setRoute(route);
+        Integer flightID = flightService.saveFlight(flight);
+
+        Flight createdFlight = flightService.getFlightById(flightID)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND));
+        return ResponseEntity
+                .created(builder.path("/flights/{id}").build(flightDTO.getId()))
+                .body(convertToDto(createdFlight));
     }
 
     // get single flight
-    @GetMapping("/flights/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Flight> getFlight(@PathVariable Integer id) {
-        Flight flight = flightService.getFlightById(id).get();
-        return new ResponseEntity<Flight>(flight, HttpStatus.OK);
+        Optional<Flight> flight = flightService.getFlightById(id);
+        return new ResponseEntity(flight, HttpStatus.OK);
     }
 
     // update flight
-    @PutMapping("flights/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<String> updateFlight(@PathVariable Integer id,
-            @RequestBody Flight flight) throws FlightNotSavedException {
-        flightService.updateFlight(id, flight);
-        return new ResponseEntity<String>(HttpStatus.OK);
+            @RequestBody FlightDto flightDTO) throws FlightNotSavedException {
+        Flight flight;
+        flight = convertToEntity(flightDTO);
+
+        Integer update = flightService.updateFlight(id, flight);
+        return new ResponseEntity(update, HttpStatus.OK);
     }
 
     // delete a flight
-    @DeleteMapping("flights/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteFlight(@PathVariable Integer id)
             throws FlightNotSavedException {
-        flightService.deleteFlight(id);
-        return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+        String isRemoved = flightService.deleteFlight(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    public FlightDto convertToDto(Flight flight) {
+        return modelMapper.map(flight, FlightDto.class);
+    }
+
+    public Flight convertToEntity(FlightDto flightDTO) {
+        return modelMapper.map(flightDTO, Flight.class);
+    }
+
 }

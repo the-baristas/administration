@@ -1,11 +1,8 @@
 package com.utopia.flightservice.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -13,17 +10,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.net.URI;
-import java.sql.Timestamp;
-import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.utopia.flightservice.controller.RouteController;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.dto.FlightDto;
 import com.utopia.flightservice.entity.Airplane;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
@@ -31,27 +26,17 @@ import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.service.AirplaneService;
 import com.utopia.flightservice.service.FlightService;
 import com.utopia.flightservice.service.RouteService;
+
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.server.ResponseStatusException;
 
 @WebMvcTest(FlightController.class)
 public class FlightControllerTests {
@@ -75,6 +60,9 @@ public class FlightControllerTests {
     @Autowired
     private FlightController controller;
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd HH:mm:ss");
+
     // Flight Controller Is Not Null
     @Test
     public void controllerLoads() throws Exception {
@@ -85,8 +73,8 @@ public class FlightControllerTests {
     public void test_getAllFlights_statusOkAndListLength() throws Exception {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
-        Timestamp departureTime = Timestamp.valueOf(str1);
-        Timestamp arrivalTime = Timestamp.valueOf(str2);
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
 
         List<Airplane> airplanes = new ArrayList<>();
         Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
@@ -107,8 +95,10 @@ public class FlightControllerTests {
         routes.add(route2);
 
         List<Flight> flights = new ArrayList<>();
-        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
-        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime, 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route2);
+        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
+        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route2);
 
         flights.add(flight1);
         flights.add(flight2);
@@ -128,12 +118,12 @@ public class FlightControllerTests {
     public void shouldGetFlightById() throws Exception {
 
         Flight flight = makeFlight();
-        Optional optional = Optional.of(flight);
+        Optional<Flight> optional = Optional.of(flight);
 
         when(flightService.getFlightById(100)).thenReturn(optional);
 
-        mockMvc.perform(get("/flights/100")
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                get("/flights/100").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(flight.getId()))
                 .andExpect(jsonPath("$.airplane").value(flight.getAirplane()))
                 .andExpect(status().isOk());
@@ -145,38 +135,47 @@ public class FlightControllerTests {
         Flight flight = makeFlight();
         FlightDto flightDTO = makeFlightDTO();
 
-        when(airplaneService.findAirplaneById(Long.valueOf(flightDTO.getAirplaneId()))).thenReturn(flight.getAirplane());
-        when(routeService.getRouteById(flightDTO.getRouteId())).thenReturn(Optional.of(flight.getRoute()));
-        when(flightService.getFlightById(flight.getId())).thenReturn(Optional.of(flight));
         when(flightService.saveFlight(flight)).thenReturn(flight.getId());
+        when(flightService.getFlightById(flight.getId()))
+                .thenReturn(Optional.of(flight));
+        when(airplaneService
+                .findAirplaneById(Long.valueOf(flightDTO.getAirplaneId())))
+                        .thenReturn(flight.getAirplane());
+        when(routeService.getRouteById(flightDTO.getRouteId()))
+                .thenReturn(Optional.of(flight.getRoute()));
 
         mockMvc.perform(post("/flights").contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(flightDTO)))
-                .andDo(print())
-                .andExpect(status().isCreated()); // receives 500 error bc getting null pointer exception
+                .content(asJsonString(flightDTO))).andDo(print())
+                .andExpect(status().isCreated());
 
         verify(flightService).saveFlight(flight);
-
     }
-
 
     @Test
     public void shouldUpdateflight() throws Exception, FlightNotSavedException {
 
-            FlightDto flightDTO = makeFlightDTO();
+        FlightDto flightDTO = makeFlightDTO();
 
-            Flight updatedFlight = makeFlight();
-            FlightDto updatedFlightDTO = makeFlightDTO();
+        Flight updatedFlight = makeFlight();
+        FlightDto updatedFlightDTO = makeFlightDTO();
 
-            when(airplaneService.findAirplaneById(Long.valueOf(flightDTO.getAirplaneId()))).thenReturn(updatedFlight.getAirplane());
-            when(routeService.getRouteById(flightDTO.getRouteId())).thenReturn(Optional.of(updatedFlight.getRoute()));
-            when(flightService.getFlightById(flightDTO.getId())).thenReturn(Optional.of(updatedFlight));
-            when(flightService.updateFlight(flightDTO.getId(), updatedFlight)).thenReturn(updatedFlight.getId());
+        when(airplaneService
+                .findAirplaneById(Long.valueOf(flightDTO.getAirplaneId())))
+                        .thenReturn(updatedFlight.getAirplane());
+        when(routeService.getRouteById(flightDTO.getRouteId()))
+                .thenReturn(Optional.of(updatedFlight.getRoute()));
+        when(flightService.getFlightById(flightDTO.getId()))
+                .thenReturn(Optional.of(updatedFlight));
+        when(flightService.updateFlight(flightDTO.getId(), updatedFlight))
+                .thenReturn(updatedFlight.getId());
 
-            mockMvc.perform(put("/flights/{id}", updatedFlightDTO.getId(), updatedFlightDTO).contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(updatedFlightDTO))).andExpect(status().isOk());
-        }
-
+        mockMvc.perform(
+                put("/flights/{id}", updatedFlightDTO.getId(), updatedFlightDTO)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper()
+                                .writeValueAsString(updatedFlightDTO)))
+                .andExpect(status().isOk());
+    }
 
     // utility functions
 
@@ -186,8 +185,8 @@ public class FlightControllerTests {
 
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
-        Timestamp departureTime = Timestamp.valueOf(str1);
-        Timestamp arrivalTime = Timestamp.valueOf(str2);
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
         flight.setDepartureTime(departureTime);
         flight.setArrivalTime(arrivalTime);
 
@@ -215,8 +214,8 @@ public class FlightControllerTests {
 
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
-        Timestamp departureTime = Timestamp.valueOf(str1);
-        Timestamp arrivalTime = Timestamp.valueOf(str2);
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
         flightDTO.setDepartureTime(departureTime);
         flightDTO.setArrivalTime(arrivalTime);
 
@@ -233,7 +232,6 @@ public class FlightControllerTests {
 
         return flightDTO;
     }
-
 
     public static String asJsonString(final Object obj) {
         try {

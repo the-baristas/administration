@@ -1,34 +1,44 @@
 package com.utopia.flightservice.entity;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.time.LocalDateTime;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.utopia.flightservice.service.RouteService;
-import lombok.*;
 
-import com.utopia.flightservice.repository.RouteDao;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.persistence.*;
-import java.sql.Timestamp;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity(name = "flight")
 @JsonSerialize
-@Data @NoArgsConstructor @AllArgsConstructor
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Flight {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false,
+            cascade = CascadeType.MERGE)
     @JoinColumn(name = "airplane_id", referencedColumnName = "id")
     private Airplane airplane;
 
     @Column(name = "departure_time")
-    private Timestamp departureTime;
+    private LocalDateTime departureTime;
 
     @Column(name = "arrival_time")
-    private Timestamp arrivalTime;
+    private LocalDateTime arrivalTime;
 
     @Column(name = "first_reserved")
     private Integer firstReserved;
@@ -51,7 +61,8 @@ public class Flight {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false,
+            cascade = CascadeType.MERGE)
     @JoinColumn(name = "route_id", referencedColumnName = "id")
     private Route route;
 

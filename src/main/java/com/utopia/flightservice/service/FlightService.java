@@ -40,26 +40,29 @@ public class FlightService {
         return flightDao.findAllByRouteIn(routes, paging);
     }
 
-    public List<Flight> getFlightsByRouteAndDate(Integer pageNo, Integer pageSize, String sortBy, List<Route> routes, FlightQuery flightQuery) {
+    public Page<Flight> getFlightsByRouteAndDate(Integer pageNo, Integer pageSize, String sortBy, List<Route> routes, FlightQuery flightQuery) {
 
 
             Integer month = Integer.valueOf(flightQuery.getMonth());
             Integer date = Integer.valueOf(flightQuery.getDate());
             Integer year = Integer.valueOf(flightQuery.getYear());
+            Integer hour = 00;
+            Integer min = 00;
 
-            LocalDateTime dateQuery = LocalDateTime.of(year, month, date, 00, 00);
-            LocalDateTime queryHelper = LocalDateTime.of(year, month, date + 1, 00, 00);
+            LocalDateTime dateQuery = LocalDateTime.of(year, month, date, hour, min);
+            LocalDateTime queryHelper = LocalDateTime.of(year, month, date + 1, hour, min);
 
             Timestamp departure = Timestamp.valueOf(dateQuery);
             Timestamp departureHelper = Timestamp.valueOf(queryHelper);
 
         try {
             Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-            return flightDao.findByRouteInAndDate(paging, routes, departure, departureHelper);
+            return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging);
         } catch (NullPointerException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights for those locations/dates. Try again.");
         }
     }
+
 
     // get one flight by the flight id
     public Optional<Flight> getFlightById(Integer id) {

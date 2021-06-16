@@ -43,10 +43,10 @@ public class RouteService {
 	}
 
 	public List<Route> getRouteByLocationInfo(String originId, String destinationId) {
-		List<Airport> query1 = airportService.getAirportByIdOrCity(originId);
-		List<Airport> query2 = airportService.getAirportByIdOrCity(destinationId);
+			List<Airport> query1 = airportService.getAirportByIdOrCity(originId);
+			List<Airport> query2 = airportService.getAirportByIdOrCity(destinationId);
 
-		return routeDao.findByOriginAirportInAndDestinationAirportIn(query1, query2);
+			return routeDao.findByOriginAirportInAndDestinationAirportIn(query1, query2);
 	}
 
 	public Page<Route> getByOriginAirportOrDestinationAirport(Integer pageNo, Integer pageSize, String sortBy, String query1, String query2) throws RouteNotFoundException {

@@ -78,10 +78,16 @@ public class RouteController {
 
 	// get single route with location data
 	@GetMapping("/{originId}/{destinationId}")
-	public ResponseEntity<Route> getRouteByLocationInfo(@PathVariable String originId, @PathVariable String destinationId) {
+	public ResponseEntity<Route> getRouteByLocationInfo(@PathVariable String originId, @PathVariable String destinationId) throws RouteNotFoundException {
 		List<Route> routes = routeService.getRouteByLocationInfo(originId, destinationId);
-		return new ResponseEntity(routes, HttpStatus.OK);
+
+		if (!routes.isEmpty()) {
+			return new ResponseEntity(routes, HttpStatus.OK);
+	} else {
+			throw new RouteNotFoundException("Route does not exist.");
+		}
 	}
+
 
 	// get routes where origin or destination match query
 	@GetMapping("/routes-query")

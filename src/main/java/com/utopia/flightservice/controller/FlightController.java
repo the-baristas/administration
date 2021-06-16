@@ -100,7 +100,7 @@ public class FlightController {
             List<Route> routes = routeService.getRouteByLocationInfo(originId, destinationId);
 
             try {
-                Page<Flight> flights = flightService.getFlightsByRoute(pageNo, pageSize, sortBy, routes);
+                Page<Flight> flights = flightService.getFlightsByRouteAndDate(pageNo, pageSize, sortBy, routes, flightQuery);
                 return new ResponseEntity(flights, HttpStatus.OK);
             } catch (NullPointerException e) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights for those locations/dates. Try again.");

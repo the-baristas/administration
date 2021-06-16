@@ -22,10 +22,8 @@ public interface FlightDao extends JpaRepository<Flight, Integer> {
 
     Page<Flight> findAllByRouteIn(List<Route> routes, Pageable paging);
 
-    @Query("FROM flight WHERE route_id in ?1 AND departure_time >= DATE(?2) AND departure_time <  DATE(?3)")
-    List<Flight> findByRouteInAndDate(Pageable paging, List<Route> routes, Timestamp departure, Timestamp departureHelper);
+    Page<Flight> findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(List<Route> routes, Timestamp departure, Timestamp departureHelper, Pageable paging);
 
-    List<Flight> findByRouteDestinationAirport(String query);
 
     @Modifying
     @Query("UPDATE flight SET route_id = ?2, airplane_id = ?3, departure_time = ?4, arrival_time = ?5, first_reserved = ?6, first_price = ?7, business_reserved = ?8, business_price = ?9, economy_reserved = ?10, economy_price = ?11, is_active = ?12 WHERE id = ?1")

@@ -1,15 +1,18 @@
 package com.utopia.flightservice.dto;
 
-import com.utopia.flightservice.entity.Route;
-import com.utopia.flightservice.service.RouteService;
+import java.time.LocalDateTime;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
@@ -25,11 +28,15 @@ public class FlightDto {
     @PositiveOrZero
     private Integer routeId;
 
-    @NotBlank
-    private Timestamp departureTime;
+    @NotNull
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime departureTime;
 
-    @NotBlank
-    private Timestamp arrivalTime;
+    @NotNull
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime arrivalTime;
 
     @PositiveOrZero
     private Integer firstReserved;

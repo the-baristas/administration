@@ -13,7 +13,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class AirplaneRepositoryTests {
+public class AirplaneRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 

@@ -51,6 +51,19 @@ public class AirportController {
         }
     }
 
+    // get airport by id or city containing
+    @GetMapping("/airports/search")
+    public ResponseEntity<List<Airport>> getAirportByIdOrCity(@RequestParam(name="query") String query) {
+        List<Airport> airports = airportService.getAirportByIdOrCity(query);
+
+        if (airports.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT,
+                    "No airports found in database matching that query.");
+        } else {
+            return ResponseEntity.ok(airports);
+        }
+    }
+
     // find airport containing letter
     @GetMapping("/airports-containing")
     public ResponseEntity<List<Airport>> getAirportContaining(

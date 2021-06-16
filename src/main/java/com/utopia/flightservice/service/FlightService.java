@@ -49,15 +49,43 @@ public class FlightService {
             Integer hour = 00;
             Integer min = 00;
 
-            LocalDateTime dateQuery = LocalDateTime.of(year, month, date, hour, min);
-            LocalDateTime queryHelper = LocalDateTime.of(year, month, date + 1, hour, min);
-
-            Timestamp departure = Timestamp.valueOf(dateQuery);
-            Timestamp departureHelper = Timestamp.valueOf(queryHelper);
-
         try {
-            Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-            return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging);
+            if(flightQuery.getFilter().equals("all")) {
+                LocalDateTime dateQuery = LocalDateTime.of(year, month, date, hour, min);
+                LocalDateTime queryHelper = LocalDateTime.of(year, month, date + 1, hour, min);
+                Timestamp departure = Timestamp.valueOf(dateQuery);
+                Timestamp departureHelper = Timestamp.valueOf(queryHelper);
+                Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+                return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging);
+            } else if(flightQuery.getFilter().equals("morning")) {
+                LocalDateTime dateQuery = LocalDateTime.of(year, month, date, 04, min);
+                LocalDateTime queryHelper = LocalDateTime.of(year, month, date, 12, min);
+                Timestamp departure = Timestamp.valueOf(dateQuery);
+                Timestamp departureHelper = Timestamp.valueOf(queryHelper);
+                Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+                return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging);
+            } else if(flightQuery.getFilter().equals("afternoon")) {
+                LocalDateTime dateQuery = LocalDateTime.of(year, month, date, 12, min);
+                LocalDateTime queryHelper = LocalDateTime.of(year, month, date, 18, min);
+                Timestamp departure = Timestamp.valueOf(dateQuery);
+                Timestamp departureHelper = Timestamp.valueOf(queryHelper);
+                Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+                return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging);
+            } else if(flightQuery.getFilter().equals("evening")) {
+                LocalDateTime dateQuery = LocalDateTime.of(year, month, date, 18, min);
+                LocalDateTime queryHelper = LocalDateTime.of(year, month, date + 1, 04, min);
+                Timestamp departure = Timestamp.valueOf(dateQuery);
+                Timestamp departureHelper = Timestamp.valueOf(queryHelper);
+                Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+                return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging);
+            } else {
+                LocalDateTime dateQuery = LocalDateTime.of(year, month, date, hour, min);
+                LocalDateTime queryHelper = LocalDateTime.of(year, month, date + 1, hour, min);
+                Timestamp departure = Timestamp.valueOf(dateQuery);
+                Timestamp departureHelper = Timestamp.valueOf(queryHelper);
+                Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+                return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging);
+            }
         } catch (NullPointerException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights for those locations/dates. Try again.");
         }

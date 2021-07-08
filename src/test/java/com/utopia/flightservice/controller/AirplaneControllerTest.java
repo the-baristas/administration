@@ -13,6 +13,7 @@ import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.service.AirplaneService;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
+@Disabled
 @WebMvcTest(AirplaneController.class)
 public class AirplaneControllerTest {
     private WebTestClient webTestClient;

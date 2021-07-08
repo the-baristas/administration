@@ -1,36 +1,33 @@
 package com.utopia.flightservice.service;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.utopia.flightservice.dto.FlightDto;
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
-import com.utopia.flightservice.exception.AirportNotSavedException;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @SpringBootTest
 class FlightServiceTests {
@@ -47,12 +44,15 @@ class FlightServiceTests {
     @MockBean
     private FlightDao flightDao;
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd HH:mm:ss");
+
     @Test
     void findAllFlights_FindsFlights() {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
-        Timestamp departureTime = Timestamp.valueOf(str1);
-        Timestamp arrivalTime = Timestamp.valueOf(str2);
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
 
         Flight flight = new Flight();
         flight.setId(101);
@@ -84,8 +84,8 @@ class FlightServiceTests {
     void findFlightById_FindsFlight() {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
-        Timestamp departureTime = Timestamp.valueOf(str1);
-        Timestamp arrivalTime = Timestamp.valueOf(str2);
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
 
         Optional<Flight> flight = Optional.ofNullable(new Flight());
         flight.get().setId(101);
@@ -94,7 +94,6 @@ class FlightServiceTests {
         Airport destinationAirport = new Airport("TC2", "Test City 2", true);
         Route route = new Route(1, originAirport, destinationAirport, true);
         Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
-
 
         flight.get().setRoute(route);
         flight.get().setAirplane(airplane);
@@ -113,26 +112,34 @@ class FlightServiceTests {
         Optional<Flight> foundFlight = flightService.getFlightById(101);
         assertThat(flight.get().getId(), is(foundFlight.get().getId()));
         assertThat(flight.get().getRoute(), is(foundFlight.get().getRoute()));
-        assertThat(flight.get().getAirplane(), is(foundFlight.get().getAirplane()));
-        assertThat(flight.get().getDepartureTime(), is(foundFlight.get().getDepartureTime()));
-        assertThat(flight.get().getArrivalTime(), is(foundFlight.get().getArrivalTime()));
-        assertThat(flight.get().getFirstReserved(), is(foundFlight.get().getFirstReserved()));
-        assertThat(flight.get().getFirstPrice(), is(foundFlight.get().getFirstPrice()));
-        assertThat(flight.get().getBusinessReserved(), is(foundFlight.get().getBusinessReserved()));
-        assertThat(flight.get().getBusinessPrice(), is(foundFlight.get().getBusinessPrice()));
-        assertThat(flight.get().getEconomyReserved(), is(foundFlight.get().getEconomyReserved()));
-        assertThat(flight.get().getEconomyPrice(), is(foundFlight.get().getEconomyPrice()));
-        assertThat(flight.get().getIsActive(), is(foundFlight.get().getIsActive()));
+        assertThat(flight.get().getAirplane(),
+                is(foundFlight.get().getAirplane()));
+        assertThat(flight.get().getDepartureTime(),
+                is(foundFlight.get().getDepartureTime()));
+        assertThat(flight.get().getArrivalTime(),
+                is(foundFlight.get().getArrivalTime()));
+        assertThat(flight.get().getFirstReserved(),
+                is(foundFlight.get().getFirstReserved()));
+        assertThat(flight.get().getFirstPrice(),
+                is(foundFlight.get().getFirstPrice()));
+        assertThat(flight.get().getBusinessReserved(),
+                is(foundFlight.get().getBusinessReserved()));
+        assertThat(flight.get().getBusinessPrice(),
+                is(foundFlight.get().getBusinessPrice()));
+        assertThat(flight.get().getEconomyReserved(),
+                is(foundFlight.get().getEconomyReserved()));
+        assertThat(flight.get().getEconomyPrice(),
+                is(foundFlight.get().getEconomyPrice()));
+        assertThat(flight.get().getIsActive(),
+                is(foundFlight.get().getIsActive()));
     }
 
-
     @Test
-    void addFlight_AndSaveIt()
-            throws FlightNotSavedException {
+    void addFlight_AndSaveIt() throws FlightNotSavedException {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
-        Timestamp departureTime = Timestamp.valueOf(str1);
-        Timestamp arrivalTime = Timestamp.valueOf(str2);
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
 
         Flight flight = new Flight();
         flight.setId(101);
@@ -141,7 +148,6 @@ class FlightServiceTests {
         Airport destinationAirport = new Airport("TC2", "Test City 2", true);
         Route route = new Route(1, originAirport, destinationAirport, true);
         Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
-
 
         flight.setRoute(route);
         flight.setAirplane(airplane);
@@ -164,8 +170,8 @@ class FlightServiceTests {
     void findAllFlightPages() {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
-        Timestamp departureTime = Timestamp.valueOf(str1);
-        Timestamp arrivalTime = Timestamp.valueOf(str2);
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
 
         Flight flight = new Flight();
         flight.setId(101);
@@ -199,8 +205,8 @@ class FlightServiceTests {
     void shouldGetFlight_ByRouteId() {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
-        Timestamp departureTime = Timestamp.valueOf(str1);
-        Timestamp arrivalTime = Timestamp.valueOf(str2);
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
 
         Flight flight = new Flight();
         flight.setId(101);
@@ -215,7 +221,6 @@ class FlightServiceTests {
         routes.add(route1);
         routes.add(route2);
         routes.add(route3);
-
 
         Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
 
@@ -236,10 +241,9 @@ class FlightServiceTests {
 
         when(flightDao.findAllByRouteIn(routes, paging)).thenReturn(flightPage);
 
-        Page<Flight> foundFlights = flightService.getFlightsByRoute(0, 10, "id", routes);
+        Page<Flight> foundFlights = flightService.getFlightsByRoute(0, 10, "id",
+                routes);
         assertEquals(flightPage, foundFlights);
     }
-
-
 
 }

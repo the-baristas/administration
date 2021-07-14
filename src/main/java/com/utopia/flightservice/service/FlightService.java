@@ -49,11 +49,8 @@ public class FlightService {
             Integer hour = 00;
             Integer min = 00;
 
-            LocalDateTime dateQuery = LocalDateTime.of(year, month, date, hour, min);
-            LocalDateTime queryHelper = LocalDateTime.of(year, month, date + 1, hour, min);
-
-            Timestamp departure = Timestamp.valueOf(dateQuery);
-            Timestamp departureHelper = Timestamp.valueOf(queryHelper);
+            LocalDateTime departure = LocalDateTime.of(year, month, date, hour, min);
+            LocalDateTime departureHelper = LocalDateTime.of(year, month, date + 1, hour, min);
 
         try {
             Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));

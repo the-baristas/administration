@@ -5,26 +5,26 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.dto.AirplaneDto;
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.service.AirplaneService;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
-@Disabled
 @WebMvcTest(AirplaneController.class)
 public class AirplaneControllerTest {
     private WebTestClient webTestClient;
@@ -38,28 +38,36 @@ public class AirplaneControllerTest {
     @MockBean
     private AirplaneService airplaneService;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     public void setUp() {
         webTestClient = MockMvcWebTestClient.bindTo(mockMvc).build();
     }
 
     @Test
-    public void findAllAirplanes_JsonArray() throws Exception {
+    public void findAll_AirplanesPageFound() throws JsonProcessingException {
         Airplane airplane = new Airplane();
         airplane.setId(1L);
         airplane.setFirstClassSeatsMax(1L);
         airplane.setBusinessClassSeatsMax(1L);
         airplane.setEconomyClassSeatsMax(1L);
-        List<Airplane> foundAirplanes = Arrays.asList(airplane);
-        when(airplaneService.findAllAirplanes()).thenReturn(foundAirplanes);
-        List<AirplaneDto> foundAirplaneDtos = foundAirplanes.stream()
-                .map((Airplane a) -> modelMapper.map(a, AirplaneDto.class))
-                .collect(Collectors.toList());
+        Page<Airplane> foundAirplanesPage = new PageImpl<Airplane>(
+                Arrays.asList(airplane));
+        Integer pageIndex = 0;
+        Integer pageSize = 1;
+        when(airplaneService.findAll(pageIndex, pageSize))
+                .thenReturn(foundAirplanesPage);
+        Page<AirplaneDto> foundAirplaneDtosPage = foundAirplanesPage
+                .map((Airplane a) -> modelMapper.map(a, AirplaneDto.class));
 
-        webTestClient.get().uri("/airplanes").accept(MediaType.APPLICATION_JSON)
-                .exchange().expectStatus().isOk().expectHeader()
-                .contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(AirplaneDto.class).isEqualTo(foundAirplaneDtos);
+        webTestClient.get()
+                .uri("/airplanes?index={pageIndex}&size={pageSize}", pageIndex,
+                        pageSize)
+                .accept(MediaType.APPLICATION_JSON).exchange().expectStatus()
+                .isOk().expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .json(objectMapper.writeValueAsString(foundAirplaneDtosPage));
     }
 
     @Test
@@ -69,7 +77,7 @@ public class AirplaneControllerTest {
         foundAirplane.setFirstClassSeatsMax(0L);
         foundAirplane.setBusinessClassSeatsMax(0L);
         foundAirplane.setEconomyClassSeatsMax(0L);
-        when(airplaneService.findAirplaneById(foundAirplane.getId()))
+        when(airplaneService.findById(foundAirplane.getId()))
                 .thenReturn(foundAirplane);
         AirplaneDto foundAirplaneDto = modelMapper.map(foundAirplane,
                 AirplaneDto.class);
@@ -87,7 +95,7 @@ public class AirplaneControllerTest {
         airplane.setFirstClassSeatsMax(1L);
         airplane.setBusinessClassSeatsMax(1L);
         airplane.setEconomyClassSeatsMax(1L);
-        when(airplaneService.createAirplane(airplane)).thenReturn(airplane);
+        when(airplaneService.create(airplane)).thenReturn(airplane);
         AirplaneDto airplaneDto = modelMapper.map(airplane, AirplaneDto.class);
 
         webTestClient.post().uri("/airplanes")
@@ -105,10 +113,10 @@ public class AirplaneControllerTest {
         airplane.setFirstClassSeatsMax(0L);
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
-        when(airplaneService.updateAirplane(airplane)).thenReturn(airplane);
+        when(airplaneService.update(airplane)).thenReturn(airplane);
         AirplaneDto airplaneDto = modelMapper.map(airplane, AirplaneDto.class);
 
-        webTestClient.put().uri("/airplanes")
+        webTestClient.put().uri("/airplanes/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON).bodyValue(airplane)
                 .exchange().expectStatus().isOk().expectHeader()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -117,14 +125,14 @@ public class AirplaneControllerTest {
     }
 
     @Test
-    public void deleteAirplane_ValidAirplaneId_AirplaneDeleted() {
+    public void deleteById_ValidAirplaneId_AirplaneDeleted() {
         Airplane airplane = new Airplane();
         airplane.setId(1L);
         airplane.setFirstClassSeatsMax(0L);
         airplane.setBusinessClassSeatsMax(0L);
         airplane.setEconomyClassSeatsMax(0L);
 
-        airplaneService.deleteAirplaneById(airplane.getId());
-        verify(airplaneService, times(1)).deleteAirplaneById(airplane.getId());
+        airplaneService.deleteById(airplane.getId());
+        verify(airplaneService, times(1)).deleteById(airplane.getId());
     }
 }

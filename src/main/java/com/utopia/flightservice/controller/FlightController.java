@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import com.utopia.flightservice.dto.FlightDto;
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.entity.Flight;
@@ -95,14 +97,13 @@ public class FlightController {
     }
 
     // get all flights based on location info and date
-    @PostMapping("/query")
-    public ResponseEntity<List<Flight>> getFlightsByRouteAndLocation(
-            @RequestParam(name = "originId") String originId,
-            @RequestParam(name = "destinationId") String destinationId,
-            @RequestBody FlightQuery flightQuery,
+    @PostMapping("query")
+    public ResponseEntity<Page<Flight>> getFlightsByRouteAndLocation(
+            @RequestParam String originId, @RequestParam String destinationId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy)
+            @RequestParam(defaultValue = "id") String sortBy,
+            @Valid @RequestBody FlightQuery flightQuery)
             throws ResponseStatusException {
 
         List<Route> routes = routeService.getRouteByLocationInfo(originId,
@@ -111,7 +112,7 @@ public class FlightController {
         try {
             Page<Flight> flights = flightService.getFlightsByRouteAndDate(
                     pageNo, pageSize, sortBy, routes, flightQuery);
-            return new ResponseEntity(flights, HttpStatus.OK);
+            return ResponseEntity.ok(flights);
         } catch (NullPointerException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Could not find flights for those locations/dates. Try again.");
@@ -119,7 +120,7 @@ public class FlightController {
     }
 
     // create new flight
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<FlightDto> createFlight(
             @RequestBody FlightDto flightDTO, UriComponentsBuilder builder)
             throws FlightNotSavedException {

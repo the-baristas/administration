@@ -1,10 +1,21 @@
 package com.utopia.flightservice.entity;
 
-import lombok.*;
+import javax.validation.constraints.Positive;
 
-@Data @NoArgsConstructor @AllArgsConstructor
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class FlightQuery {
-    private String month;
-    private String date;
-    private String year;
+    @Positive
+    private Integer month;
+
+    @Positive
+    private Integer date;
+
+    @Positive
+    private Integer year;
 }

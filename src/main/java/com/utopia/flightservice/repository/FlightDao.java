@@ -1,32 +1,41 @@
 package com.utopia.flightservice.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.sql.Timestamp;
-import java.util.List;
 
 @Transactional
 @Repository
 public interface FlightDao extends JpaRepository<Flight, Integer> {
 
-
     Page<Flight> findAllByRouteIn(List<Route> routes, Pageable paging);
 
-    Page<Flight> findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(List<Route> routes, Timestamp departure, Timestamp departureHelper, Pageable paging);
-
+    Page<Flight> findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+            List<Route> routes, LocalDateTime departure,
+            LocalDateTime departureHelper, Pageable paging);
 
     @Modifying
-    @Query("UPDATE flight SET route_id = ?2, airplane_id = ?3, departure_time = ?4, arrival_time = ?5, first_reserved = ?6, first_price = ?7, business_reserved = ?8, business_price = ?9, economy_reserved = ?10, economy_price = ?11, is_active = ?12 WHERE id = ?1")
-    void updateFlight(Integer id, Route route, Airplane airplane, Timestamp departureTime, Timestamp arrivalTime, Integer firstReserved, Float firstPrice, Integer businessReserved, Float businessPrice, Integer economyReserved, Float economyPrice, Boolean isActive);
+    @Query("UPDATE Flight SET route_id = ?2, airplane_id = ?3, departure_time = ?4, arrival_time = ?5, first_reserved = ?6, first_price = ?7, business_reserved = ?8, business_price = ?9, economy_reserved = ?10, economy_price = ?11, is_active = ?12 WHERE id = ?1")
+    void updateFlight(Integer id, Route route, Airplane airplane,
+            LocalDateTime departureTime, LocalDateTime arrivalTime,
+            Integer firstReserved, Float firstPrice, Integer businessReserved,
+            Float businessPrice, Integer economyReserved, Float economyPrice,
+            Boolean isActive);
 
+    @Query("SELECT CASE WHEN COUNT(f) > 0 THEN TRUE ELSE FALSE END FROM Flight f WHERE f.airplane.id = :airplaneId AND f.isActive = TRUE")
+    boolean areAnyActiveFlightsWithAirplane(
+            @Param("airplaneId") Long airplaneId);
 }

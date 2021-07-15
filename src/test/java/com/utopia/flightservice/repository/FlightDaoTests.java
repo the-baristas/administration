@@ -141,4 +141,80 @@ public class FlightDaoTests {
         Optional<Flight> flightFromDB = dao.findById(flightId);
         assertThat(flightFromDB.isPresent(), is(false));
     }
+
+    @Test
+    void areNoActiveFlightsWithAirplane_IdOfAirplaneWithNoActiveFlight_True() {
+        final Flight flight = new Flight();
+        flight.setId(1);
+        flight.setIsActive(Boolean.FALSE);
+        flight.setArrivalTime(LocalDateTime.of(2025, 1, 1, 1, 0, 0));
+        flight.setDepartureTime(LocalDateTime.of(2025, 1, 1, 1, 0, 0));
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(3.01f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(2.01f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(1.01f);
+
+        final Airplane airplane = new Airplane();
+        final Long airplaneId = 1L;
+        airplane.setId(airplaneId);
+        flight.setAirplane(airplane);
+
+        final Route route = new Route();
+        route.setId(1);
+        route.setOriginAirport(new Airport());
+        route.getOriginAirport().setIataId("ORI");
+        route.getOriginAirport().setCity("Origin City");
+        route.setDestinationAirport(new Airport());
+        route.getDestinationAirport().setIataId("DES");
+        route.getDestinationAirport().setCity("Destination City");
+        route.setIsActive(Boolean.TRUE);
+        flight.setRoute(route);
+
+        entityManager.merge(flight);
+        entityManager.flush();
+        boolean anyFlightsActive = dao
+                .areAnyActiveFlightsWithAirplane(airplaneId);
+
+        assertThat(anyFlightsActive, is(false));
+    }
+
+    @Test
+    void areNoActiveFlightsWithAirplane_IdOfAirplaneWithActiveFlight_False() {
+        final Flight flight = new Flight();
+        flight.setId(1);
+        flight.setIsActive(Boolean.TRUE);
+        flight.setArrivalTime(LocalDateTime.of(2025, 1, 1, 1, 0, 0));
+        flight.setDepartureTime(LocalDateTime.of(2025, 1, 1, 1, 0, 0));
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(3.01f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(2.01f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(1.01f);
+
+        final Airplane airplane = new Airplane();
+        final Long airplaneId = 1L;
+        airplane.setId(airplaneId);
+        flight.setAirplane(airplane);
+
+        final Route route = new Route();
+        route.setId(1);
+        route.setOriginAirport(new Airport());
+        route.getOriginAirport().setIataId("ORI");
+        route.getOriginAirport().setCity("Origin City");
+        route.setDestinationAirport(new Airport());
+        route.getDestinationAirport().setIataId("DES");
+        route.getDestinationAirport().setCity("Destination City");
+        route.setIsActive(Boolean.TRUE);
+        flight.setRoute(route);
+
+        entityManager.merge(flight);
+        entityManager.flush();
+        boolean anyFlightsActive = dao
+                .areAnyActiveFlightsWithAirplane(airplaneId);
+
+        assertThat(anyFlightsActive, is(true));
+    }
 }

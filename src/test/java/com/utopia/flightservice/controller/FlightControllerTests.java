@@ -96,9 +96,9 @@ public class FlightControllerTests {
 
         List<Flight> flights = new ArrayList<>();
         Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
-                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, null);
         Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
-                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route2);
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route2, null);
 
         flights.add(flight1);
         flights.add(flight2);
@@ -175,6 +175,11 @@ public class FlightControllerTests {
                         .content(new ObjectMapper()
                                 .writeValueAsString(updatedFlightDTO)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testEmailFlightDetailsToAll() throws Exception {
+        mockMvc.perform(get("/flights/1")).andExpect(status().isOk());
     }
 
     // utility functions

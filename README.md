@@ -16,3 +16,6 @@ GET ALL FLIGHTS (admin): /flightservice/flights
 GET SINGLE FLIGHT, UPDATE/DELETE SINGLE FLIGHT: /flightservice/flights/{id}
 
 CREATE NEW FLIGHT: /flightservice/flights
+
+To run this, you will also need valid AWS credentials:
+https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/get-started.html

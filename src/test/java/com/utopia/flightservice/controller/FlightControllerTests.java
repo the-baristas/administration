@@ -139,7 +139,7 @@ public class FlightControllerTests {
         when(flightService.getFlightById(flight.getId()))
                 .thenReturn(Optional.of(flight));
         when(airplaneService
-                .findAirplaneById(Long.valueOf(flightDTO.getAirplaneId())))
+                .findById(Long.valueOf(flightDTO.getAirplaneId())))
                         .thenReturn(flight.getAirplane());
         when(routeService.getRouteById(flightDTO.getRouteId()))
                 .thenReturn(Optional.of(flight.getRoute()));
@@ -160,7 +160,7 @@ public class FlightControllerTests {
         FlightDto updatedFlightDTO = makeFlightDTO();
 
         when(airplaneService
-                .findAirplaneById(Long.valueOf(flightDTO.getAirplaneId())))
+                .findById(Long.valueOf(flightDTO.getAirplaneId())))
                         .thenReturn(updatedFlight.getAirplane());
         when(routeService.getRouteById(flightDTO.getRouteId()))
                 .thenReturn(Optional.of(updatedFlight.getRoute()));

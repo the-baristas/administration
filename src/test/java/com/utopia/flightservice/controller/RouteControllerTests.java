@@ -18,7 +18,9 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.dto.RouteDto;
 import com.utopia.flightservice.entity.Airport;
+import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.exception.RouteNotFoundException;
 import com.utopia.flightservice.service.AirportService;
 import com.utopia.flightservice.service.RouteService;
 
@@ -54,6 +56,76 @@ public class RouteControllerTests {
     @Test
     public void controllerLoads() throws Exception {
         assertThat(controller).isNotNull();
+    }
+
+    @Test
+    public void test_getRouteById() throws Exception {
+
+        List<Route> routes = new ArrayList<>();
+        Airport originAirport1 = airportService.getAirportById("SFO");
+        Airport originAirport2 = airportService.getAirportById("MSP");
+
+        Airport destinationAirport1 = airportService.getAirportById("LAX");
+        Airport destinationAirport2 = airportService.getAirportById("JFK");
+
+        Route route1 = new Route(25, originAirport1, destinationAirport1, true);
+        Route route2 = new Route(26, originAirport2, destinationAirport2, true);
+        routes.add(route1);
+        routes.add(route2);
+
+        when(routeService.getRouteById(25)).thenReturn(Optional.of(route1));
+
+        mockMvc.perform(get("/routes/25").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(route1.getId()));
+
+    }
+
+    @Test
+    public void test_getRouteByLocation() throws Exception {
+
+        List<Route> routes = new ArrayList<>();
+
+        Airport originAirport = new Airport("SFO", "Test City 1", true);
+        Airport destinationAirport = new Airport("LAX", "Test City 2", true);
+
+        Route route1 = new Route(25, originAirport, destinationAirport, true);
+        routes.add(route1);
+
+        when(routeService.getRouteByLocationInfo("SFO", "LAX")).thenReturn(routes);
+
+        String originId = "SFO";
+        String destinationId = "LAX";
+
+        mockMvc.perform(get("/routes/{originId}/{destinationId}", originId, destinationId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)));
+
+    }
+
+    @Test
+    public void test_getRouteWithQuery() throws Exception, RouteNotFoundException {
+
+        List<Route> routes = new ArrayList<>();
+
+        Airport originAirport = new Airport("SFO", "Test City 1", true);
+        Airport destinationAirport = new Airport("LAX", "Test City 2", true);
+
+        Route route1 = new Route(25, originAirport, destinationAirport, true);
+        routes.add(route1);
+
+        String query = "LAX";
+        Page<Route> routePage = new PageImpl<Route>(routes);
+
+        when(routeService.getByOriginAirportOrDestinationAirport(0, 10, "id", query, query)).thenReturn(routePage);
+
+
+        mockMvc.perform(get("/routes/routes-query?query={query}&pageNo=0&pageSize=10&sortBy=id", query)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)));
+
     }
 
     @Test

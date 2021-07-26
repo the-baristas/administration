@@ -3,7 +3,8 @@ package com.utopia.flightservice.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,10 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.utopia.flightservice.entity.Airplane;
-import com.utopia.flightservice.entity.Airport;
-import com.utopia.flightservice.entity.Flight;
-import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.entity.*;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
 
@@ -245,5 +243,382 @@ class FlightServiceTests {
                 routes);
         assertEquals(flightPage, foundFlights);
     }
+
+    @Test
+    public void shouldGetFlightsByRouteAndDate_FilterAll() {
+
+        //params
+        Integer pageNo = 0;
+        Integer pageSize = 10;
+        String sortBy = "id";
+
+        Airport airport1 = new Airport("LAX", "Test City 1", true);
+        Airport airport2 = new Airport("JFK", "Test City 2", true);
+
+        Route route1 = new Route(1, airport1, airport2, true);
+        List<Route> routes = new ArrayList<Route>();
+        routes.add(route1);
+
+        FlightQuery flightQuery = new FlightQuery(3, 16, 2021, "all");
+
+        // mocks
+
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        Flight flight = new Flight();
+        flight.setId(101);
+        flight.setRoute(route1);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+
+        List<Flight> flights = new ArrayList<Flight>();
+        flights.add(flight);
+        Pageable paging = PageRequest.of(0, 10, Sort.by(sortBy));
+        Page<Flight> flightPage = new PageImpl<Flight>(flights);
+
+        Integer month = Integer.valueOf(flightQuery.getMonth());
+        Integer date = Integer.valueOf(flightQuery.getDate());
+        Integer year = Integer.valueOf(flightQuery.getYear());
+        Integer hour = 00;
+        Integer min = 00;
+
+        LocalDateTime departure = LocalDateTime.of(year, month, date, hour, min);
+        LocalDateTime departureHelper = LocalDateTime.of(year, month, date + 1, hour, min);
+
+        when(flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging)).thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(pageNo, pageSize, sortBy,
+                routes, flightQuery);
+        assertEquals(flightPage, foundFlights);
+
+    }
+
+    @Test
+    public void shouldGetFlightsByRouteAndDate_FilterMorning() {
+
+        //params
+        Integer pageNo = 0;
+        Integer pageSize = 10;
+        String sortBy = "id";
+
+        Airport airport1 = new Airport("LAX", "Test City 1", true);
+        Airport airport2 = new Airport("JFK", "Test City 2", true);
+
+        Route route1 = new Route(1, airport1, airport2, true);
+        List<Route> routes = new ArrayList<Route>();
+        routes.add(route1);
+
+        FlightQuery flightQuery = new FlightQuery(3, 16, 2021, "morning");
+
+        // mocks
+
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        Flight flight = new Flight();
+        flight.setId(101);
+        flight.setRoute(route1);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+
+        List<Flight> flights = new ArrayList<Flight>();
+        flights.add(flight);
+        Pageable paging = PageRequest.of(0, 10, Sort.by(sortBy));
+        Page<Flight> flightPage = new PageImpl<Flight>(flights);
+
+        Integer month = Integer.valueOf(flightQuery.getMonth());
+        Integer date = Integer.valueOf(flightQuery.getDate());
+        Integer year = Integer.valueOf(flightQuery.getYear());
+        Integer hour = 00;
+        Integer min = 00;
+
+        LocalDateTime departure = LocalDateTime.of(year, month, date, 04, min);
+        LocalDateTime departureHelper = LocalDateTime.of(year, month, date, 12, min);
+
+        when(flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging)).thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(pageNo, pageSize, sortBy,
+                routes, flightQuery);
+        assertEquals(flightPage, foundFlights);
+
+    }
+
+    @Test
+    public void shouldGetFlightsByRouteAndDate_FilterAfternoon() {
+
+        //params
+        Integer pageNo = 0;
+        Integer pageSize = 10;
+        String sortBy = "id";
+
+        Airport airport1 = new Airport("LAX", "Test City 1", true);
+        Airport airport2 = new Airport("JFK", "Test City 2", true);
+
+        Route route1 = new Route(1, airport1, airport2, true);
+        List<Route> routes = new ArrayList<Route>();
+        routes.add(route1);
+
+        FlightQuery flightQuery = new FlightQuery(3, 16, 2021, "afternoon");
+
+        // mocks
+
+        String str1 = "2020-09-01 12:01:15";
+        String str2 = "2020-09-01 17:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        Flight flight = new Flight();
+        flight.setId(101);
+        flight.setRoute(route1);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+
+        List<Flight> flights = new ArrayList<Flight>();
+        flights.add(flight);
+        Pageable paging = PageRequest.of(0, 10, Sort.by(sortBy));
+        Page<Flight> flightPage = new PageImpl<Flight>(flights);
+
+        Integer month = Integer.valueOf(flightQuery.getMonth());
+        Integer date = Integer.valueOf(flightQuery.getDate());
+        Integer year = Integer.valueOf(flightQuery.getYear());
+        Integer hour = 00;
+        Integer min = 00;
+
+        LocalDateTime departure = LocalDateTime.of(year, month, date, 12, min);
+        LocalDateTime departureHelper = LocalDateTime.of(year, month, date, 18, min);
+
+        when(flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging)).thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(pageNo, pageSize, sortBy,
+                routes, flightQuery);
+        assertEquals(flightPage, foundFlights);
+
+    }
+
+    @Test
+    public void shouldGetFlightsByRouteAndDate_FilterEvening() {
+
+        //params
+        Integer pageNo = 0;
+        Integer pageSize = 10;
+        String sortBy = "id";
+
+        Airport airport1 = new Airport("LAX", "Test City 1", true);
+        Airport airport2 = new Airport("JFK", "Test City 2", true);
+
+        Route route1 = new Route(1, airport1, airport2, true);
+        List<Route> routes = new ArrayList<Route>();
+        routes.add(route1);
+
+        FlightQuery flightQuery = new FlightQuery(3, 16, 2021, "evening");
+
+        // mocks
+
+        String str1 = "2020-09-01 20:01:15";
+        String str2 = "2020-09-01 21:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        Flight flight = new Flight();
+        flight.setId(101);
+        flight.setRoute(route1);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+
+        List<Flight> flights = new ArrayList<Flight>();
+        flights.add(flight);
+        Pageable paging = PageRequest.of(0, 10, Sort.by(sortBy));
+        Page<Flight> flightPage = new PageImpl<Flight>(flights);
+
+        Integer month = Integer.valueOf(flightQuery.getMonth());
+        Integer date = Integer.valueOf(flightQuery.getDate());
+        Integer year = Integer.valueOf(flightQuery.getYear());
+        Integer hour = 00;
+        Integer min = 00;
+
+        LocalDateTime departure = LocalDateTime.of(year, month, date, 18, min);
+        LocalDateTime departureHelper = LocalDateTime.of(year, month, date + 1, 04, min);
+
+        when(flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging)).thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(pageNo, pageSize, sortBy,
+                routes, flightQuery);
+        assertEquals(flightPage, foundFlights);
+
+    }
+
+    @Test
+    public void testUpdateflight() throws FlightNotSavedException {
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Flight flight = new Flight();
+        flight.setId(101);
+
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+
+        Flight flight2 = new Flight();
+        flight2.setId(101);
+        flight2.setRoute(route);
+        flight2.setAirplane(airplane);
+        flight2.setDepartureTime(departureTime);
+        flight2.setArrivalTime(arrivalTime);
+        flight2.setFirstReserved(0);
+        flight2.setFirstPrice(350.00f);
+        flight2.setBusinessReserved(0);
+        flight2.setBusinessPrice(300.00f);
+        flight2.setEconomyReserved(0);
+        flight2.setEconomyPrice(200.00f);
+        flight2.setIsActive(false);
+
+        when(flightDao.save(flight)).thenReturn(flight);
+        doNothing().when(flightDao).updateFlight(101, flight.getRoute(), flight.getAirplane(),
+                flight.getDepartureTime(), flight.getArrivalTime(),
+                flight.getFirstReserved(), flight.getFirstPrice(),
+                flight.getBusinessReserved(), flight.getBusinessPrice(),
+                flight.getEconomyReserved(), flight.getEconomyPrice(),
+                flight.getIsActive());
+
+        Integer savedFlightId = flightService.saveFlight(flight);
+        Integer updatedFlightId = flightService.updateFlight(101, flight2);
+
+        assertThat(flight.getId(), is(updatedFlightId));
+    }
+
+    @Test
+    public void testDeleteFlight_NotFound() throws FlightNotSavedException {
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Flight flight = new Flight();
+        flight.setId(101);
+
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+        String flightMsg = flightService.deleteFlight(101);
+        Optional<Flight> flightOpt = Optional.of(flight);
+
+        when(flightService.getFlightById(101)).thenReturn(flightOpt);
+        when(flightDao.findById(101)).thenReturn(flightOpt);
+        doNothing().when(flightDao).delete(flight);
+
+        assertThat(flightMsg, is("Flight not found!"));
+    }
+
+    @Test
+    public void testDeleteFlight_FlightFound() throws FlightNotSavedException {
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Flight flight = new Flight();
+        flight.setId(101);
+
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+
+        Optional<Flight> flightOpt = Optional.of(flight);
+
+        when(flightDao.findById(101)).thenReturn(flightOpt);
+        doNothing().when(flightDao).delete(flight);
+
+        String deleteMsg = flightService.deleteFlight(101);
+
+        assertThat(deleteMsg, is("Flight Deleted!"));
+    }
+
 
 }

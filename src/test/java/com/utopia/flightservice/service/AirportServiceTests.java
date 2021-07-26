@@ -3,6 +3,7 @@ package com.utopia.flightservice.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -65,4 +66,51 @@ public class AirportServiceTests {
         assertThat(airport.getIataId(), is(savedAirportID));
     }
 
+    @Test
+    public void test_findByCityContaining() {
+
+        Airport airport = new Airport();
+        airport.setIataId("TA6");
+        airport.setCity("Test City 6");
+        airport.setIsActive(true);
+        List<Airport> airports = Arrays.asList(airport);
+        when(airportDao.findByCityContaining("Test")).thenReturn(airports);
+
+        List <Airport> foundAirports = airportService.findByCityContainingLetter("Test");
+        assertEquals(airports, foundAirports);
+    }
+
+    @Test
+    public void test_updateAirport() throws AirportNotSavedException {
+        Airport airport = new Airport();
+        airport.setIataId("TA6");
+        airport.setCity("Test City 6");
+        airport.setIsActive(true);
+
+        Airport airport2 = new Airport();
+        airport.setIataId("TA6");
+        airport.setCity("Updated Test City 6");
+        airport.setIsActive(true);
+
+        when(airportDao.findByIataId("TA6")).thenReturn(airport);
+        doNothing().when(airportDao).updateAirport("TA6", "Updated Test City 6", true);
+
+        String msg = airportService.updateAirport("TA6", airport);
+        assertEquals("TA6", msg);
+    }
+
+    @Test
+    public void test_deleteAirport() throws AirportNotSavedException {
+
+        Airport airport = new Airport();
+        airport.setIataId("TA6");
+        airport.setCity("Test City 6");
+        airport.setIsActive(true);
+
+        when(airportDao.findByIataId("TA6")).thenReturn(airport);
+        doNothing().when(airportDao).delete(airport);
+
+        String msg = airportService.deleteAirport("TA6");
+        assertEquals("Airport Deleted!", msg);
+    }
 }

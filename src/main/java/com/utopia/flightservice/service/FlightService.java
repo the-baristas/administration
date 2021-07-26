@@ -108,7 +108,7 @@ public class FlightService {
                     flight.getEconomyReserved(), flight.getEconomyPrice(),
                     flight.getIsActive());
         } catch (Exception e) {
-            throw new FlightNotSavedException("ERROR! Route not updated.");
+            throw new FlightNotSavedException("ERROR! Flight not updated.");
         }
         return flight.getId();
     }

@@ -4,9 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.utopia.flightservice.email.EmailSender;
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.FlightQuery;
 import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.entity.User;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
 
@@ -24,6 +26,9 @@ public class FlightService {
 
     @Autowired
     private FlightDao flightDao;
+
+    @Autowired
+    private EmailSender emailSender;
 
     // get every flight as a list
     public List<Flight> getAllFlights() {
@@ -127,6 +132,14 @@ public class FlightService {
             throw new FlightNotSavedException("ERROR! Flight not deleted.");
         }
         return "Flight Deleted!";
+    }
+
+
+    //email flight details to all the emails of the users booked for the flight
+    public void emailFlightDetailsToAllBookedUsers(Flight flight){
+        for(User user : flight.getBookedUsers()){
+            emailSender.sendFlightDetails(user.getEmail(), flight);
+        }
     }
 
 }

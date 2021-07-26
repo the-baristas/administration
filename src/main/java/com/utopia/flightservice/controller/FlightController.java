@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import com.utopia.flightservice.dto.FlightDto;
+import com.utopia.flightservice.dto.FlightEmailRequestDto;
 import com.utopia.flightservice.entity.Airplane;
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.FlightQuery;
@@ -172,6 +173,13 @@ public class FlightController {
             throws FlightNotSavedException {
         String isRemoved = flightService.deleteFlight(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    // email flight details to all users that have booked tickets for that flight
+    @GetMapping("/email/{flightId}")
+    public ResponseEntity<String> emailFlightDetailsToAll(@PathVariable Integer flightId){
+        flightService.emailFlightDetailsToAllBookedUsers(flightService.getFlightById(flightId).get());
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     public FlightDto convertToDto(Flight flight) {

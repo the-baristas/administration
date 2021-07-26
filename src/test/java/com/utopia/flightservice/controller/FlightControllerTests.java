@@ -13,9 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.dto.FlightDto;
@@ -98,9 +96,9 @@ public class FlightControllerTests {
 
         List<Flight> flights = new ArrayList<>();
         Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
-                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, null);
         Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
-                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route2);
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route2, null);
 
         flights.add(flight1);
         flights.add(flight2);
@@ -220,11 +218,17 @@ public class FlightControllerTests {
         Route route = new Route(1, originAirport, destinationAirport, true);
         routes.add(route);
 
+        User user1 = new User(1L, "testuser1", "test@gmail.com", "347-283-1078");
+        User user2 = new User(2L, "testuser2", "testuser2@gmail.com", "212-202-3454");
+        Set<User> bookedUsers = new TreeSet<User>();
+        bookedUsers.add(user1);
+        bookedUsers.add(user2);
+
         List<Flight> flights = new ArrayList<>();
         Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
-                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
         Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
-                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
 
         flights.add(flight1);
         flights.add(flight2);
@@ -273,11 +277,17 @@ public class FlightControllerTests {
         Route route = new Route(1, originAirport, destinationAirport, true);
         routes.add(route);
 
+        User user1 = new User(1L, "testuser1", "test@gmail.com", "347-283-1078");
+        User user2 = new User(2L, "testuser2", "testuser2@gmail.com", "212-202-3454");
+        Set<User> bookedUsers = new TreeSet<User>();
+        bookedUsers.add(user1);
+        bookedUsers.add(user2);
+
         List<Flight> flights = new ArrayList<>();
         Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
-                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
         Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
-                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route);
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
 
         flights.add(flight1);
         flights.add(flight2);
@@ -299,6 +309,10 @@ public class FlightControllerTests {
                 .content(asJsonString(flightQuery))).andDo(print())
                 .andExpect(status().isOk());
 
+    }
+
+    public void testEmailFlightDetailsToAll() throws Exception {
+        mockMvc.perform(get("/flights/1")).andExpect(status().isOk());
     }
 
     // utility functions

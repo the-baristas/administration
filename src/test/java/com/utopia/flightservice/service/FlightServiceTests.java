@@ -2,6 +2,7 @@ package com.utopia.flightservice.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -13,6 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import java.util.*;
+
+import com.utopia.flightservice.email.EmailSender;
 import com.utopia.flightservice.entity.*;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
@@ -41,6 +45,9 @@ class FlightServiceTests {
 
     @MockBean
     private FlightDao flightDao;
+
+    @MockBean
+    private EmailSender emailSender;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter
             .ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -620,5 +627,14 @@ class FlightServiceTests {
         assertThat(deleteMsg, is("Flight Deleted!"));
     }
 
+    void testEmailFlightDetailsToAllBookedUsers(){
+        Flight flight = new Flight();
+        HashSet<User> users = new HashSet<>();
+        users.add(new User(1l, "name", "email", "11111111111"));
+        users.add(new User(2l, "name2", "email2", "22222222222"));
+        flight.setBookedUsers(users);
+
+        assertDoesNotThrow(() -> {flightService.emailFlightDetailsToAllBookedUsers(flight);});
+    }
 
 }

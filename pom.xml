@@ -161,6 +161,18 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.7</version>
+                <configuration>
+                    <excludes>
+                        <exclude>com.utopia.flightservice.entity</exclude>
+                        <exclude>com.utopia.flightservice.dto</exclude>
+                        <exclude>com.utopia.flightservice.attributeconverter</exclude>
+                        <exclude>com.utopia.flightservice.exception</exclude>
+                        <exclude>com/utopia/flightservice/entity/*</exclude>
+                        <exclude>com/utopia/flightservice/dto/*</exclude>
+                        <exclude>com/utopia/flightservice/attributeconverter/*</exclude>
+                        <exclude>com/utopia/flightservice/exception/*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>

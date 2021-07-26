@@ -220,7 +220,7 @@ public class FlightControllerTests {
 
         User user1 = new User(1L, "testuser1", "test@gmail.com", "347-283-1078");
         User user2 = new User(2L, "testuser2", "testuser2@gmail.com", "212-202-3454");
-        Set<User> bookedUsers = new TreeSet<User>();
+        HashSet<User> bookedUsers = new HashSet<User>();
         bookedUsers.add(user1);
         bookedUsers.add(user2);
 
@@ -279,7 +279,7 @@ public class FlightControllerTests {
 
         User user1 = new User(1L, "testuser1", "test@gmail.com", "347-283-1078");
         User user2 = new User(2L, "testuser2", "testuser2@gmail.com", "212-202-3454");
-        Set<User> bookedUsers = new TreeSet<User>();
+        HashSet<User> bookedUsers = new HashSet<User>();
         bookedUsers.add(user1);
         bookedUsers.add(user2);
 

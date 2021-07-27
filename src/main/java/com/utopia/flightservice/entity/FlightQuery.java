@@ -18,4 +18,7 @@ public class FlightQuery {
 
     @Positive
     private Integer year;
+
+    private String filter;
+
 }

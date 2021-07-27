@@ -99,7 +99,7 @@ public class FlightController {
 
     // get all flights based on location info and date
     @PostMapping("query")
-    public ResponseEntity<Page<Flight>> getFlightsByRouteAndLocation(
+    public ResponseEntity<Page<Flight>> getFlightsByRouteAndDate(
             @RequestParam String originId, @RequestParam String destinationId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,

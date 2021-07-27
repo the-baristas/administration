@@ -135,4 +135,85 @@ public class AirplaneControllerTest {
         airplaneService.deleteById(airplane.getId());
         verify(airplaneService, times(1)).deleteById(airplane.getId());
     }
+
+    @Test
+    public void foundPlane_ByModel() throws JsonProcessingException {
+        Airplane airplane = new Airplane();
+        airplane.setId(1L);
+        airplane.setFirstClassSeatsMax(1L);
+        airplane.setBusinessClassSeatsMax(1L);
+        airplane.setEconomyClassSeatsMax(1L);
+        airplane.setModel("Airbus A220");
+
+        Airplane airplane2 = new Airplane();
+        airplane2.setId(2L);
+        airplane2.setFirstClassSeatsMax(1L);
+        airplane2.setBusinessClassSeatsMax(1L);
+        airplane2.setEconomyClassSeatsMax(1L);
+        airplane2.setModel("Airbus A220");
+
+        Page<Airplane> foundAirplanesPage = new PageImpl<Airplane>(
+                Arrays.asList(airplane, airplane2));
+        Integer pageIndex = 0;
+        Integer pageSize = 1;
+        String term = "Airbus A220";
+
+        when(airplaneService.search(term, pageIndex,
+                pageSize))
+                .thenReturn(foundAirplanesPage);
+
+        Page<AirplaneDto> foundAirplaneDtosPage = foundAirplanesPage
+                .map((Airplane a) -> modelMapper.map(a, AirplaneDto.class));
+
+        webTestClient.get()
+                .uri("/airplanes/search?term={term}&index={pageIndex}&size={pageSize}", term, pageIndex,
+                        pageSize)
+                .accept(MediaType.APPLICATION_JSON).exchange().expectStatus()
+                .isOk().expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .json(objectMapper.writeValueAsString(foundAirplaneDtosPage));
+
+    }
+
+    @Test
+    public void foundDistinct_ByModel() throws JsonProcessingException {
+        Airplane airplane = new Airplane();
+        airplane.setId(1L);
+        airplane.setFirstClassSeatsMax(1L);
+        airplane.setBusinessClassSeatsMax(1L);
+        airplane.setEconomyClassSeatsMax(1L);
+        airplane.setModel("Airbus A220");
+
+        Airplane airplane2 = new Airplane();
+        airplane2.setId(2L);
+        airplane2.setFirstClassSeatsMax(1L);
+        airplane2.setBusinessClassSeatsMax(1L);
+        airplane2.setEconomyClassSeatsMax(1L);
+        airplane2.setModel("Airbus A220");
+
+        Page<Airplane> foundAirplanesPage = new PageImpl<Airplane>(
+                Arrays.asList(airplane, airplane2));
+        Integer pageIndex = 0;
+        Integer pageSize = 1;
+        String term = "Airbus A220";
+
+        when(airplaneService.findDistinctByModelContaining(term, pageIndex,
+                pageSize))
+                .thenReturn(foundAirplanesPage);
+
+        Page<AirplaneDto> foundAirplaneDtosPage = foundAirplanesPage
+                .map((Airplane a) -> modelMapper.map(a, AirplaneDto.class));
+
+        webTestClient.get()
+                .uri("/airplanes/distinct_search?term={term}&index={pageIndex}&size={pageSize}", term, pageIndex,
+                        pageSize)
+                .accept(MediaType.APPLICATION_JSON).exchange().expectStatus()
+                .isOk().expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .json(objectMapper.writeValueAsString(foundAirplaneDtosPage));
+
+    }
+
+
+
 }

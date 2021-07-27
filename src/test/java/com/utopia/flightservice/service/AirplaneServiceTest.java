@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.repository.AirplaneRepository;
 import com.utopia.flightservice.repository.FlightDao;
 
@@ -24,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(MockitoExtension.class)
@@ -134,5 +136,38 @@ class AirplaneServiceTest {
                 () -> airplaneService.deleteById(id));
         assertThat(exception.getMessage(), containsString(
                 "Airplane with id: 1 which has at least one active flight cannot be deleted."));
+    }
+
+    @Test
+    public void testSearch() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Airplane airplane = new Airplane(28L, 200L, 300L, 400L, "Test Model");
+        Page<Airplane> airplanePage = new PageImpl<Airplane>(
+                Arrays.asList(airplane));
+        when(airplaneRepository.findByModelContaining("Test Model", pageable)).thenReturn(airplanePage);
+        Page<Airplane> foundAirplanesPage = airplaneService.search("Test Model", 0, 10);
+        assertEquals(airplanePage, foundAirplanesPage);
+    }
+
+    @Test
+    public void test_FindByModelContaining() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Airplane airplane = new Airplane(28L, 200L, 300L, 400L, "Test Model");
+        Page<Airplane> airplanePage = new PageImpl<Airplane>(
+                Arrays.asList(airplane));
+        when(airplaneRepository.findByModelContaining("Test Model", pageable)).thenReturn(airplanePage);
+        Page<Airplane> foundAirplanesPage = airplaneService.findByModelContaining("Test Model", 0, 10);
+        assertEquals(airplanePage, foundAirplanesPage);
+    }
+
+    @Test
+    public void test_findDistinctByModelContaining() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Airplane airplane = new Airplane(28L, 200L, 300L, 400L, "Test Model");
+        Page<Airplane> airplanePage = new PageImpl<Airplane>(
+                Arrays.asList(airplane));
+        when(airplaneRepository.findDistinctByModelContaining("Test Model", pageable)).thenReturn(airplanePage);
+        Page<Airplane> foundAirplanesPage = airplaneService.findDistinctByModelContaining("Test Model", 0, 10);
+        assertEquals(airplanePage, foundAirplanesPage);
     }
 }

@@ -50,41 +50,27 @@ public class AirportService {
 
     // add a new airport
     public String saveAirport(Airport airport) throws AirportNotSavedException {
-        try {
             airportDao.save(airport);
             return airport.getIataId();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            throw new AirportNotSavedException("ERROR! Airport not saved.");
-        }
     }
 
     // update an airport's information (in progress)
     public String updateAirport(String id, Airport airport)
             throws AirportNotSavedException {
-        try {
             if (airportDao.findByIataId(id) != null) {
                 airportDao.updateAirport(id, airport.getCity(),
                         airport.getIsActive());
+            } else {
+                return "Airport not found!";
             }
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Could not find airport with ID:" + id);
-        }
-
         return airport.getIataId();
     }
 
     // delete an airport
     public String deleteAirport(String id) throws AirportNotSavedException {
-        try {
             Airport theAirport = getAirportById(id);
             airportDao.delete(theAirport);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            throw new AirportNotSavedException("ERROR! Airport not deleted.");
-        }
-        return "Airport Deleted!";
+            return "Airport Deleted!";
     }
 
 }

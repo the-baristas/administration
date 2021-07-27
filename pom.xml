@@ -98,6 +98,11 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>ses</artifactId>
         </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>regions</artifactId>
+            <version>2.16.93</version>
+        </dependency>
 
     </dependencies>
 
@@ -156,6 +161,18 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.7</version>
+                <configuration>
+                    <excludes>
+                        <exclude>com.utopia.flightservice.entity</exclude>
+                        <exclude>com.utopia.flightservice.dto</exclude>
+                        <exclude>com.utopia.flightservice.attributeconverter</exclude>
+                        <exclude>com.utopia.flightservice.exception</exclude>
+                        <exclude>com/utopia/flightservice/entity/*</exclude>
+                        <exclude>com/utopia/flightservice/dto/*</exclude>
+                        <exclude>com/utopia/flightservice/attributeconverter/*</exclude>
+                        <exclude>com/utopia/flightservice/exception/*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>

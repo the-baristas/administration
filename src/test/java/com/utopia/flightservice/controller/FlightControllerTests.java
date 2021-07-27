@@ -6,24 +6,21 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.dto.FlightDto;
-import com.utopia.flightservice.entity.Airplane;
-import com.utopia.flightservice.entity.Airport;
-import com.utopia.flightservice.entity.Flight;
-import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.entity.*;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.service.AirplaneService;
+import com.utopia.flightservice.service.AirportService;
 import com.utopia.flightservice.service.FlightService;
 import com.utopia.flightservice.service.RouteService;
 
@@ -56,6 +53,9 @@ public class FlightControllerTests {
 
     @MockBean
     private AirplaneService airplaneService;
+
+    @MockBean
+    private AirportService airportService;
 
     @Autowired
     private FlightController controller;
@@ -178,6 +178,139 @@ public class FlightControllerTests {
     }
 
     @Test
+    public void shouldDeleteFlight() throws FlightNotSavedException, Exception {
+
+        Flight flight = makeFlight();
+        FlightDto flightDTO = makeFlightDTO();
+
+        flightService.saveFlight(flight);
+
+        when(flightService.deleteFlight(flight.getId()))
+                .thenReturn("Flight Deleted!");
+
+        mockMvc.perform(
+                delete("/flights/100").contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(flight)))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void shouldGetFlightsByRouteId() throws Exception {
+
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        List<Airplane> airplanes = new ArrayList<>();
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+        Airplane airplane2 = new Airplane(1l, 100l, 100l, 100l, "Model 2");
+        airplanes.add(airplane);
+        airplanes.add(airplane2);
+
+        List<Airport> airports = new ArrayList<>();
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        airports.add(originAirport);
+        airports.add(destinationAirport);
+
+        List<Route> routes = new ArrayList<>();
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        routes.add(route);
+
+        User user1 = new User(1L, "testuser1", "test@gmail.com", "347-283-1078");
+        User user2 = new User(2L, "testuser2", "testuser2@gmail.com", "212-202-3454");
+        HashSet<User> bookedUsers = new HashSet<User>();
+        bookedUsers.add(user1);
+        bookedUsers.add(user2);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
+        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
+
+        flights.add(flight1);
+        flights.add(flight2);
+
+        when(routeService.getRouteByLocationInfo("TC1", "TC2"))
+                .thenReturn(routes);
+
+        Page<Flight> flightPage = new PageImpl<Flight>(flights);
+
+        when(flightService.getFlightsByRoute(0, 10,
+                "id", routes)).thenReturn(flightPage);
+
+        mockMvc.perform(get("/flights/search?originId=TC1&destinationId=TC2&pageNo=0&pageSize=10&sortBy=id")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)));
+
+    }
+
+    @Test
+    public void shouldGetFlightsByRouteAndDate() throws Exception {
+
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        List<Airplane> airplanes = new ArrayList<>();
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+        Airplane airplane2 = new Airplane(1l, 100l, 100l, 100l, "Model 2");
+        airplanes.add(airplane);
+        airplanes.add(airplane2);
+
+        List<Airport> airports = new ArrayList<>();
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        airports.add(originAirport);
+        airports.add(destinationAirport);
+
+        List<Airport> originAirports = new ArrayList<>();
+        originAirports.add(originAirport);
+        List<Airport> destAirports = new ArrayList<>();
+        destAirports.add(destinationAirport);
+
+        List<Route> routes = new ArrayList<>();
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        routes.add(route);
+
+        User user1 = new User(1L, "testuser1", "test@gmail.com", "347-283-1078");
+        User user2 = new User(2L, "testuser2", "testuser2@gmail.com", "212-202-3454");
+        HashSet<User> bookedUsers = new HashSet<User>();
+        bookedUsers.add(user1);
+        bookedUsers.add(user2);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
+        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
+                0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
+
+        flights.add(flight1);
+        flights.add(flight2);
+
+        when(routeService.getRouteByLocationInfo("TC1", "TC2"))
+                .thenReturn(routes);
+
+        when(airportService.getAirportByIdOrCity("TC1")).thenReturn(originAirports);
+        when(airportService.getAirportByIdOrCity("TC2")).thenReturn(destAirports);
+
+        Page<Flight> flightPage = new PageImpl<Flight>(flights);
+        FlightQuery flightQuery = new FlightQuery(9, 1, 2020, "all");
+
+        when(flightService.getFlightsByRouteAndDate(0, 10,
+                "economyPrice", routes, flightQuery)).thenReturn(flightPage);
+
+        mockMvc.perform(post("/flights/query?originId=TC1&destinationId=TC2&pageNo=0&pageSize=10&sortBy=id", flightQuery)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(flightQuery))).andDo(print())
+                .andExpect(status().isOk());
+
+    }
+
     public void testEmailFlightDetailsToAll() throws Exception {
         mockMvc.perform(get("/flights/1")).andExpect(status().isOk());
     }

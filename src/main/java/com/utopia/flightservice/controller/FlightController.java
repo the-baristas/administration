@@ -156,6 +156,7 @@ public class FlightController {
     }
 
     // get single flight
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<Flight> getFlight(@PathVariable Integer id) {
         Optional<Flight> flight = flightService.getFlightById(id);

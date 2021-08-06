@@ -19,7 +19,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
-                .mvcMatchers(HttpMethod.GET, "/").permitAll()
+                .mvcMatchers(HttpMethod.GET, "/flights/health").permitAll()
+                .mvcMatchers(HttpMethod.GET, "/flights").permitAll()
+                .mvcMatchers(HttpMethod.GET, "/flights").permitAll()
+                .mvcMatchers(HttpMethod.GET, "/flights/search").permitAll()
+                .mvcMatchers(HttpMethod.POST, "/flights/query").permitAll()
                 .mvcMatchers("/v3/api-docs/**", "/swagger-ui/**",
                         "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated().and()

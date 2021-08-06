@@ -20,24 +20,28 @@ import com.utopia.flightservice.repository.AirportDao;
 import com.utopia.flightservice.repository.RouteDao;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class RouteServiceTests {
 
-    @Autowired
+    @InjectMocks
     private RouteService routeService;
 
-    @Autowired
+    @Mock
     private AirportService airportService;
 
-    @MockBean
+    @Mock
     private RouteDao routeDao;
 
-    @MockBean
+    @Mock
     private AirportDao airportDao;
 
     @Test
@@ -136,17 +140,10 @@ public class RouteServiceTests {
         route.setIsActive(true);
         List<Route> allRoutes = Arrays.asList(route);
 
-        when(airportService.getAirportById("SFO")).thenReturn(airport);
-        when(airportService.getAirportById("LAX")).thenReturn(airport2);
-
         List<Airport> query1 = airportService.getAirportByIdOrCity(originId);
         List<Airport> query2 = airportService.getAirportByIdOrCity(destinationId);
 
         when(routeDao.findByOriginAirportInAndDestinationAirportIn(query1, query2)).thenReturn(allRoutes);
-        when(airportDao.findByIataIdContainingOrCityContaining(originId,
-                originId)).thenReturn(query1);
-        when(airportDao.findByIataIdContainingOrCityContaining(destinationId,
-                destinationId)).thenReturn(query2);
 
         List<Route> foundRoutes = routeService.getRouteByLocationInfo("SFO", "LAX");
 
@@ -175,7 +172,7 @@ public class RouteServiceTests {
         String sortBy = "id";
         Pageable paging = PageRequest.of(pageIndex, pageSize, Sort.by(sortBy));
 
-        when(airportDao.findByIataIdContainingOrCityContaining(query1, query1)).thenReturn(airports);
+        when(airportService.getAirportByIdOrCity(query1)).thenReturn(airports);
         when(routeDao.findByOriginAirportInOrDestinationAirportIn(airports, airports, paging)).thenReturn(routePage);
 
         Page<Route> foundRoutes = routeService.getByOriginAirportOrDestinationAirport(pageIndex, pageSize, sortBy, query1, query1);

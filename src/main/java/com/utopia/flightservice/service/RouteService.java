@@ -57,6 +57,7 @@ public class RouteService {
 		try {
 			return routeDao.findByOriginAirportInOrDestinationAirportIn(airports, airports, paging);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new RouteNotFoundException("ERROR! No routes found.");
 		}
 	}

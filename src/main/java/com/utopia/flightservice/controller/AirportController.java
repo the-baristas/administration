@@ -9,6 +9,7 @@ import com.utopia.flightservice.service.AirportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ public class AirportController {
     private AirportService airportService;
 
     // get all airports
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/airports")
     public ResponseEntity<List<Airport>> getAllAirports() {
         List<Airport> airports = airportService.getAllAirports();
@@ -40,6 +42,7 @@ public class AirportController {
     }
 
     // get single airport
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/airports/{id}")
     public ResponseEntity<Airport> getAirport(@PathVariable String id) {
         Airport airport = airportService.getAirportById(id);
@@ -52,6 +55,7 @@ public class AirportController {
     }
 
     // get airport by id or city containing
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/airports/search")
     public ResponseEntity<List<Airport>> getAirportByIdOrCity(@RequestParam(name="query") String query) {
         List<Airport> airports = airportService.getAirportByIdOrCity(query);
@@ -65,6 +69,7 @@ public class AirportController {
     }
 
     // find airport containing letter
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/airports-containing")
     public ResponseEntity<List<Airport>> getAirportContaining(
             @RequestParam(name = "contains") String contains) {
@@ -82,6 +87,7 @@ public class AirportController {
 
     // create a new airport, set up controller to catch exceptions from service
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("/airports/{id}")
     public ResponseEntity<String> createAirport(@RequestBody Airport airport,
             UriComponentsBuilder builder) throws AirportNotSavedException {
@@ -93,6 +99,7 @@ public class AirportController {
     }
 
     // update airport
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("/airports/{id}")
     public ResponseEntity<String> updateAirport(@PathVariable String id,
             @RequestBody Airport airport) throws AirportNotSavedException {
@@ -101,6 +108,7 @@ public class AirportController {
     }
 
     // delete an airport
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/airports/{id}")
     public ResponseEntity<String> deleteAirport(@PathVariable String id)
             throws AirportNotSavedException {

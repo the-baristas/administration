@@ -33,9 +33,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(FlightController.class)
+@WithMockUser(authorities = { "ROLE_ADMIN" })
 public class FlightControllerTests {
 
     // import mock mvc
@@ -311,6 +313,7 @@ public class FlightControllerTests {
 
     }
 
+    @Test
     public void testEmailFlightDetailsToAll() throws Exception {
         mockMvc.perform(get("/flights/1")).andExpect(status().isOk());
     }

@@ -104,6 +104,44 @@
             <version>2.16.93</version>
         </dependency>
 
+        <!--     Security      -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
+            <version>0.11.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>30.1-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.17.0</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
@@ -171,6 +209,8 @@
                         <exclude>com/utopia/flightservice/dto/*</exclude>
                         <exclude>com/utopia/flightservice/attributeconverter/*</exclude>
                         <exclude>com/utopia/flightservice/exception/*</exclude>
+                        <exclude>com/utopia/flightservice/email/*</exclude>
+                        <exclude>com/utopia/flightservice/security/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

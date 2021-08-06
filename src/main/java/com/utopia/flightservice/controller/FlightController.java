@@ -20,12 +20,18 @@ import com.utopia.flightservice.service.AirplaneService;
 import com.utopia.flightservice.service.FlightService;
 import com.utopia.flightservice.service.RouteService;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +45,10 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
+@SecurityScheme(name = "bearer", // can be set to anything
+        type = SecuritySchemeType.HTTP, scheme = "bearer")
+@OpenAPIDefinition(info = @Info(title = "Flight Service", version = "v1"),
+        security = @SecurityRequirement(name = "bearer"))
 @RequestMapping("/flights")
 public class FlightController {
 
@@ -121,6 +131,7 @@ public class FlightController {
     }
 
     // create new flight
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<FlightDto> createFlight(
             @RequestBody FlightDto flightDTO, UriComponentsBuilder builder)
@@ -152,6 +163,7 @@ public class FlightController {
     }
 
     // update flight
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateFlight(@PathVariable Integer id,
             @RequestBody FlightDto flightDTO) throws FlightNotSavedException {
@@ -168,6 +180,7 @@ public class FlightController {
     }
 
     // delete a flight
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteFlight(@PathVariable Integer id)
             throws FlightNotSavedException {
@@ -176,6 +189,7 @@ public class FlightController {
     }
 
     // email flight details to all users that have booked tickets for that flight
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/email/{flightId}")
     public ResponseEntity<String> emailFlightDetailsToAll(@PathVariable Integer flightId){
         flightService.emailFlightDetailsToAllBookedUsers(flightService.getFlightById(flightId).get());

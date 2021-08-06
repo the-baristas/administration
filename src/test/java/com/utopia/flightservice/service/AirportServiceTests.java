@@ -15,17 +15,21 @@ import com.utopia.flightservice.exception.AirportNotSavedException;
 import com.utopia.flightservice.repository.AirportDao;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class AirportServiceTests {
 
-    @Autowired
+    @InjectMocks
     private AirportService airportService;
 
-    @MockBean
+    @Mock
     private AirportDao airportDao;
 
     @Test

@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -47,6 +48,7 @@ public class RouteController {
 	}
 
 	// get all routes
+	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	@GetMapping("/all")
 	public ResponseEntity<List<Route>> getAllRoutes() {
 			List<Route> routes = routeService.getAllRoutes();			
@@ -57,6 +59,7 @@ public class RouteController {
 			}
 	}
 
+	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	@GetMapping("")
 	public ResponseEntity<Page<Route>> getPagedRoutes(@RequestParam(defaultValue = "0") Integer pageNo,
 													  @RequestParam(defaultValue = "10") Integer pageSize,
@@ -70,6 +73,7 @@ public class RouteController {
 	}
 
 	// get single route
+	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	@GetMapping("/{id}")
 	public ResponseEntity<Route> getRoute(@PathVariable Integer id) {
 		Optional<Route> route = routeService.getRouteById(id);
@@ -77,6 +81,7 @@ public class RouteController {
 		}
 
 	// get single route with location data
+	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	@GetMapping("/{originId}/{destinationId}")
 	public ResponseEntity<Route> getRouteByLocationInfo(@PathVariable String originId, @PathVariable String destinationId) throws RouteNotFoundException {
 		List<Route> routes = routeService.getRouteByLocationInfo(originId, destinationId);
@@ -90,6 +95,7 @@ public class RouteController {
 
 
 	// get routes where origin or destination match query
+	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	@GetMapping("/routes-query")
 	public ResponseEntity<Page<Route>> getRoutesWithQuery(@RequestParam String query,
 														  @RequestParam(defaultValue = "0") Integer pageNo,
@@ -106,6 +112,7 @@ public class RouteController {
 	}
 	
 	// create a new route
+	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	@PostMapping("")
 	public ResponseEntity<RouteDto> createRoute(@RequestBody RouteDto routeDTO, UriComponentsBuilder builder) throws RouteNotSavedException {
 		HttpHeaders responseHeaders = new HttpHeaders();
@@ -126,6 +133,7 @@ public class RouteController {
 			}
 	
 	// update route
+	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	@PutMapping("/{id}")
 	public ResponseEntity<RouteDto> updateRoute(@PathVariable Integer id, @RequestBody RouteDto routeDTO, UriComponentsBuilder builder) throws RouteNotSavedException {
 		Route route;
@@ -141,6 +149,7 @@ public class RouteController {
 	}
 	
 	// delete a route
+	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteRoute(@PathVariable Integer id) throws RouteNotSavedException {
 		String isRemoved = routeService.deleteRoute(id);

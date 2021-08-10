@@ -21,7 +21,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable().authorizeRequests()
                 .mvcMatchers(HttpMethod.GET, "/flights/health").permitAll()
                 .mvcMatchers(HttpMethod.GET, "/flights").permitAll()
-                .mvcMatchers(HttpMethod.GET, "/flights").permitAll()
                 .mvcMatchers(HttpMethod.GET, "/flights/search").permitAll()
                 .mvcMatchers(HttpMethod.POST, "/flights/query").permitAll()
                 .mvcMatchers("/v3/api-docs/**", "/swagger-ui/**",

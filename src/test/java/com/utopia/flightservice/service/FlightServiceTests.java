@@ -22,6 +22,10 @@ import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,22 +35,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class FlightServiceTests {
 
-    @Autowired
+    @InjectMocks
     private FlightService flightService;
 
-    @Autowired
+    @InjectMocks
     private RouteService routeService;
 
-    @Autowired
+    @InjectMocks
     private AirplaneService airplaneService;
 
-    @MockBean
+    @Mock
     private FlightDao flightDao;
 
-    @MockBean
+    @Mock
     private EmailSender emailSender;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter
@@ -541,12 +545,6 @@ class FlightServiceTests {
         flight2.setIsActive(false);
 
         when(flightDao.save(flight)).thenReturn(flight);
-        doNothing().when(flightDao).updateFlight(101, flight.getRoute(), flight.getAirplane(),
-                flight.getDepartureTime(), flight.getArrivalTime(),
-                flight.getFirstReserved(), flight.getFirstPrice(),
-                flight.getBusinessReserved(), flight.getBusinessPrice(),
-                flight.getEconomyReserved(), flight.getEconomyPrice(),
-                flight.getIsActive());
 
         Integer savedFlightId = flightService.saveFlight(flight);
         Integer updatedFlightId = flightService.updateFlight(101, flight2);
@@ -582,10 +580,6 @@ class FlightServiceTests {
         flight.setIsActive(true);
         String flightMsg = flightService.deleteFlight(101);
         Optional<Flight> flightOpt = Optional.of(flight);
-
-        when(flightService.getFlightById(101)).thenReturn(flightOpt);
-        when(flightDao.findById(101)).thenReturn(flightOpt);
-        doNothing().when(flightDao).delete(flight);
 
         assertThat(flightMsg, is("Flight not found!"));
     }
@@ -627,6 +621,7 @@ class FlightServiceTests {
         assertThat(deleteMsg, is("Flight Deleted!"));
     }
 
+    @Test
     void testEmailFlightDetailsToAllBookedUsers(){
         Flight flight = new Flight();
         HashSet<User> users = new HashSet<>();

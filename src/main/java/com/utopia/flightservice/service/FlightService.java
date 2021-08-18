@@ -111,7 +111,7 @@ public class FlightService {
                     flight.getFirstReserved(), flight.getFirstPrice(),
                     flight.getBusinessReserved(), flight.getBusinessPrice(),
                     flight.getEconomyReserved(), flight.getEconomyPrice(),
-                    flight.getIsActive());
+                    flight.getIsActive(), flight.getDepartureGate(),flight.getArrivalGate());
         } catch (Exception e) {
             throw new FlightNotSavedException("ERROR! Flight not updated.");
         }

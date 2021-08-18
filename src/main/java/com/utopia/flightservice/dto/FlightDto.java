@@ -2,6 +2,7 @@ package com.utopia.flightservice.dto;
 
 import java.time.LocalDateTime;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -33,10 +34,16 @@ public class FlightDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime departureTime;
 
+    @NotBlank
+    private String departureGate;
+
     @NotNull
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime arrivalTime;
+
+    @NotBlank
+    private String arrivalGate;
 
     @PositiveOrZero
     private Integer firstReserved;

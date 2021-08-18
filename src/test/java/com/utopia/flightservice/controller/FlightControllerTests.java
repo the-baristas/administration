@@ -99,9 +99,9 @@ public class FlightControllerTests {
         routes.add(route2);
 
         List<Flight> flights = new ArrayList<>();
-        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
+        Flight flight1 = new Flight(100, airplane, departureTime, "A1", arrivalTime, "B1",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, null);
-        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
+        Flight flight2 = new Flight(101, airplane2, departureTime, "A2", arrivalTime, "B2",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route2, null);
 
         flights.add(flight1);
@@ -229,9 +229,9 @@ public class FlightControllerTests {
         bookedUsers.add(user2);
 
         List<Flight> flights = new ArrayList<>();
-        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
+        Flight flight1 = new Flight(100, airplane, departureTime, "A1", arrivalTime, "B1",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
-        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
+        Flight flight2 = new Flight(101, airplane2, departureTime, "A1", arrivalTime, "B2",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
 
         flights.add(flight1);
@@ -288,9 +288,9 @@ public class FlightControllerTests {
         bookedUsers.add(user2);
 
         List<Flight> flights = new ArrayList<>();
-        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
+        Flight flight1 = new Flight(100, airplane, departureTime, "A1", arrivalTime,"B1",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
-        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
+        Flight flight2 = new Flight(101, airplane2, departureTime, "A2", arrivalTime, "B2",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
 
         flights.add(flight1);

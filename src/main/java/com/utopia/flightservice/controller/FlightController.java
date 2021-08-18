@@ -1,5 +1,6 @@
 package com.utopia.flightservice.controller;
 
+import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.exception.ModelMapperFailedException;
 import com.utopia.flightservice.service.AirplaneService;
+import com.utopia.flightservice.service.AwsS3Service;
 import com.utopia.flightservice.service.FlightService;
 import com.utopia.flightservice.service.RouteService;
 
@@ -41,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -63,6 +66,9 @@ public class FlightController {
 
     @Autowired
     private AirplaneService airplaneService;
+
+    @Autowired
+    private AwsS3Service s3Service;
 
     @GetMapping("/health")
     public String checkHealth() {
@@ -196,6 +202,16 @@ public class FlightController {
         flightService.emailFlightDetailsToAllBookedUsers(flightService.getFlightById(flightId).get());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    //Upload a file (a csv file with flight information to AWS S3 which will then be handled by a lambda
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PostMapping("/csv")
+    public ResponseEntity<String> uploadFlightCsv(@RequestParam("file") MultipartFile file) throws IOException {
+        s3Service.uploadFlightCsv(file);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    //converters
 
     public FlightDto convertToDto(Flight flight) {
         return modelMapper.map(flight, FlightDto.class);

@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,10 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.dto.FlightDto;
 import com.utopia.flightservice.entity.*;
 import com.utopia.flightservice.exception.FlightNotSavedException;
-import com.utopia.flightservice.service.AirplaneService;
-import com.utopia.flightservice.service.AirportService;
-import com.utopia.flightservice.service.FlightService;
-import com.utopia.flightservice.service.RouteService;
+import com.utopia.flightservice.service.*;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,6 +31,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -58,6 +57,9 @@ public class FlightControllerTests {
 
     @MockBean
     private AirportService airportService;
+
+    @MockBean
+    private AwsS3Service s3Service;
 
     @Autowired
     private FlightController controller;
@@ -316,6 +318,19 @@ public class FlightControllerTests {
     @Test
     public void testEmailFlightDetailsToAll() throws Exception {
         mockMvc.perform(get("/flights/1")).andExpect(status().isOk());
+    }
+
+    @Test void testUploadFlightCsv() throws Exception {
+        MockMultipartFile file
+                = new MockMultipartFile(
+                "file",
+                "hello.txt",
+                MediaType.TEXT_PLAIN_VALUE,
+                "Hello, World!".getBytes()
+        );
+
+       mockMvc.perform(multipart("/flights/csv").file(file))
+                .andExpect(status().isOk());
     }
 
     // utility functions

@@ -18,9 +18,8 @@ import software.amazon.awssdk.services.ses.model.SesException;
 @Service
 public class EmailSender {
 
-//    @Value("${aws.emailSender}")
-//    private String sender;
-    private String sender = "anthony.sirimarco@smoothstack.com";
+    @Value("${aws.emailSender}")
+    private String sender;
 
     private Region region = Region.US_EAST_2;
 

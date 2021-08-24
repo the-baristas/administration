@@ -126,10 +126,6 @@ public class FlightController {
             @RequestBody FlightDto flightDTO, UriComponentsBuilder builder)
             throws FlightNotSavedException {
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        URI location = builder.path("/flights/{id}")
-                .buildAndExpand(flightDTO.getId()).toUri();
-        responseHeaders.setLocation(location);
         Flight flight;
 
         try {
@@ -138,6 +134,11 @@ public class FlightController {
             throw new ModelMapperFailedException(e);
         }
         Integer flightID = flightService.saveFlight(flight);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        URI location = builder.path("/flights/{id}")
+                .buildAndExpand(flightID).toUri();
+        responseHeaders.setLocation(location);
 
         Flight createdFlight = flightService.getFlightById(flightID).get();
         return ResponseEntity.status(HttpStatus.CREATED)

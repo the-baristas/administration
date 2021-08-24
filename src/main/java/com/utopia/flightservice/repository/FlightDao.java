@@ -27,6 +27,10 @@ public interface FlightDao extends JpaRepository<Flight, Integer> {
             List<Route> routes, LocalDateTime departure,
             LocalDateTime departureHelper, Pageable paging);
 
+    List<Flight> findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+            Route route, LocalDateTime startTime,
+            LocalDateTime endTime);
+
     @Modifying
     @Query("UPDATE Flight SET route_id = ?2, airplane_id = ?3, departure_time = ?4, arrival_time = ?5, first_reserved = ?6, first_price = ?7, business_reserved = ?8, business_price = ?9, economy_reserved = ?10, economy_price = ?11, is_active = ?12 WHERE id = ?1")
     void updateFlight(Integer id, Route route, Airplane airplane,

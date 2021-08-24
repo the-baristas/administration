@@ -1,17 +1,19 @@
 package com.utopia.flightservice.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import com.utopia.flightservice.email.EmailSender;
-import com.utopia.flightservice.entity.Flight;
-import com.utopia.flightservice.entity.FlightQuery;
-import com.utopia.flightservice.entity.Route;
-import com.utopia.flightservice.entity.User;
+import com.utopia.flightservice.entity.*;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
 
+import com.utopia.flightservice.repository.RouteDao;
+import org.jgrapht.GraphPath;
+import org.jgrapht.graph.DefaultEdge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +32,15 @@ public class FlightService {
     @Autowired
     private EmailSender emailSender;
 
+    @Autowired
+    private GraphService graphService;
+
+    @Autowired
+    private RouteService routeService;
+
+    @Autowired
+    private RouteDao routeDao;
+
     // get every flight as a list
     public List<Flight> getAllFlights() {
         return flightDao.findAll();
@@ -47,32 +58,73 @@ public class FlightService {
         return flightDao.findAllByRouteIn(routes, paging);
     }
 
-    public Page<Flight> getFlightsByRouteAndDate(Integer pageNo, Integer pageSize, String sortBy, List<Route> routes, FlightQuery flightQuery) {
 
 
-        Integer month = Integer.valueOf(flightQuery.getMonth());
-        Integer date = Integer.valueOf(flightQuery.getDate());
-        Integer year = Integer.valueOf(flightQuery.getYear());
+    private List<LinkedList<Flight>> searchFlights(Airport originAirport, Airport destinationAirport, LocalDateTime startTime, LocalDateTime endTime) {
+
+        // get all paths based on starting place and destination
+        List<GraphPath<Airport, DefaultEdge>> paths = graphService.getPaths(originAirport, destinationAirport);
+
+        // create a list of linked lists
+        List<LinkedList<Flight>> allTrips = new ArrayList<LinkedList<Flight>>();
+
+        // loop through paths
+        for (GraphPath<Airport, DefaultEdge> path: paths) {
+            List<Airport> airports = path.getVertexList();
+            List<Route> routes = new ArrayList<Route>();
+
+            // for each airport in the list of paths, find the route
+            for (int i = 0; i < airports.size(); i++) {
+                Airport origin = airports.get(i);
+                Airport dest = airports.get(i + 1);
+
+                if(dest != null) {
+                    routes.add(routeDao.findByOriginAirportAndDestinationAirport(origin, dest).get());
+                }
+            }
+
+            for(Route r: routes) {
+                List<Flight> flights = flightDao.findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(r, startTime, endTime);
+                List<LinkedList<Flight>> trips = new ArrayList<LinkedList<Flight>>();
+                for(Flight f: flights) {
+                    LinkedList<Flight> trip = new LinkedList<>();
+                    trip.add(f);
+                    trips.add(trip);
+                }
+
+            }
+        }
+
+        return trips;
+
+    }
+
+    public Page<Flight> getFlightsByRouteAndDate(Integer pageNo, Integer pageSize, String sortBy, List<Route> routes, FlightQuery startFlightQuery) {
+
+        Integer month = startFlightQuery.getMonth();
+        Integer date = startFlightQuery.getDate();
+        Integer year = startFlightQuery.getYear();
         Integer hour = 00;
         Integer min = 00;
 
+
         try {
-            if(flightQuery.getFilter().equals("all")) {
-                LocalDateTime departure = LocalDateTime.of(year, month, date, hour, min);
-                LocalDateTime departureHelper = LocalDateTime.of(year, month, date + 1, hour, min);
+            if(startFlightQuery.getFilter().equals("all")) {
+                LocalDateTime startTime = LocalDateTime.of(year, month, date, hour, min);
+                LocalDateTime endTime = startTime.plusDays(1);
                 Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-                return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging);
-            } else if(flightQuery.getFilter().equals("morning")) {
+                return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, startTime, endTime, paging);
+            } else if(startFlightQuery.getFilter().equals("morning")) {
                 LocalDateTime departure = LocalDateTime.of(year, month, date, 04, min);
                 LocalDateTime departureHelper = LocalDateTime.of(year, month, date, 12, min);
                 Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
                 return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging);
-            } else if(flightQuery.getFilter().equals("afternoon")) {
+            } else if(startFlightQuery.getFilter().equals("afternoon")) {
                 LocalDateTime departure = LocalDateTime.of(year, month, date, 12, min);
                 LocalDateTime departureHelper = LocalDateTime.of(year, month, date, 18, min);
                 Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
                 return flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging);
-            } else if(flightQuery.getFilter().equals("evening")) {
+            } else if(startFlightQuery.getFilter().equals("evening")) {
                 LocalDateTime departure = LocalDateTime.of(year, month, date, 18, min);
                 LocalDateTime departureHelper = LocalDateTime.of(year, month, date + 1, 04, min);
                 Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));

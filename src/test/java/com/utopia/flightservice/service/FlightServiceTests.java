@@ -21,6 +21,12 @@ import com.utopia.flightservice.entity.*;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
 
+import com.utopia.flightservice.repository.RouteDao;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.graph.SimpleDirectedGraph;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,6 +54,12 @@ class FlightServiceTests {
 
     @MockBean
     private EmailSender emailSender;
+
+    @MockBean
+    private GraphService graphService;
+
+    @MockBean
+    private RouteDao routeDao;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter
             .ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -635,6 +647,100 @@ class FlightServiceTests {
         flight.setBookedUsers(users);
 
         assertDoesNotThrow(() -> {flightService.emailFlightDetailsToAllBookedUsers(flight);});
+    }
+
+    @Test
+    public void testSearchFlights_WithGraph() {
+
+        Flight startToMiddleFlight = new Flight();
+        startToMiddleFlight.setId(101);
+        Flight middleToEndFlight = new Flight();
+        middleToEndFlight.setId(102);
+        Flight startToEndFlight = new Flight();
+        startToEndFlight.setId(103);
+
+        Airport start = new Airport("LAX", "Start", true);
+        Airport end = new Airport("JFK", "End", true);
+        Airport middle = new Airport("DFW", "Middle", true);
+
+        Route startToMiddleRoute = new Route(1, start, middle, true);
+        Route middleToEndRoute = new Route(2, middle, end, true);
+        Route startToEndRoute = new Route(3, start, end, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        LocalDateTime startToMiddleStartTime = LocalDateTime.of(5, 5, 5, 1,0);
+        LocalDateTime startToMiddleEndTime = LocalDateTime.of(5, 5, 5, 2,0);
+
+        LocalDateTime middleToEndStartTime = LocalDateTime.of(5, 5, 5, 2,0);
+        LocalDateTime middleToEndEndTime = LocalDateTime.of(5, 5, 5, 3,0);
+
+        LocalDateTime startToEndStartTime = LocalDateTime.of(5, 5, 5, 3,0);
+        LocalDateTime startToEndEndTime = LocalDateTime.of(5, 5, 5, 4,0);
+
+
+        startToMiddleFlight.setRoute(startToMiddleRoute);
+        startToMiddleFlight.setAirplane(airplane);
+        startToMiddleFlight.setDepartureTime(startToMiddleStartTime);
+        startToMiddleFlight.setArrivalTime(startToMiddleEndTime);
+        startToMiddleFlight.setFirstReserved(0);
+        startToMiddleFlight.setFirstPrice(350.00f);
+        startToMiddleFlight.setBusinessReserved(0);
+        startToMiddleFlight.setBusinessPrice(300.00f);
+        startToMiddleFlight.setEconomyReserved(0);
+        startToMiddleFlight.setEconomyPrice(200.00f);
+        startToMiddleFlight.setIsActive(true);
+
+        middleToEndFlight.setRoute(middleToEndRoute);
+        middleToEndFlight.setAirplane(airplane);
+        middleToEndFlight.setDepartureTime(middleToEndStartTime);
+        middleToEndFlight.setArrivalTime(middleToEndEndTime);
+        middleToEndFlight.setFirstReserved(0);
+        middleToEndFlight.setFirstPrice(350.00f);
+        middleToEndFlight.setBusinessReserved(0);
+        middleToEndFlight.setBusinessPrice(300.00f);
+        middleToEndFlight.setEconomyReserved(0);
+        middleToEndFlight.setEconomyPrice(200.00f);
+        middleToEndFlight.setIsActive(true);
+
+        startToEndFlight.setRoute(startToEndRoute);
+        startToEndFlight.setAirplane(airplane);
+        startToEndFlight.setDepartureTime(startToEndStartTime);
+        startToEndFlight.setArrivalTime(startToEndEndTime);
+        startToEndFlight.setFirstReserved(0);
+        startToEndFlight.setFirstPrice(350.00f);
+        startToEndFlight.setBusinessReserved(0);
+        startToEndFlight.setBusinessPrice(300.00f);
+        startToEndFlight.setEconomyReserved(0);
+        startToEndFlight.setEconomyPrice(200.00f);
+        startToEndFlight.setIsActive(true);
+
+        LocalDateTime searchDepartureTime = LocalDateTime.of(5, 5, 5, 0, 0);
+        LocalDateTime searchArrivalTime = LocalDateTime.of(5, 5, 5, 0, 0);
+
+        Graph<Airport, DefaultEdge> graph = new SimpleDirectedGraph<>(DefaultEdge.class);
+        GraphWalk<Airport, DefaultEdge> nonStopPath = new GraphWalk<Airport, DefaultEdge>(graph, Arrays.asList(start, middle, end), 0);
+        GraphWalk<Airport, DefaultEdge> oneStopPath = new GraphWalk<Airport, DefaultEdge>(graph, Arrays.asList(start, end), 0);
+        List<GraphPath<Airport, DefaultEdge>> paths = Arrays.asList(nonStopPath, oneStopPath);
+
+        when(graphService.getPaths(start, end)).thenReturn(paths);
+        when(routeDao.findByOriginAirportAndDestinationAirport(start, end)).thenReturn(Optional.of(startToEndRoute));
+        when(routeDao.findByOriginAirportAndDestinationAirport(start, middle)).thenReturn(Optional.of(startToMiddleRoute));
+        when(routeDao.findByOriginAirportAndDestinationAirport(middle, end)).thenReturn(Optional.of(middleToEndRoute));
+        when(flightDao.findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(startToEndRoute, startToEndStartTime, startToEndEndTime)).thenReturn(Arrays.asList(startToEndFlight));
+        when(flightDao.findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(startToMiddleRoute, startToMiddleStartTime, startToMiddleEndTime)).thenReturn(Arrays.asList(startToMiddleFlight));
+        when(flightDao.findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(middleToEndRoute, middleToEndStartTime, middleToEndEndTime)).thenReturn(Arrays.asList(middleToEndFlight));
+
+        List<LinkedList<Flight>> allTrips = flightService.searchFlights(start, end, searchDepartureTime, searchArrivalTime);
+        LinkedList<Flight> oneStopTrip = new LinkedList<Flight>();
+        oneStopTrip.add(startToMiddleFlight);
+        oneStopTrip.add(middleToEndFlight);
+
+        LinkedList<Flight> nonStopTrip = new LinkedList<Flight>();
+        nonStopTrip.add(startToEndFlight);
+
+        List<LinkedList<Flight>> mockTrips = Arrays.asList(oneStopTrip, nonStopTrip);
+
+        assertThat(allTrips, is(mockTrips));
     }
 
 }

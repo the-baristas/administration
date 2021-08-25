@@ -60,7 +60,7 @@ public class FlightService {
 
 
 
-    private List<LinkedList<Flight>> searchFlights(Airport originAirport, Airport destinationAirport, LocalDateTime startTime, LocalDateTime endTime) {
+    public List<LinkedList<Flight>> searchFlights(Airport originAirport, Airport destinationAirport, LocalDateTime searchStartTime, LocalDateTime searchEndTime) {
 
         // get all paths based on starting place and destination
         List<GraphPath<Airport, DefaultEdge>> paths = graphService.getPaths(originAirport, destinationAirport);
@@ -73,29 +73,37 @@ public class FlightService {
             List<Airport> airports = path.getVertexList();
             List<Route> routes = new ArrayList<Route>();
 
-            // for each airport in the list of paths, find the route
-            for (int i = 0; i < airports.size(); i++) {
+            // for each path, find the corresponding route and add to the routes array
+            for (int i = 0; i < airports.size()-1; i++) {
                 Airport origin = airports.get(i);
                 Airport dest = airports.get(i + 1);
-
-                if(dest != null) {
                     routes.add(routeDao.findByOriginAirportAndDestinationAirport(origin, dest).get());
-                }
             }
+
+            List<LinkedList<Flight>> pathTrips = new ArrayList<LinkedList<Flight>>();
 
             for(Route r: routes) {
-                List<Flight> flights = flightDao.findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(r, startTime, endTime);
-                List<LinkedList<Flight>> trips = new ArrayList<LinkedList<Flight>>();
-                for(Flight f: flights) {
-                    LinkedList<Flight> trip = new LinkedList<>();
-                    trip.add(f);
-                    trips.add(trip);
-                }
+                pathTrips.add(new LinkedList<Flight>());
+                for(int i = 0; i < pathTrips.size(); i++) {
+                    //get flights for each route
+                    LinkedList<Flight> pathTrip = pathTrips.get(i);
+                    Flight lastFlight = pathTrip.peekLast();
+                    if (lastFlight != null) {
+                        searchStartTime = lastFlight.getDepartureTime();
+                        searchEndTime = lastFlight.getArrivalTime();
+                    }
+
+                    List<Flight> flights = flightDao.findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(r, searchStartTime, searchEndTime);
+                    for (Flight f : flights) {
+                        pathTrip.add(f);
+                    }
+                    }
 
             }
+            allTrips.addAll(pathTrips);
         }
 
-        return trips;
+        return allTrips;
 
     }
 

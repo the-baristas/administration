@@ -4,24 +4,29 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import java.util.*;
-
 import com.utopia.flightservice.email.EmailSender;
-import com.utopia.flightservice.entity.*;
+import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.entity.Airport;
+import com.utopia.flightservice.entity.Flight;
+import com.utopia.flightservice.entity.FlightQuery;
+import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.entity.User;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
-
 import com.utopia.flightservice.repository.RouteDao;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultEdge;
@@ -266,7 +271,7 @@ class FlightServiceTests {
     @Test
     public void shouldGetFlightsByRouteAndDate_FilterAll() {
 
-        //params
+        // params
         Integer pageNo = 0;
         Integer pageSize = 10;
         String sortBy = "id";
@@ -314,13 +319,18 @@ class FlightServiceTests {
         Integer hour = 00;
         Integer min = 00;
 
-        LocalDateTime departure = LocalDateTime.of(year, month, date, hour, min);
-        LocalDateTime departureHelper = LocalDateTime.of(year, month, date + 1, hour, min);
+        LocalDateTime departure = LocalDateTime.of(year, month, date, hour,
+                min);
+        LocalDateTime departureHelper = LocalDateTime.of(year, month, date + 1,
+                hour, min);
 
-        when(flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging)).thenReturn(flightPage);
+        when(flightDao
+                .findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+                        routes, departure, departureHelper, paging))
+                                .thenReturn(flightPage);
 
-        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(pageNo, pageSize, sortBy,
-                routes, flightQuery);
+        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(
+                pageNo, pageSize, sortBy, routes, flightQuery);
         assertEquals(flightPage, foundFlights);
 
     }
@@ -328,7 +338,7 @@ class FlightServiceTests {
     @Test
     public void shouldGetFlightsByRouteAndDate_FilterMorning() {
 
-        //params
+        // params
         Integer pageNo = 0;
         Integer pageSize = 10;
         String sortBy = "id";
@@ -377,12 +387,16 @@ class FlightServiceTests {
         Integer min = 00;
 
         LocalDateTime departure = LocalDateTime.of(year, month, date, 04, min);
-        LocalDateTime departureHelper = LocalDateTime.of(year, month, date, 12, min);
+        LocalDateTime departureHelper = LocalDateTime.of(year, month, date, 12,
+                min);
 
-        when(flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging)).thenReturn(flightPage);
+        when(flightDao
+                .findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+                        routes, departure, departureHelper, paging))
+                                .thenReturn(flightPage);
 
-        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(pageNo, pageSize, sortBy,
-                routes, flightQuery);
+        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(
+                pageNo, pageSize, sortBy, routes, flightQuery);
         assertEquals(flightPage, foundFlights);
 
     }
@@ -390,7 +404,7 @@ class FlightServiceTests {
     @Test
     public void shouldGetFlightsByRouteAndDate_FilterAfternoon() {
 
-        //params
+        // params
         Integer pageNo = 0;
         Integer pageSize = 10;
         String sortBy = "id";
@@ -439,12 +453,16 @@ class FlightServiceTests {
         Integer min = 00;
 
         LocalDateTime departure = LocalDateTime.of(year, month, date, 12, min);
-        LocalDateTime departureHelper = LocalDateTime.of(year, month, date, 18, min);
+        LocalDateTime departureHelper = LocalDateTime.of(year, month, date, 18,
+                min);
 
-        when(flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging)).thenReturn(flightPage);
+        when(flightDao
+                .findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+                        routes, departure, departureHelper, paging))
+                                .thenReturn(flightPage);
 
-        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(pageNo, pageSize, sortBy,
-                routes, flightQuery);
+        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(
+                pageNo, pageSize, sortBy, routes, flightQuery);
         assertEquals(flightPage, foundFlights);
 
     }
@@ -452,7 +470,7 @@ class FlightServiceTests {
     @Test
     public void shouldGetFlightsByRouteAndDate_FilterEvening() {
 
-        //params
+        // params
         Integer pageNo = 0;
         Integer pageSize = 10;
         String sortBy = "id";
@@ -501,12 +519,16 @@ class FlightServiceTests {
         Integer min = 00;
 
         LocalDateTime departure = LocalDateTime.of(year, month, date, 18, min);
-        LocalDateTime departureHelper = LocalDateTime.of(year, month, date + 1, 04, min);
+        LocalDateTime departureHelper = LocalDateTime.of(year, month, date + 1,
+                04, min);
 
-        when(flightDao.findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(routes, departure, departureHelper, paging)).thenReturn(flightPage);
+        when(flightDao
+                .findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+                        routes, departure, departureHelper, paging))
+                                .thenReturn(flightPage);
 
-        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(pageNo, pageSize, sortBy,
-                routes, flightQuery);
+        Page<Flight> foundFlights = flightService.getFlightsByRouteAndDate(
+                pageNo, pageSize, sortBy, routes, flightQuery);
         assertEquals(flightPage, foundFlights);
 
     }
@@ -553,12 +575,12 @@ class FlightServiceTests {
         flight2.setIsActive(false);
 
         when(flightDao.save(flight)).thenReturn(flight);
-        doNothing().when(flightDao).updateFlight(101, flight.getRoute(), flight.getAirplane(),
-                flight.getDepartureTime(), flight.getArrivalTime(),
-                flight.getFirstReserved(), flight.getFirstPrice(),
-                flight.getBusinessReserved(), flight.getBusinessPrice(),
-                flight.getEconomyReserved(), flight.getEconomyPrice(),
-                flight.getIsActive());
+        doNothing().when(flightDao).updateFlight(101, flight.getRoute(),
+                flight.getAirplane(), flight.getDepartureTime(),
+                flight.getArrivalTime(), flight.getFirstReserved(),
+                flight.getFirstPrice(), flight.getBusinessReserved(),
+                flight.getBusinessPrice(), flight.getEconomyReserved(),
+                flight.getEconomyPrice(), flight.getIsActive());
 
         Integer savedFlightId = flightService.saveFlight(flight);
         Integer updatedFlightId = flightService.updateFlight(101, flight2);
@@ -639,44 +661,45 @@ class FlightServiceTests {
         assertThat(deleteMsg, is("Flight Deleted!"));
     }
 
-    void testEmailFlightDetailsToAllBookedUsers(){
+    void testEmailFlightDetailsToAllBookedUsers() {
         Flight flight = new Flight();
         HashSet<User> users = new HashSet<>();
         users.add(new User(1l, "name", "email", "11111111111"));
         users.add(new User(2l, "name2", "email2", "22222222222"));
         flight.setBookedUsers(users);
 
-        assertDoesNotThrow(() -> {flightService.emailFlightDetailsToAllBookedUsers(flight);});
+        assertDoesNotThrow(() -> {
+            flightService.emailFlightDetailsToAllBookedUsers(flight);
+        });
     }
 
     @Test
     public void testSearchFlights_WithGraph() {
-
         Flight startToMiddleFlight = new Flight();
-        startToMiddleFlight.setId(101);
+        startToMiddleFlight.setId(1);
         Flight middleToEndFlight = new Flight();
-        middleToEndFlight.setId(102);
+        middleToEndFlight.setId(2);
         Flight startToEndFlight = new Flight();
-        startToEndFlight.setId(103);
+        startToEndFlight.setId(3);
 
-        Airport start = new Airport("LAX", "Start", true);
-        Airport end = new Airport("JFK", "End", true);
-        Airport middle = new Airport("DFW", "Middle", true);
+        Airport startAirport = new Airport("LAX", "Los Angeles", true);
+        Airport middleAirport = new Airport("DFW", "Dallas", true);
+        Airport endAirport = new Airport("JFK", "New York", true);
 
-        Route startToMiddleRoute = new Route(1, start, middle, true);
-        Route middleToEndRoute = new Route(2, middle, end, true);
-        Route startToEndRoute = new Route(3, start, end, true);
-        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+        Route startToMiddleRoute = new Route(1, startAirport, middleAirport,
+                true);
+        Route middleToEndRoute = new Route(2, middleAirport, endAirport, true);
+        Route startToEndRoute = new Route(3, startAirport, endAirport, true);
+        Airplane airplane = new Airplane(1L, 100L, 100L, 100L, "Model 1");
 
-        LocalDateTime startToMiddleStartTime = LocalDateTime.of(5, 5, 5, 1,0);
-        LocalDateTime startToMiddleEndTime = LocalDateTime.of(5, 5, 5, 2,0);
+        LocalDateTime startToMiddleStartTime = LocalDateTime.of(5, 5, 5, 1, 0);
+        LocalDateTime startToMiddleEndTime = LocalDateTime.of(5, 5, 5, 2, 0);
 
-        LocalDateTime middleToEndStartTime = LocalDateTime.of(5, 5, 5, 2,0);
-        LocalDateTime middleToEndEndTime = LocalDateTime.of(5, 5, 5, 3,0);
+        LocalDateTime middleToEndStartTime = LocalDateTime.of(5, 5, 5, 2, 0);
+        LocalDateTime middleToEndEndTime = LocalDateTime.of(5, 5, 5, 3, 0);
 
-        LocalDateTime startToEndStartTime = LocalDateTime.of(5, 5, 5, 3,0);
-        LocalDateTime startToEndEndTime = LocalDateTime.of(5, 5, 5, 4,0);
-
+        LocalDateTime startToEndStartTime = LocalDateTime.of(5, 5, 5, 3, 0);
+        LocalDateTime startToEndEndTime = LocalDateTime.of(5, 5, 5, 4, 0);
 
         startToMiddleFlight.setRoute(startToMiddleRoute);
         startToMiddleFlight.setAirplane(airplane);
@@ -714,23 +737,41 @@ class FlightServiceTests {
         startToEndFlight.setEconomyPrice(200.00f);
         startToEndFlight.setIsActive(true);
 
-        LocalDateTime searchDepartureTime = LocalDateTime.of(5, 5, 5, 0, 0);
-        LocalDateTime searchArrivalTime = LocalDateTime.of(5, 5, 5, 0, 0);
+        LocalDateTime searchStartTime = LocalDateTime.of(5, 5, 5, 0, 0);
+        LocalDateTime searchEndTime = LocalDateTime.of(5, 5, 6, 0, 0);
 
-        Graph<Airport, DefaultEdge> graph = new SimpleDirectedGraph<>(DefaultEdge.class);
-        GraphWalk<Airport, DefaultEdge> nonStopPath = new GraphWalk<Airport, DefaultEdge>(graph, Arrays.asList(start, middle, end), 0);
-        GraphWalk<Airport, DefaultEdge> oneStopPath = new GraphWalk<Airport, DefaultEdge>(graph, Arrays.asList(start, end), 0);
-        List<GraphPath<Airport, DefaultEdge>> paths = Arrays.asList(nonStopPath, oneStopPath);
+        Graph<Airport, DefaultEdge> graph = new SimpleDirectedGraph<>(
+                DefaultEdge.class);
+        GraphWalk<Airport, DefaultEdge> nonStopPath = new GraphWalk<Airport, DefaultEdge>(
+                graph, Arrays.asList(startAirport, middleAirport, endAirport),
+                0);
+        GraphWalk<Airport, DefaultEdge> oneStopPath = new GraphWalk<Airport, DefaultEdge>(
+                graph, Arrays.asList(startAirport, endAirport), 0);
+        List<GraphPath<Airport, DefaultEdge>> paths = Arrays.asList(nonStopPath,
+                oneStopPath);
 
-        when(graphService.getPaths(start, end)).thenReturn(paths);
-        when(routeDao.findByOriginAirportAndDestinationAirport(start, end)).thenReturn(Optional.of(startToEndRoute));
-        when(routeDao.findByOriginAirportAndDestinationAirport(start, middle)).thenReturn(Optional.of(startToMiddleRoute));
-        when(routeDao.findByOriginAirportAndDestinationAirport(middle, end)).thenReturn(Optional.of(middleToEndRoute));
-        when(flightDao.findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(startToEndRoute, startToEndStartTime, startToEndEndTime)).thenReturn(Arrays.asList(startToEndFlight));
-        when(flightDao.findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(startToMiddleRoute, startToMiddleStartTime, startToMiddleEndTime)).thenReturn(Arrays.asList(startToMiddleFlight));
-        when(flightDao.findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(middleToEndRoute, middleToEndStartTime, middleToEndEndTime)).thenReturn(Arrays.asList(middleToEndFlight));
+        when(graphService.getPaths(startAirport, endAirport)).thenReturn(paths);
+        when(routeDao.findByOriginAirportAndDestinationAirport(startAirport,
+                endAirport)).thenReturn(Optional.of(startToEndRoute));
+        when(routeDao.findByOriginAirportAndDestinationAirport(startAirport,
+                middleAirport)).thenReturn(Optional.of(startToMiddleRoute));
+        when(routeDao.findByOriginAirportAndDestinationAirport(middleAirport,
+                endAirport)).thenReturn(Optional.of(middleToEndRoute));
+        when(flightDao
+                .findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+                        startToMiddleRoute, searchStartTime, searchEndTime))
+                                .thenReturn(Arrays.asList(startToMiddleFlight));
+        when(flightDao
+                .findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+                        middleToEndRoute, startToMiddleEndTime, searchEndTime))
+                                .thenReturn(Arrays.asList(middleToEndFlight));
+        when(flightDao
+                .findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+                        startToEndRoute, searchStartTime, searchEndTime))
+                                .thenReturn(Arrays.asList(startToEndFlight));
 
-        List<LinkedList<Flight>> allTrips = flightService.searchFlights(start, end, searchDepartureTime, searchArrivalTime);
+        List<LinkedList<Flight>> allTrips = flightService
+                .searchFlights(startAirport, endAirport, searchStartTime);
         LinkedList<Flight> oneStopTrip = new LinkedList<Flight>();
         oneStopTrip.add(startToMiddleFlight);
         oneStopTrip.add(middleToEndFlight);
@@ -738,9 +779,10 @@ class FlightServiceTests {
         LinkedList<Flight> nonStopTrip = new LinkedList<Flight>();
         nonStopTrip.add(startToEndFlight);
 
-        List<LinkedList<Flight>> mockTrips = Arrays.asList(oneStopTrip, nonStopTrip);
+        List<LinkedList<Flight>> mockTrips = Arrays.asList(oneStopTrip,
+                nonStopTrip);
 
+        assertThat(allTrips.size(), is(2));
         assertThat(allTrips, is(mockTrips));
     }
-
 }

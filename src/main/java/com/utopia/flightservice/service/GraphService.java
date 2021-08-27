@@ -47,10 +47,10 @@ public class GraphService {
 
     public List<GraphPath<Airport, DefaultEdge>> getPaths(Airport originAirport,
             Airport destinationAirport) {
-        AllDirectedPaths<Airport, DefaultEdge> algo = new AllDirectedPaths<Airport, DefaultEdge>(
+        AllDirectedPaths<Airport, DefaultEdge> algo = new AllDirectedPaths<>(
                 graph);
         List<GraphPath<Airport, DefaultEdge>> paths = algo
-                .getAllPaths(originAirport, destinationAirport, true, 2);
+                .getAllPaths(originAirport, destinationAirport, true, 3);
         return paths;
     }
 }

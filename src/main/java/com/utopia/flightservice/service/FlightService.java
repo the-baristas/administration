@@ -2,9 +2,11 @@ package com.utopia.flightservice.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.utopia.flightservice.email.EmailSender;
 import com.utopia.flightservice.entity.Airport;
@@ -16,8 +18,11 @@ import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.repository.FlightDao;
 import com.utopia.flightservice.repository.RouteDao;
 
+import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.AllDirectedPaths;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,9 +45,6 @@ public class FlightService {
     private GraphService graphService;
 
     @Autowired
-    private RouteService routeService;
-
-    @Autowired
     private RouteDao routeDao;
 
     // get every flight as a list
@@ -62,20 +64,20 @@ public class FlightService {
         return flightDao.findAllByRouteIn(routes, paging);
     }
 
-    public List<LinkedList<Flight>> searchFlights(Airport originAirport,
+    public List<List<Flight>> searchFlights(Airport originAirport,
             Airport destinationAirport, LocalDateTime startTime) {
-
         // get all paths based on starting place and destination
-        List<GraphPath<Airport, DefaultEdge>> paths = graphService
+        List<GraphPath<Airport, DefaultEdge>> airportPaths = graphService
                 .getPaths(originAirport, destinationAirport);
 
-        // create a list of linked lists
-        List<LinkedList<Flight>> allTrips = new ArrayList<LinkedList<Flight>>();
+        Graph<Flight, DefaultEdge> flightGraph = new SimpleDirectedGraph<>(
+                DefaultEdge.class);
 
-        // loop through paths
+        Set<Flight> firstRouteFlights = new HashSet<>();
+        Set<Flight> lastRouteFlights = new HashSet<>();
         LocalDateTime endTime = startTime.plusDays(1);
-        for (GraphPath<Airport, DefaultEdge> path : paths) {
-            List<Airport> airports = path.getVertexList();
+        for (GraphPath<Airport, DefaultEdge> airportPath : airportPaths) {
+            List<Airport> airports = airportPath.getVertexList();
             List<Route> routes = new ArrayList<Route>();
 
             // for each path, find the corresponding route and add to the routes
@@ -88,46 +90,57 @@ public class FlightService {
                         .get());
             }
 
-            List<LinkedList<Flight>> pathTrips = new ArrayList<LinkedList<Flight>>();
-
-            // Iterate routes once.
+            // Create flight path for first route.
             int routeIndex = 0;
-            Route route = routes.get(routeIndex);
-            List<Flight> flights = flightDao
+            List<Flight> routeZeroFlights = flightDao
                     .findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
-                            route, startTime, endTime);
-            addFlightsToPathTrips(flights, pathTrips);
-            routeIndex++;
+                            routes.get(routeIndex), startTime, endTime);
+            firstRouteFlights.addAll(routeZeroFlights);
+            if (routeIndex == routes.size() - 1) {
+                lastRouteFlights.addAll(routeZeroFlights);
+            }
+            routeIndex = Math.min(routeIndex + 1, routes.size() - 1);
 
-            // Finish the rest of the iterations of routes.
-            for (LinkedList<Flight> pathTrip : pathTrips) {
-                for (; routeIndex < routes.size(); routeIndex++) {
-                    int flightIndex = routeIndex - 1;
-                    Flight flight = pathTrip.get(flightIndex);
-                    route = routes.get(routeIndex);
-                    flights = flightDao
+            for (Flight routeZeroFlight : routeZeroFlights) {
+                flightGraph.addVertex(routeZeroFlight);
+
+                List<Flight> routeOneFlights = flightDao
+                        .findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+                                routes.get(routeIndex),
+                                routeZeroFlight.getArrivalTime(), endTime);
+                if (routeIndex == routes.size() - 1) {
+                    lastRouteFlights.addAll(routeOneFlights);
+                }
+                routeIndex = Math.min(routeIndex + 1, routes.size() - 1);
+
+                for (Flight routeOneFlight : routeOneFlights) {
+                    flightGraph.addVertex(routeOneFlight);
+                    flightGraph.addEdge(routeZeroFlight, routeOneFlight);
+
+                    List<Flight> routeTwoFlights = flightDao
                             .findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
-                                    route, flight.getArrivalTime(), endTime);
-                    addFlightsToPathTrips(flights, pathTrips);
+                                    routes.get(routeIndex),
+                                    routeOneFlight.getArrivalTime(), endTime);
+                    if (routeIndex == routes.size() - 1) {
+                        lastRouteFlights.addAll(routeTwoFlights);
+                    }
+
+                    for (Flight routeTwoFlight : routeTwoFlights) {
+                        flightGraph.addVertex(routeTwoFlight);
+                        flightGraph.addEdge(routeOneFlight, routeTwoFlight);
+                    }
                 }
             }
-
-            allTrips.addAll(pathTrips);
         }
 
-        return allTrips;
-    }
-
-    private void addFlightsToPathTrips(List<Flight> flights,
-            List<LinkedList<Flight>> pathTrips) {
-        for (int flightIndex = 0; flightIndex < flights.size(); flightIndex++) {
-            Flight flight = flights.get(flightIndex);
-            if (flightIndex >= pathTrips.size()) {
-                pathTrips.add(new LinkedList<Flight>());
-            }
-            LinkedList<Flight> pathTrip = pathTrips.get(flightIndex);
-            pathTrip.add(flight);
-        }
+        AllDirectedPaths<Flight, DefaultEdge> algo = new AllDirectedPaths<>(
+                flightGraph);
+        List<GraphPath<Flight, DefaultEdge>> flightPaths = algo
+                .getAllPaths(firstRouteFlights, lastRouteFlights, true, 3);
+        return flightPaths.stream()
+                .map(((GraphPath<Flight, DefaultEdge> graphPath) -> graphPath
+                        .getVertexList()))
+                .collect(Collectors.toList());
     }
 
     public Page<Flight> getFlightsByRouteAndDate(Integer pageNo,

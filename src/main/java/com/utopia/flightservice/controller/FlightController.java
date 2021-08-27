@@ -3,6 +3,7 @@ package com.utopia.flightservice.controller;
 import java.net.URI;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,13 +11,11 @@ import javax.validation.Valid;
 
 import com.utopia.flightservice.dto.FlightDto;
 import com.utopia.flightservice.dto.FlightEmailRequestDto;
-import com.utopia.flightservice.entity.Airplane;
-import com.utopia.flightservice.entity.Flight;
-import com.utopia.flightservice.entity.FlightQuery;
-import com.utopia.flightservice.entity.Route;
+import com.utopia.flightservice.entity.*;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.exception.ModelMapperFailedException;
 import com.utopia.flightservice.service.AirplaneService;
+import com.utopia.flightservice.service.AirportService;
 import com.utopia.flightservice.service.FlightService;
 import com.utopia.flightservice.service.RouteService;
 
@@ -53,6 +52,9 @@ public class FlightController {
 
     @Autowired
     private AirplaneService airplaneService;
+
+    @Autowired
+    private AirportService airportService;
 
     @GetMapping("/health")
     public String checkHealth() {
@@ -181,6 +183,33 @@ public class FlightController {
     public ResponseEntity<String> emailFlightDetailsToAll(@PathVariable Integer flightId){
         flightService.emailFlightDetailsToAllBookedUsers(flightService.getFlightById(flightId).get());
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/layovers")
+    public ResponseEntity<String> getFlightsWithLayovers(
+            @RequestParam String originId, @RequestParam String destinationId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @Valid @RequestBody FlightQuery flightQuery)
+            throws ResponseStatusException {
+
+        Integer month = flightQuery.getMonth();
+        Integer date = flightQuery.getDate();
+        Integer year = flightQuery.getYear();
+        Integer hour = 0;
+        Integer min = 0;
+
+        LocalDateTime dateTime = LocalDateTime.of(year, month, date, hour, min);
+
+        try {
+            Airport origin = airportService.getAirportByIdOrCity(originId).get(0);
+            Airport dest = airportService.getAirportByIdOrCity(destinationId).get(0);
+            List<LinkedList<Flight>> trips = flightService.searchFlightsWithLayovers(origin, dest, dateTime);
+            return new ResponseEntity(trips, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights based on query.");
+        }
     }
 
     public FlightDto convertToDto(Flight flight) {

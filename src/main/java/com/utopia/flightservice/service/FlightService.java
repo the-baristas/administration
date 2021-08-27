@@ -62,13 +62,13 @@ public class FlightService {
         return flightDao.findAllByRouteIn(routes, paging);
     }
 
-    public List<LinkedList<Flight>> searchFlights(Airport originAirport,
+    public List<LinkedList<Flight>> searchFlightsWithLayovers(Airport originAirport,
             Airport destinationAirport, LocalDateTime startTime) {
 
         // get all paths based on starting place and destination
         List<GraphPath<Airport, DefaultEdge>> paths = graphService
                 .getPaths(originAirport, destinationAirport);
-
+        System.out.println(paths);
         // create a list of linked lists
         List<LinkedList<Flight>> allTrips = new ArrayList<LinkedList<Flight>>();
 

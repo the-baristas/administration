@@ -253,6 +253,33 @@ public class FlightControllerTests {
     }
 
     @Test
+    public void shouldGetFlightsByRouteId_OnlyActiveTrue_FindsNoFlights() throws Exception {
+
+        List<Airport> airports = new ArrayList<>();
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        airports.add(originAirport);
+        airports.add(destinationAirport);
+
+        List<Route> routes = new ArrayList<>();
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        routes.add(route);
+
+        when(routeService.getRouteByLocationInfo("TC1", "TC2"))
+                .thenReturn(routes);
+
+        Page<Flight> flightPage = new PageImpl<Flight>(Arrays.asList());
+
+        when(flightService.getFlightsByRoute(0, 10, true,
+                "id", routes)).thenReturn(flightPage);
+
+        mockMvc.perform(get("/flights/search?originId=TC1&destinationId=TC2&pageNo=0&pageSize=10&sortBy=id&activeOnly=true")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+    }
+
+    @Test
     public void shouldGetFlightsByRouteAndDate() throws Exception {
 
         String str1 = "2020-09-01 09:01:15";

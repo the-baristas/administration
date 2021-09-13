@@ -41,10 +41,22 @@ public class FlightService {
         return flightDao.findAll(paging);
     }
 
+    public Page<Flight> getPagedFlightsFilterActive(Integer pageNo, Integer pageSize, Boolean active,
+                                        String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        return flightDao.findAllActive(active, paging);
+    }
+
     public Page<Flight> getFlightsByRoute(Integer pageNo, Integer pageSize,
                                           String sortBy, List<Route> routes) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         return flightDao.findAllByRouteIn(routes, paging);
+    }
+
+    public Page<Flight> getFlightsByRoute(Integer pageNo, Integer pageSize, Boolean active,
+                                          String sortBy, List<Route> routes) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        return flightDao.findAllByRouteInAndIsActiveEquals(routes, active, paging);
     }
 
     public Page<Flight> getFlightsByRouteAndDate(Integer pageNo, Integer pageSize, String sortBy, List<Route> routes, FlightQuery flightQuery) {
@@ -87,6 +99,7 @@ public class FlightService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights for those locations/dates. Try again.");
         }
     }
+
 
     // get one flight by the flight id
     public Optional<Flight> getFlightById(Integer id) {

@@ -211,6 +211,42 @@ class FlightServiceTests {
     }
 
     @Test
+    void findAllFlightPagesFilterActive() {
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Flight flight = new Flight();
+        flight.setId(101);
+
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+        List<Flight> allFlights = Arrays.asList(flight);
+        Pageable paging = PageRequest.of(0, 10, Sort.by("id"));
+        Page<Flight> flightPage = new PageImpl<Flight>(allFlights);
+
+        when(flightDao.findAllActive(true, paging)).thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getPagedFlightsFilterActive(0, 10, true,"id");
+        assertEquals(flightPage, foundFlights);
+    }
+
+    @Test
     void shouldGetFlight_ByRouteId() {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
@@ -251,6 +287,51 @@ class FlightServiceTests {
         when(flightDao.findAllByRouteIn(routes, paging)).thenReturn(flightPage);
 
         Page<Flight> foundFlights = flightService.getFlightsByRoute(0, 10, "id",
+                routes);
+        assertEquals(flightPage, foundFlights);
+    }
+
+    @Test
+    void shouldGetFlight_ByRouteId_Active() {
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Flight flight = new Flight();
+        flight.setId(101);
+
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+
+        List<Route> routes = new ArrayList<Route>();
+        Route route1 = new Route(1, originAirport, destinationAirport, true);
+        Route route2 = new Route(2, originAirport, destinationAirport, true);
+        Route route3 = new Route(3, originAirport, destinationAirport, true);
+        routes.add(route1);
+        routes.add(route2);
+        routes.add(route3);
+
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        flight.setRoute(route1);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+        List<Flight> allFlights = Arrays.asList(flight);
+        Pageable paging = PageRequest.of(0, 10, Sort.by("id"));
+        Page<Flight> flightPage = new PageImpl<Flight>(allFlights);
+
+        when(flightDao.findAllByRouteInAndIsActiveEquals(routes, true, paging)).thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getFlightsByRoute(0, 10, true,"id",
                 routes);
         assertEquals(flightPage, foundFlights);
     }

@@ -21,10 +21,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FlightDao extends JpaRepository<Flight, Integer> {
 
+    @Query("SELECT f from Flight f WHERE f.isActive = ?1")
+    Page<Flight> findAllActive(Boolean active, Pageable paging);
+
     Page<Flight> findAllByRouteIn(List<Route> routes, Pageable paging);
+
+    Page<Flight> findAllByRouteInAndIsActiveEquals(List<Route> routes, Boolean active, Pageable paging);
 
     Page<Flight> findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
             List<Route> routes, LocalDateTime departure,
+            LocalDateTime departureHelper, Pageable paging);
+
+    Page<Flight> findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThanAndIsActiveEquals(
+            List<Route> routes, LocalDateTime departure, Boolean active,
             LocalDateTime departureHelper, Pageable paging);
 
     @Modifying

@@ -84,6 +84,28 @@ public class RouteControllerTests {
     }
 
     @Test
+    public void test_getAllRoutes() throws Exception {
+
+        List<Route> routes = new ArrayList<>();
+        Airport originAirport1 = airportService.getAirportById("SFO");
+        Airport originAirport2 = airportService.getAirportById("MSP");
+
+        Airport destinationAirport1 = airportService.getAirportById("LAX");
+        Airport destinationAirport2 = airportService.getAirportById("JFK");
+
+        Route route1 = new Route(25, originAirport1, destinationAirport1, true);
+        Route route2 = new Route(26, originAirport2, destinationAirport2, true);
+        routes.add(route1);
+        routes.add(route2);
+
+        when(routeService.getAllRoutes()).thenReturn(routes);
+
+        mockMvc.perform(get("/routes/all").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(2)));
+
+    }
+
+    @Test
     public void test_getRouteByLocation() throws Exception {
 
         List<Route> routes = new ArrayList<>();

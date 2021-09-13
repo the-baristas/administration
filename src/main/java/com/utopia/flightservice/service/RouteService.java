@@ -36,6 +36,11 @@ public class RouteService {
 		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 		return routeDao.findAll(paging);
 	}
+
+	public Page<Route> getPagedRoutes(Integer pageNo, Integer pageSize, Boolean active, String sortBy) {
+		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+		return routeDao.findAllActive(active, paging);
+	}
 	
 	// get one route by the route id
 	public Optional<Route> getRouteById(Integer id) {
@@ -61,6 +66,19 @@ public class RouteService {
 			throw new RouteNotFoundException("ERROR! No routes found.");
 		}
 	}
+
+	public Page<Route> getByOriginAirportOrDestinationAirport(Integer pageNo, Integer pageSize, Boolean active, String sortBy, String query1, String query2) throws RouteNotFoundException {
+
+		List<Airport> airports = airportService.getAirportByIdOrCity(query1);
+		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
+		try {
+			return routeDao.findByOriginAirportInOrDestinationAirportInFilterActive(airports, airports, active, paging);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RouteNotFoundException("ERROR! No routes found.");
+		}
+	}
 	
 	// add a new route
 	public Integer saveRoute(Route route) throws RouteNotSavedException {
@@ -75,7 +93,8 @@ public class RouteService {
 	// update a route's information
 	public Integer updateRoute(Integer id, Route route) throws RouteNotSavedException {
 		try {
-			routeDao.updateRoute(id, route.getOriginAirport(), route.getDestinationAirport(), route.getIsActive());
+			route.setId(id);
+			routeDao.save(route);
 		} catch (Exception e) {
 			throw new RouteNotSavedException("ERROR! Route not updated.");
 		}

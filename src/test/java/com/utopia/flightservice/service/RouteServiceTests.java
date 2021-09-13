@@ -121,6 +121,31 @@ public class RouteServiceTests {
     }
 
     @Test
+    public void test_getPagedRoutes_Active() {
+        Route route = new Route();
+        route.setId(28);
+
+        Airport airport = airportService.getAirportById("SFO");
+        Airport airport2 = airportService.getAirportById("LAX");
+
+        route.setOriginAirport(airport);
+        route.setDestinationAirport(airport2);
+        route.setIsActive(true);
+        List<Route> allRoutes = Arrays.asList(route);
+        Page<Route> routePage = new PageImpl<Route>(
+                Arrays.asList(route));
+
+        Integer pageIndex = 0;
+        Integer pageSize = 1;
+        String sortBy = "id";
+        Pageable paging = PageRequest.of(pageIndex, pageSize, Sort.by(sortBy));
+        when(routeDao.findAllActive(true, paging)).thenReturn(routePage);
+
+        Page<Route> foundRoutes = routeService.getPagedRoutes(pageIndex, pageSize, true, sortBy);
+        assertEquals(routePage, foundRoutes);
+    }
+
+    @Test
     public void test_getRouteByLocationInfo() {
         String originId = "SFO";
         String destinationId = "LAX";
@@ -181,13 +206,42 @@ public class RouteServiceTests {
     }
 
     @Test
+    public void test_getByOriginAirport_OrDestinationAirport_AndActive() throws RouteNotFoundException {
+        String query1 = "SFO";
+        Route route = new Route();
+        route.setId(28);
+
+        Airport airport = airportService.getAirportById("SFO");
+        Airport airport2 = airportService.getAirportById("LAX");
+        List<Airport> airports = new ArrayList();
+        airports.add(airport);
+
+        route.setOriginAirport(airport);
+        route.setDestinationAirport(airport2);
+        route.setIsActive(true);
+        Page<Route> routePage = new PageImpl<Route>(
+                Arrays.asList(route));
+
+        Integer pageIndex = 0;
+        Integer pageSize = 10;
+        String sortBy = "id";
+        Pageable paging = PageRequest.of(pageIndex, pageSize, Sort.by(sortBy));
+
+        when(airportService.getAirportByIdOrCity(query1)).thenReturn(airports);
+        when(routeDao.findByOriginAirportInOrDestinationAirportInFilterActive(airports, airports, true, paging)).thenReturn(routePage);
+
+        Page<Route> foundRoutes = routeService.getByOriginAirportOrDestinationAirport(pageIndex, pageSize, true, sortBy, query1, query1);
+
+        assertEquals(routePage, foundRoutes);
+    }
+
+    @Test
     public void test_updateRoute() throws RouteNotSavedException {
         Integer id = 28;
         Airport airport1 = new Airport("SFO", "Test Airport 1", true);
         Airport airport2 = new Airport("LAX", "Test Airport 2", true);
         Route route = new Route(28, airport1, airport2, true);
 
-        doNothing().when(routeDao).updateRoute(28, airport1, airport2, true);
         Integer updateId = routeService.updateRoute(28, route);
         assertEquals(id, updateId);
     }

@@ -63,8 +63,16 @@ public class RouteController {
 	@GetMapping("")
 	public ResponseEntity<Page<Route>> getPagedRoutes(@RequestParam(defaultValue = "0") Integer pageNo,
 													  @RequestParam(defaultValue = "10") Integer pageSize,
-													  @RequestParam(defaultValue = "id") String sortBy) {
-		Page<Route> routes = routeService.getPagedRoutes(pageNo, pageSize, sortBy);
+													  @RequestParam(defaultValue = "id") String sortBy,
+													  @RequestParam(name = "activeOnly", required = false) Boolean activeOnly) {
+		Page<Route> routes;
+		if (activeOnly == null || !activeOnly){
+			routes = routeService.getPagedRoutes(pageNo, pageSize, sortBy);
+		}
+		else{
+			routes = routeService.getPagedRoutes(pageNo, pageSize, true, sortBy);
+		}
+
 		if (!routes.hasContent()) {
 			return new ResponseEntity("No flights found in database.", HttpStatus.NO_CONTENT);
 		} else {
@@ -100,10 +108,20 @@ public class RouteController {
 	public ResponseEntity<Page<Route>> getRoutesWithQuery(@RequestParam String query,
 														  @RequestParam(defaultValue = "0") Integer pageNo,
 														  @RequestParam(defaultValue = "10") Integer pageSize,
-														  @RequestParam(defaultValue = "id") String sortBy
+														  @RequestParam(defaultValue = "id") String sortBy,
+														  @RequestParam(name = "activeOnly", required = false) Boolean activeOnly
 														  ) throws RouteNotFoundException {
 
-		Page<Route> routes = routeService.getByOriginAirportOrDestinationAirport(pageNo, pageSize, sortBy, query, query);
+		Page<Route> routes;
+
+		if (activeOnly == null || !activeOnly){
+			routes = routeService.getByOriginAirportOrDestinationAirport(pageNo, pageSize, sortBy, query, query);
+		}
+		else{
+			routes = routeService.getByOriginAirportOrDestinationAirport(pageNo, pageSize, true, sortBy, query, query);
+		}
+
+
 		if (routes.isEmpty()) {
 			return new ResponseEntity("No routes found in database matching this query!", HttpStatus.NO_CONTENT);
 		} else {

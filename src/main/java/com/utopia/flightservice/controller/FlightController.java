@@ -185,7 +185,7 @@ public class FlightController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("/layovers")
+    @PostMapping("/new-search")
     public ResponseEntity<String> getFlightsWithLayovers(
             @RequestParam String originId, @RequestParam String destinationId,
             @RequestParam(defaultValue = "0") Integer pageNo,
@@ -205,7 +205,7 @@ public class FlightController {
         try {
             Airport origin = airportService.getAirportByIdOrCity(originId).get(0);
             Airport dest = airportService.getAirportByIdOrCity(destinationId).get(0);
-            List<LinkedList<Flight>> trips = flightService.searchFlightsWithLayovers(origin, dest, dateTime);
+            List<List<Flight>> trips = flightService.searchFlights(origin, dest, dateTime);
             return new ResponseEntity(trips, HttpStatus.OK);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find flights based on query.");

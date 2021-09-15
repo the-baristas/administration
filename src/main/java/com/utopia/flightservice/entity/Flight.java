@@ -70,4 +70,5 @@ public class Flight {
                     referencedColumnName = "id"))
     private Set<User> bookedUsers;
 
+
 }

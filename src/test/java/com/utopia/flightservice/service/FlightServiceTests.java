@@ -50,9 +50,6 @@ class FlightServiceTests {
     private FlightService flightService;
 
     @Autowired
-    private RouteService routeService;
-
-    @Autowired
     private AirplaneService airplaneService;
 
     @MockBean

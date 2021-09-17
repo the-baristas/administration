@@ -21,11 +21,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
 @WebMvcTest(AirplaneController.class)
+@WithMockUser(authorities = { "ROLE_ADMIN" })
 public class AirplaneControllerTest {
     private WebTestClient webTestClient;
 

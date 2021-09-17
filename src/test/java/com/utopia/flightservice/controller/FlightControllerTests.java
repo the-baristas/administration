@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,10 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utopia.flightservice.dto.FlightDto;
 import com.utopia.flightservice.entity.*;
 import com.utopia.flightservice.exception.FlightNotSavedException;
-import com.utopia.flightservice.service.AirplaneService;
-import com.utopia.flightservice.service.AirportService;
-import com.utopia.flightservice.service.FlightService;
-import com.utopia.flightservice.service.RouteService;
+import com.utopia.flightservice.service.*;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,9 +31,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(FlightController.class)
+@WithMockUser(authorities = { "ROLE_ADMIN" })
 public class FlightControllerTests {
 
     // import mock mvc
@@ -56,6 +57,9 @@ public class FlightControllerTests {
 
     @MockBean
     private AirportService airportService;
+
+    @MockBean
+    private AwsS3Service s3Service;
 
     @Autowired
     private FlightController controller;
@@ -95,9 +99,9 @@ public class FlightControllerTests {
         routes.add(route2);
 
         List<Flight> flights = new ArrayList<>();
-        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
+        Flight flight1 = new Flight(100, airplane, departureTime, "A1", arrivalTime, "B1",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, null);
-        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
+        Flight flight2 = new Flight(101, airplane2, departureTime, "A2", arrivalTime, "B2",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route2, null);
 
         flights.add(flight1);
@@ -225,9 +229,9 @@ public class FlightControllerTests {
         bookedUsers.add(user2);
 
         List<Flight> flights = new ArrayList<>();
-        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
+        Flight flight1 = new Flight(100, airplane, departureTime, "A1", arrivalTime, "B1",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
-        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
+        Flight flight2 = new Flight(101, airplane2, departureTime, "A1", arrivalTime, "B2",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
 
         flights.add(flight1);
@@ -245,6 +249,33 @@ public class FlightControllerTests {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)));
+
+    }
+
+    @Test
+    public void shouldGetFlightsByRouteId_OnlyActiveTrue_FindsNoFlights() throws Exception {
+
+        List<Airport> airports = new ArrayList<>();
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        airports.add(originAirport);
+        airports.add(destinationAirport);
+
+        List<Route> routes = new ArrayList<>();
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        routes.add(route);
+
+        when(routeService.getRouteByLocationInfo("TC1", "TC2"))
+                .thenReturn(routes);
+
+        Page<Flight> flightPage = new PageImpl<Flight>(Arrays.asList());
+
+        when(flightService.getFlightsByRoute(0, 10, true,
+                "id", routes)).thenReturn(flightPage);
+
+        mockMvc.perform(get("/flights/search?originId=TC1&destinationId=TC2&pageNo=0&pageSize=10&sortBy=id&activeOnly=true")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
 
     }
 
@@ -284,9 +315,9 @@ public class FlightControllerTests {
         bookedUsers.add(user2);
 
         List<Flight> flights = new ArrayList<>();
-        Flight flight1 = new Flight(100, airplane, departureTime, arrivalTime,
+        Flight flight1 = new Flight(100, airplane, departureTime, "A1", arrivalTime,"B1",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
-        Flight flight2 = new Flight(101, airplane2, departureTime, arrivalTime,
+        Flight flight2 = new Flight(101, airplane2, departureTime, "A2", arrivalTime, "B2",
                 0, 300.00f, 0, 250.00f, 0, 200.00f, true, route, bookedUsers);
 
         flights.add(flight1);
@@ -311,8 +342,22 @@ public class FlightControllerTests {
 
     }
 
+    @Test
     public void testEmailFlightDetailsToAll() throws Exception {
         mockMvc.perform(get("/flights/1")).andExpect(status().isOk());
+    }
+
+    @Test void testUploadFlightCsv() throws Exception {
+        MockMultipartFile file
+                = new MockMultipartFile(
+                "file",
+                "hello.txt",
+                MediaType.TEXT_PLAIN_VALUE,
+                "Hello, World!".getBytes()
+        );
+
+       mockMvc.perform(multipart("/flights/csv").file(file))
+                .andExpect(status().isOk());
     }
 
     // utility functions

@@ -32,10 +32,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(RouteController.class)
 @AutoConfigureMockMvc
+@WithMockUser(authorities = { "ROLE_ADMIN" })
 public class RouteControllerTests {
 
     // import mock mvc
@@ -78,6 +80,28 @@ public class RouteControllerTests {
         mockMvc.perform(get("/routes/25").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(route1.getId()));
+
+    }
+
+    @Test
+    public void test_getAllRoutes() throws Exception {
+
+        List<Route> routes = new ArrayList<>();
+        Airport originAirport1 = airportService.getAirportById("SFO");
+        Airport originAirport2 = airportService.getAirportById("MSP");
+
+        Airport destinationAirport1 = airportService.getAirportById("LAX");
+        Airport destinationAirport2 = airportService.getAirportById("JFK");
+
+        Route route1 = new Route(25, originAirport1, destinationAirport1, true);
+        Route route2 = new Route(26, originAirport2, destinationAirport2, true);
+        routes.add(route1);
+        routes.add(route2);
+
+        when(routeService.getAllRoutes()).thenReturn(routes);
+
+        mockMvc.perform(get("/routes/all").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(2)));
 
     }
 

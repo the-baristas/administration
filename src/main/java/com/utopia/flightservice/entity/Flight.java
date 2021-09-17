@@ -33,8 +33,14 @@ public class Flight {
     @Column(name = "departure_time")
     private LocalDateTime departureTime;
 
+    @Column(name = "departure_gate")
+    private String departureGate;
+
     @Column(name = "arrival_time")
     private LocalDateTime arrivalTime;
+
+    @Column(name = "arrival_gate")
+    private String arrivalGate;
 
     @Column(name = "first_reserved")
     private Integer firstReserved;

@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +33,7 @@ public class AirplaneController {
         this.modelMapper = modelMapper;
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<Page<AirplaneDto>> findAll(
             @RequestParam("index") Integer pageIndex,
@@ -43,12 +45,14 @@ public class AirplaneController {
         return ResponseEntity.ok(airplaneDtosPage);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("{id}")
     public ResponseEntity<AirplaneDto> findById(@PathVariable Long id) {
         AirplaneDto airplaneDto = convertToDto(airplaneService.findById(id));
         return ResponseEntity.status(HttpStatus.OK).body(airplaneDto);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("search")
     public ResponseEntity<Page<AirplaneDto>> findByModelContaining(
             @RequestParam String term, @RequestParam("index") Integer pageIndex,
@@ -59,6 +63,7 @@ public class AirplaneController {
         return ResponseEntity.status(HttpStatus.OK).body(airplaneDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("distinct_search")
     public ResponseEntity<Page<AirplaneDto>> findDistinctByModelContaining(
             @RequestParam("term") String term,
@@ -70,6 +75,7 @@ public class AirplaneController {
         return ResponseEntity.status(HttpStatus.OK).body(airplaneDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<AirplaneDto> create(
             @RequestBody AirplaneDto airplaneDto,
@@ -83,6 +89,7 @@ public class AirplaneController {
                 .body(createdAirplaneDto);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("{id}")
     public ResponseEntity<AirplaneDto> update(
             @RequestBody AirplaneDto airplaneDto)
@@ -94,6 +101,7 @@ public class AirplaneController {
 
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id)
             throws ResponseStatusException {

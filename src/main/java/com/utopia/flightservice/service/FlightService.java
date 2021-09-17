@@ -58,6 +58,12 @@ public class FlightService {
         return flightDao.findAll(paging);
     }
 
+    public Page<Flight> getPagedFlightsFilterActive(Integer pageNo,
+            Integer pageSize, Boolean active, String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        return flightDao.findAllActive(active, paging);
+    }
+
     public Page<Flight> getFlightsByRoute(Integer pageNo, Integer pageSize,
             String sortBy, List<Route> routes) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
@@ -147,6 +153,13 @@ public class FlightService {
                 .map(((GraphPath<Flight, DefaultEdge> graphPath) -> graphPath
                         .getVertexList()))
                 .collect(Collectors.toList());
+    }
+
+    public Page<Flight> getFlightsByRoute(Integer pageNo, Integer pageSize,
+            Boolean active, String sortBy, List<Route> routes) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        return flightDao.findAllByRouteInAndIsActiveEquals(routes, active,
+                paging);
     }
 
     public Page<Flight> getFlightsByRouteAndDate(Integer pageNo,
@@ -239,7 +252,8 @@ public class FlightService {
                     flight.getFirstReserved(), flight.getFirstPrice(),
                     flight.getBusinessReserved(), flight.getBusinessPrice(),
                     flight.getEconomyReserved(), flight.getEconomyPrice(),
-                    flight.getIsActive());
+                    flight.getIsActive(), flight.getDepartureGate(),
+                    flight.getArrivalGate());
         } catch (Exception e) {
             throw new FlightNotSavedException("ERROR! Flight not updated.");
         }

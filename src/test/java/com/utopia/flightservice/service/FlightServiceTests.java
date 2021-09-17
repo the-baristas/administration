@@ -52,13 +52,13 @@ class FlightServiceTests {
     private FlightDao flightDao;
 
     @MockBean
+    private RouteDao routeDao;
+
+    @MockBean
     private EmailSender emailSender;
 
     @MockBean
     private GraphService graphService;
-
-    @MockBean
-    private RouteDao routeDao;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter
             .ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -218,6 +218,43 @@ class FlightServiceTests {
     }
 
     @Test
+    void findAllFlightPagesFilterActive() {
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Flight flight = new Flight();
+        flight.setId(101);
+
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+        Route route = new Route(1, originAirport, destinationAirport, true);
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        flight.setRoute(route);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+        List<Flight> allFlights = Arrays.asList(flight);
+        Pageable paging = PageRequest.of(0, 10, Sort.by("id"));
+        Page<Flight> flightPage = new PageImpl<Flight>(allFlights);
+
+        when(flightDao.findAllActive(true, paging)).thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getPagedFlightsFilterActive(0,
+                10, true, "id");
+        assertEquals(flightPage, foundFlights);
+    }
+
+    @Test
     void shouldGetFlight_ByRouteId() {
         String str1 = "2020-09-01 09:01:15";
         String str2 = "2020-09-01 11:01:15";
@@ -259,6 +296,52 @@ class FlightServiceTests {
 
         Page<Flight> foundFlights = flightService.getFlightsByRoute(0, 10, "id",
                 routes);
+        assertEquals(flightPage, foundFlights);
+    }
+
+    @Test
+    void shouldGetFlight_ByRouteId_Active() {
+        String str1 = "2020-09-01 09:01:15";
+        String str2 = "2020-09-01 11:01:15";
+        LocalDateTime departureTime = LocalDateTime.parse(str1, formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(str2, formatter);
+
+        Flight flight = new Flight();
+        flight.setId(101);
+
+        Airport originAirport = new Airport("TC1", "Test City 1", true);
+        Airport destinationAirport = new Airport("TC2", "Test City 2", true);
+
+        List<Route> routes = new ArrayList<Route>();
+        Route route1 = new Route(1, originAirport, destinationAirport, true);
+        Route route2 = new Route(2, originAirport, destinationAirport, true);
+        Route route3 = new Route(3, originAirport, destinationAirport, true);
+        routes.add(route1);
+        routes.add(route2);
+        routes.add(route3);
+
+        Airplane airplane = new Airplane(1l, 100l, 100l, 100l, "Model 1");
+
+        flight.setRoute(route1);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setFirstReserved(0);
+        flight.setFirstPrice(350.00f);
+        flight.setBusinessReserved(0);
+        flight.setBusinessPrice(300.00f);
+        flight.setEconomyReserved(0);
+        flight.setEconomyPrice(200.00f);
+        flight.setIsActive(true);
+        List<Flight> allFlights = Arrays.asList(flight);
+        Pageable paging = PageRequest.of(0, 10, Sort.by("id"));
+        Page<Flight> flightPage = new PageImpl<Flight>(allFlights);
+
+        when(flightDao.findAllByRouteInAndIsActiveEquals(routes, true, paging))
+                .thenReturn(flightPage);
+
+        Page<Flight> foundFlights = flightService.getFlightsByRoute(0, 10, true,
+                "id", routes);
         assertEquals(flightPage, foundFlights);
     }
 
@@ -569,12 +652,6 @@ class FlightServiceTests {
         flight2.setIsActive(false);
 
         when(flightDao.save(flight)).thenReturn(flight);
-        doNothing().when(flightDao).updateFlight(101, flight.getRoute(),
-                flight.getAirplane(), flight.getDepartureTime(),
-                flight.getArrivalTime(), flight.getFirstReserved(),
-                flight.getFirstPrice(), flight.getBusinessReserved(),
-                flight.getBusinessPrice(), flight.getEconomyReserved(),
-                flight.getEconomyPrice(), flight.getIsActive());
 
         Integer savedFlightId = flightService.saveFlight(flight);
         Integer updatedFlightId = flightService.updateFlight(101, flight2);
@@ -610,10 +687,6 @@ class FlightServiceTests {
         flight.setIsActive(true);
         String flightMsg = flightService.deleteFlight(101);
         Optional<Flight> flightOpt = Optional.of(flight);
-
-        when(flightService.getFlightById(101)).thenReturn(flightOpt);
-        when(flightDao.findById(101)).thenReturn(flightOpt);
-        doNothing().when(flightDao).delete(flight);
 
         assertThat(flightMsg, is("Flight not found!"));
     }
@@ -655,6 +728,7 @@ class FlightServiceTests {
         assertThat(deleteMsg, is("Flight Deleted!"));
     }
 
+    @Test
     void testEmailFlightDetailsToAllBookedUsers() {
         Flight flight = new Flight();
         HashSet<User> users = new HashSet<>();
@@ -743,10 +817,8 @@ class FlightServiceTests {
         oneStopTrip.add(startToMiddleFlight);
         oneStopTrip.add(middleToEndFlight);
 
-        List<List<Flight>> mockTrips = Arrays.asList(oneStopTrip);
-
         assertThat(allTrips.size(), is(1));
-        assertThat(allTrips, is(mockTrips));
+        assertThat(allTrips, containsInAnyOrder(oneStopTrip));
     }
 
     @Test
@@ -849,10 +921,8 @@ class FlightServiceTests {
         oneStopTrip2.add(startToMiddleFlight2);
         oneStopTrip2.add(middleToEndFlight);
 
-        List<List<Flight>> mockTrips = Arrays.asList(oneStopTrip, oneStopTrip2);
-
         assertThat(allTrips.size(), is(2));
-        assertThat(allTrips, is(mockTrips));
+        assertThat(allTrips, containsInAnyOrder(oneStopTrip, oneStopTrip2));
     }
 
     @Test
@@ -1079,11 +1149,8 @@ class FlightServiceTests {
         LinkedList<Flight> nonStopTrip = new LinkedList<Flight>();
         nonStopTrip.add(startToEndFlight);
 
-        List<LinkedList<Flight>> mockTrips = Arrays.asList(oneStopTrip,
-                nonStopTrip);
-
         assertThat(allTrips.size(), is(2));
-        assertThat(allTrips, is(mockTrips));
+        assertThat(allTrips, containsInAnyOrder(oneStopTrip, nonStopTrip));
     }
 
     @Test

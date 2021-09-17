@@ -20,24 +20,28 @@ import com.utopia.flightservice.repository.AirportDao;
 import com.utopia.flightservice.repository.RouteDao;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class RouteServiceTests {
 
-    @Autowired
+    @InjectMocks
     private RouteService routeService;
 
-    @Autowired
+    @Mock
     private AirportService airportService;
 
-    @MockBean
+    @Mock
     private RouteDao routeDao;
 
-    @MockBean
+    @Mock
     private AirportDao airportDao;
 
     @Test
@@ -117,6 +121,31 @@ public class RouteServiceTests {
     }
 
     @Test
+    public void test_getPagedRoutes_Active() {
+        Route route = new Route();
+        route.setId(28);
+
+        Airport airport = airportService.getAirportById("SFO");
+        Airport airport2 = airportService.getAirportById("LAX");
+
+        route.setOriginAirport(airport);
+        route.setDestinationAirport(airport2);
+        route.setIsActive(true);
+        List<Route> allRoutes = Arrays.asList(route);
+        Page<Route> routePage = new PageImpl<Route>(
+                Arrays.asList(route));
+
+        Integer pageIndex = 0;
+        Integer pageSize = 1;
+        String sortBy = "id";
+        Pageable paging = PageRequest.of(pageIndex, pageSize, Sort.by(sortBy));
+        when(routeDao.findAllActive(true, paging)).thenReturn(routePage);
+
+        Page<Route> foundRoutes = routeService.getPagedRoutes(pageIndex, pageSize, true, sortBy);
+        assertEquals(routePage, foundRoutes);
+    }
+
+    @Test
     public void test_getRouteByLocationInfo() {
         String originId = "SFO";
         String destinationId = "LAX";
@@ -136,17 +165,10 @@ public class RouteServiceTests {
         route.setIsActive(true);
         List<Route> allRoutes = Arrays.asList(route);
 
-        when(airportService.getAirportById("SFO")).thenReturn(airport);
-        when(airportService.getAirportById("LAX")).thenReturn(airport2);
-
         List<Airport> query1 = airportService.getAirportByIdOrCity(originId);
         List<Airport> query2 = airportService.getAirportByIdOrCity(destinationId);
 
         when(routeDao.findByOriginAirportInAndDestinationAirportIn(query1, query2)).thenReturn(allRoutes);
-        when(airportDao.findByIataIdContainingOrCityContaining(originId,
-                originId)).thenReturn(query1);
-        when(airportDao.findByIataIdContainingOrCityContaining(destinationId,
-                destinationId)).thenReturn(query2);
 
         List<Route> foundRoutes = routeService.getRouteByLocationInfo("SFO", "LAX");
 
@@ -175,10 +197,40 @@ public class RouteServiceTests {
         String sortBy = "id";
         Pageable paging = PageRequest.of(pageIndex, pageSize, Sort.by(sortBy));
 
-        when(airportDao.findByIataIdContainingOrCityContaining(query1, query1)).thenReturn(airports);
+        when(airportService.getAirportByIdOrCity(query1)).thenReturn(airports);
         when(routeDao.findByOriginAirportInOrDestinationAirportIn(airports, airports, paging)).thenReturn(routePage);
 
         Page<Route> foundRoutes = routeService.getByOriginAirportOrDestinationAirport(pageIndex, pageSize, sortBy, query1, query1);
+
+        assertEquals(routePage, foundRoutes);
+    }
+
+    @Test
+    public void test_getByOriginAirport_OrDestinationAirport_AndActive() throws RouteNotFoundException {
+        String query1 = "SFO";
+        Route route = new Route();
+        route.setId(28);
+
+        Airport airport = airportService.getAirportById("SFO");
+        Airport airport2 = airportService.getAirportById("LAX");
+        List<Airport> airports = new ArrayList();
+        airports.add(airport);
+
+        route.setOriginAirport(airport);
+        route.setDestinationAirport(airport2);
+        route.setIsActive(true);
+        Page<Route> routePage = new PageImpl<Route>(
+                Arrays.asList(route));
+
+        Integer pageIndex = 0;
+        Integer pageSize = 10;
+        String sortBy = "id";
+        Pageable paging = PageRequest.of(pageIndex, pageSize, Sort.by(sortBy));
+
+        when(airportService.getAirportByIdOrCity(query1)).thenReturn(airports);
+        when(routeDao.findByOriginAirportInOrDestinationAirportInFilterActive(airports, airports, true, paging)).thenReturn(routePage);
+
+        Page<Route> foundRoutes = routeService.getByOriginAirportOrDestinationAirport(pageIndex, pageSize, true, sortBy, query1, query1);
 
         assertEquals(routePage, foundRoutes);
     }
@@ -190,7 +242,6 @@ public class RouteServiceTests {
         Airport airport2 = new Airport("LAX", "Test Airport 2", true);
         Route route = new Route(28, airport1, airport2, true);
 
-        doNothing().when(routeDao).updateRoute(28, airport1, airport2, true);
         Integer updateId = routeService.updateRoute(28, route);
         assertEquals(id, updateId);
     }

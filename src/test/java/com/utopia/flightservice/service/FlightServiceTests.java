@@ -1342,7 +1342,7 @@ class FlightServiceTests {
         oneStopTrip2.add(firstToSecondFlight);
         oneStopTrip2.add(secondToThirdFlight2);
 
-        assertThat(allTrips.size(), is(3));
+        assertThat(allTrips.size(), is(2));
         assertThat(allTrips, containsInAnyOrder(oneStopTrip1, oneStopTrip2));
     }
 

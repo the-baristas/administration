@@ -53,33 +53,30 @@ public class FlightService {
     }
 
     public Page<Flight> getPagedFlights(Integer pageNo, Integer pageSize,
-                                        String sortBy) {
+            String sortBy) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         return flightDao.findAll(paging);
     }
 
     public Page<Flight> getFlightsByRoute(Integer pageNo, Integer pageSize,
-                                          String sortBy, List<Route> routes) {
+            String sortBy, List<Route> routes) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         return flightDao.findAllByRouteIn(routes, paging);
     }
 
     public List<List<Flight>> searchFlights(Airport originAirport,
-                                            Airport destinationAirport, LocalDateTime startTime) {
+            Airport destinationAirport, LocalDateTime startTime) {
         // get all paths based on starting place and destination
         List<GraphPath<Airport, DefaultEdge>> airportPaths = graphService
                 .getPaths(originAirport, destinationAirport);
-
         Graph<Flight, DefaultEdge> flightGraph = new SimpleDirectedGraph<>(
                 DefaultEdge.class);
-
         Set<Flight> firstRouteFlights = new HashSet<>();
         Set<Flight> lastRouteFlights = new HashSet<>();
         LocalDateTime endTime = startTime.plusDays(1);
         for (GraphPath<Airport, DefaultEdge> airportPath : airportPaths) {
             List<Airport> airports = airportPath.getVertexList();
             List<Route> routes = new ArrayList<Route>();
-
             // for each path, find the corresponding route and add to the routes
             // array
             for (int i = 0; i < airports.size() - 1; i++) {
@@ -89,7 +86,6 @@ public class FlightService {
                         .findByOriginAirportAndDestinationAirport(origin, dest)
                         .get());
             }
-
             // Create flight path for first route.
             int routeIndex = 0;
             List<Flight> routeZeroFlights = flightDao
@@ -100,10 +96,8 @@ public class FlightService {
                 lastRouteFlights.addAll(routeZeroFlights);
             }
             routeIndex = Math.min(routeIndex + 1, routes.size() - 1);
-
             for (Flight routeZeroFlight : routeZeroFlights) {
                 flightGraph.addVertex(routeZeroFlight);
-
                 List<Flight> routeOneFlights = flightDao
                         .findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
                                 routes.get(routeIndex),
@@ -112,11 +106,17 @@ public class FlightService {
                     lastRouteFlights.addAll(routeOneFlights);
                 }
                 routeIndex = Math.min(routeIndex + 1, routes.size() - 1);
-
                 for (Flight routeOneFlight : routeOneFlights) {
                     flightGraph.addVertex(routeOneFlight);
-                    flightGraph.addEdge(routeZeroFlight, routeOneFlight);
-
+                    if (!(routeZeroFlight.getRoute()
+                            .getOriginAirport() == routeOneFlight.getRoute()
+                                    .getOriginAirport()
+                            && routeZeroFlight.getRoute()
+                                    .getDestinationAirport() == routeOneFlight
+                                            .getRoute()
+                                            .getDestinationAirport())) {
+                        flightGraph.addEdge(routeZeroFlight, routeOneFlight);
+                    }
                     List<Flight> routeTwoFlights = flightDao
                             .findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
                                     routes.get(routeIndex),
@@ -124,15 +124,21 @@ public class FlightService {
                     if (routeIndex == routes.size() - 1) {
                         lastRouteFlights.addAll(routeTwoFlights);
                     }
-
                     for (Flight routeTwoFlight : routeTwoFlights) {
                         flightGraph.addVertex(routeTwoFlight);
-                        flightGraph.addEdge(routeOneFlight, routeTwoFlight);
+                        if (!(routeOneFlight.getRoute()
+                                .getOriginAirport() == routeTwoFlight.getRoute()
+                                        .getOriginAirport()
+                                && routeOneFlight.getRoute()
+                                        .getDestinationAirport() == routeTwoFlight
+                                                .getRoute()
+                                                .getDestinationAirport())) {
+                            flightGraph.addEdge(routeOneFlight, routeTwoFlight);
+                        }
                     }
                 }
             }
         }
-
         AllDirectedPaths<Flight, DefaultEdge> algo = new AllDirectedPaths<>(
                 flightGraph);
         List<GraphPath<Flight, DefaultEdge>> flightPaths = algo
@@ -144,8 +150,8 @@ public class FlightService {
     }
 
     public Page<Flight> getFlightsByRouteAndDate(Integer pageNo,
-                                                 Integer pageSize, String sortBy, List<Route> routes,
-                                                 FlightQuery startFlightQuery) {
+            Integer pageSize, String sortBy, List<Route> routes,
+            FlightQuery startFlightQuery) {
 
         Integer month = startFlightQuery.getMonth();
         Integer date = startFlightQuery.getDate();

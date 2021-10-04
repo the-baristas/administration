@@ -26,11 +26,15 @@ public interface FlightDao extends JpaRepository<Flight, Integer> {
 
     Page<Flight> findAllByRouteIn(List<Route> routes, Pageable paging);
 
-    Page<Flight> findAllByRouteInAndIsActiveEquals(List<Route> routes, Boolean active, Pageable paging);
+    Page<Flight> findAllByRouteInAndIsActiveEquals(List<Route> routes,
+            Boolean active, Pageable paging);
 
     Page<Flight> findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
             List<Route> routes, LocalDateTime departure,
             LocalDateTime departureHelper, Pageable paging);
+
+    List<Flight> findByRouteAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThan(
+            Route route, LocalDateTime startTime, LocalDateTime endTime);
 
     Page<Flight> findByRouteInAndDepartureTimeGreaterThanEqualAndDepartureTimeLessThanAndIsActiveEquals(
             List<Route> routes, LocalDateTime departure, Boolean active,

@@ -1,6 +1,7 @@
 package com.utopia.flightservice.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -22,6 +23,8 @@ public interface RouteDao extends JpaRepository<Route, Integer> {
 
     List<Route> findByOriginAirportInAndDestinationAirportIn(
             List<Airport> query1, List<Airport> query2);
+
+    Optional<Route> findByOriginAirportAndDestinationAirport(Airport a1, Airport a2);
 
     Page<Route> findByOriginAirportInOrDestinationAirportIn(
             List<Airport> query1, List<Airport> query2, Pageable paging);

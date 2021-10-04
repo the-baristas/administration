@@ -10,23 +10,19 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import com.utopia.flightservice.dto.FlightDto;
-import com.utopia.flightservice.dto.FlightEmailRequestDto;
 import com.utopia.flightservice.entity.Airplane;
+import com.utopia.flightservice.entity.Airport;
 import com.utopia.flightservice.entity.Flight;
 import com.utopia.flightservice.entity.FlightQuery;
 import com.utopia.flightservice.entity.Route;
 import com.utopia.flightservice.exception.FlightNotSavedException;
 import com.utopia.flightservice.exception.ModelMapperFailedException;
 import com.utopia.flightservice.service.AirplaneService;
+import com.utopia.flightservice.service.AirportService;
 import com.utopia.flightservice.service.AwsS3Service;
 import com.utopia.flightservice.service.FlightService;
 import com.utopia.flightservice.service.RouteService;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,6 +42,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 @RestController
 @SecurityScheme(name = "bearer", // can be set to anything
@@ -68,6 +70,9 @@ public class FlightController {
     private AirplaneService airplaneService;
 
     @Autowired
+    private AirportService airportService;
+
+    @Autowired
     private AwsS3Service s3Service;
 
     @GetMapping("/health")
@@ -81,16 +86,15 @@ public class FlightController {
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(name = "activeOnly", required = false) Boolean activeOnly) {
+            @RequestParam(name = "activeOnly",
+                    required = false) Boolean activeOnly) {
 
         Page<Flight> flights;
-        if (activeOnly == null || !activeOnly){
-            flights = flightService.getPagedFlights(pageNo, pageSize,
-                    sortBy);
-        }
-        else{
-            flights = flightService.getPagedFlightsFilterActive(pageNo, pageSize, true,
-                    sortBy);
+        if (activeOnly == null || !activeOnly) {
+            flights = flightService.getPagedFlights(pageNo, pageSize, sortBy);
+        } else {
+            flights = flightService.getPagedFlightsFilterActive(pageNo,
+                    pageSize, true, sortBy);
         }
         if (!flights.hasContent()) {
             return new ResponseEntity("No flights found in database.",
@@ -109,22 +113,21 @@ public class FlightController {
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(name = "activeOnly", required = false) Boolean activeOnly) {
+            @RequestParam(name = "activeOnly",
+                    required = false) Boolean activeOnly) {
 
         List<Route> routes = routeService.getRouteByLocationInfo(originId,
                 destinationId);
 
         Page<Flight> flights;
 
-        if (activeOnly == null || !activeOnly){
-            flights = flightService.getFlightsByRoute(pageNo, pageSize,
-                    sortBy, routes);
-        }
-        else{
+        if (activeOnly == null || !activeOnly) {
+            flights = flightService.getFlightsByRoute(pageNo, pageSize, sortBy,
+                    routes);
+        } else {
             flights = flightService.getFlightsByRoute(pageNo, pageSize, true,
                     sortBy, routes);
         }
-
 
         if (flights.isEmpty()) {
             return new ResponseEntity("No flights found in database.",
@@ -164,10 +167,6 @@ public class FlightController {
             @RequestBody FlightDto flightDTO, UriComponentsBuilder builder)
             throws FlightNotSavedException {
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        URI location = builder.path("/flights/{id}")
-                .buildAndExpand(flightDTO.getId()).toUri();
-        responseHeaders.setLocation(location);
         Flight flight;
 
         try {
@@ -176,6 +175,11 @@ public class FlightController {
             throw new ModelMapperFailedException(e);
         }
         Integer flightID = flightService.saveFlight(flight);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        URI location = builder.path("/flights/{id}").buildAndExpand(flightID)
+                .toUri();
+        responseHeaders.setLocation(location);
 
         Flight createdFlight = flightService.getFlightById(flightID).get();
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -216,23 +220,59 @@ public class FlightController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    // email flight details to all users that have booked tickets for that flight
+    // email flight details to all users that have booked tickets for that
+    // flight
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/email/{flightId}")
-    public ResponseEntity<String> emailFlightDetailsToAll(@PathVariable Integer flightId){
-        flightService.emailFlightDetailsToAllBookedUsers(flightService.getFlightById(flightId).get());
+    public ResponseEntity<String> emailFlightDetailsToAll(
+            @PathVariable Integer flightId) {
+        flightService.emailFlightDetailsToAllBookedUsers(
+                flightService.getFlightById(flightId).get());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //Upload a file (a csv file with flight information to AWS S3 which will then be handled by a lambda
+    @PostMapping("/new-search")
+    public ResponseEntity<String> getFlightsWithLayovers(
+            @RequestParam String originId, @RequestParam String destinationId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @Valid @RequestBody FlightQuery flightQuery)
+            throws ResponseStatusException {
+
+        Integer month = flightQuery.getMonth();
+        Integer date = flightQuery.getDate();
+        Integer year = flightQuery.getYear();
+        Integer hour = 0;
+        Integer min = 0;
+
+        LocalDateTime dateTime = LocalDateTime.of(year, month, date, hour, min);
+
+        try {
+            Airport origin = airportService.getAirportByIdOrCity(originId)
+                    .get(0);
+            Airport dest = airportService.getAirportByIdOrCity(destinationId)
+                    .get(0);
+            List<List<Flight>> trips = flightService.searchFlights(origin, dest,
+                    dateTime);
+            return new ResponseEntity(trips, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Could not find flights based on query.");
+        }
+    }
+
+    // Upload a file (a csv file with flight information to AWS S3 which will
+    // then be handled by a lambda
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("/csv")
-    public ResponseEntity<String> uploadFlightCsv(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<String> uploadFlightCsv(
+            @RequestParam("file") MultipartFile file) throws IOException {
         s3Service.uploadFlightCsv(file);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //converters
+    // converters
 
     public FlightDto convertToDto(Flight flight) {
         return modelMapper.map(flight, FlightDto.class);

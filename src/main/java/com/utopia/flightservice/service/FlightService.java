@@ -1,11 +1,7 @@
 package com.utopia.flightservice.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.utopia.flightservice.email.EmailSender;
@@ -24,10 +20,7 @@ import org.jgrapht.alg.shortestpath.AllDirectedPaths;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -70,8 +63,9 @@ public class FlightService {
         return flightDao.findAllByRouteIn(routes, paging);
     }
 
-    public List<List<Flight>> searchFlights(Airport originAirport,
-            Airport destinationAirport, LocalDateTime startTime) {
+    public Page<List<Flight>> searchFlights(Airport originAirport,
+            Airport destinationAirport, LocalDateTime startTime, String sortBy, String filter,
+            Integer pageNo, Integer pageSize) {
         // get all paths based on starting place and destination
         List<GraphPath<Airport, DefaultEdge>> airportPaths = graphService
                 .getPaths(originAirport, destinationAirport);
@@ -149,10 +143,23 @@ public class FlightService {
                 flightGraph);
         List<GraphPath<Flight, DefaultEdge>> flightPaths = algo
                 .getAllPaths(firstRouteFlights, lastRouteFlights, true, 3);
-        return flightPaths.stream()
+        List<List<Flight>> allTrips = flightPaths.stream()
                 .map(((GraphPath<Flight, DefaultEdge> graphPath) -> graphPath
                         .getVertexList()))
                 .collect(Collectors.toList());
+        //filter and sort the trips
+        allTrips = sortTrips(filterTrips(allTrips, filter, startTime), sortBy);
+
+        //constructing the sublist for the page object
+        List<List<Flight>> tripsSublist;
+
+        //if this is the last page, we need additional logic to make sure we don't get index out of bounds
+        if((pageNo+1)*pageSize < allTrips.size())
+            tripsSublist = allTrips.subList(pageNo * pageSize, (pageNo + 1) * pageSize);
+        else
+            tripsSublist = allTrips.subList(pageNo * pageSize, allTrips.size()-1);
+
+        return new PageImpl<List<Flight>>(tripsSublist, PageRequest.of(pageNo, pageSize), allTrips.size());
     }
 
     public Page<Flight> getFlightsByRoute(Integer pageNo, Integer pageSize,
@@ -283,4 +290,56 @@ public class FlightService {
         }
     }
 
+    //helper method for sorting trips
+    private List<List<Flight>> sortTrips(List<List<Flight>> trips, String sortBy){
+
+        switch (sortBy){
+            case "departureTime":
+                return trips.stream().sorted(Comparator.comparing((trip) -> {return trip.get(0).getDepartureTime();})).collect(Collectors.toList());
+            case "arrivalTime":
+                return trips.stream().sorted(Comparator.comparing((trip) -> {return trip.get(0).getArrivalTime();})).collect(Collectors.toList());
+            case "economyPrice":
+                return trips.stream().sorted(Comparator.comparing((trip) -> {
+                    Float priceSum = 0f;
+                    for( Flight flight : trip){
+                        priceSum += flight.getEconomyPrice();
+                    }
+                    return priceSum / trip.size();
+                })).collect(Collectors.toList());
+            default:
+                return trips;
+        }
+    }
+
+    //helper method for filtering trips
+    private List<List<Flight>> filterTrips(List<List<Flight>> trips, String filter, LocalDateTime desiredDay){
+
+        LocalDateTime lowerBound;
+        LocalDateTime upperBound;
+        switch (filter){
+            case "morning":
+                //12:00AM - 11:59AM
+                lowerBound = desiredDay;
+                upperBound = desiredDay.plusMinutes(719);
+                return trips.stream().filter((trip) -> {
+                    return  trip.get(0).getDepartureTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().isBefore(upperBound);
+                }).collect(Collectors.toList());
+            case "afternoon":
+                //12:00PM - 5:59PM
+                lowerBound = desiredDay.plusMinutes(720);
+                upperBound = desiredDay.plusMinutes(1079);
+                return trips.stream().filter((trip) -> {
+                    return  trip.get(0).getDepartureTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().isBefore(upperBound);
+                }).collect(Collectors.toList());
+            case "evening":
+                //6:00PM - 11:59PM
+                lowerBound = desiredDay.plusMinutes(1080);
+                upperBound = desiredDay.plusMinutes(1439);
+                return trips.stream().filter((trip) -> {
+                    return  trip.get(0).getDepartureTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().isBefore(upperBound);
+                }).collect(Collectors.toList());
+            default:
+                return trips;
+        }
+    }
 }

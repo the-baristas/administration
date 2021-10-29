@@ -64,7 +64,7 @@ public class FlightService {
     }
 
     public Page<List<Flight>> searchFlights(Airport originAirport,
-            Airport destinationAirport, LocalDateTime startTime, String sortBy, String filter,
+            Airport destinationAirport, LocalDateTime startTime, String sortBy, FlightQuery flightQuery,
             Integer pageNo, Integer pageSize) {
         // get all paths based on starting place and destination
         List<GraphPath<Airport, DefaultEdge>> airportPaths = graphService
@@ -148,7 +148,7 @@ public class FlightService {
                         .getVertexList()))
                 .collect(Collectors.toList());
         //filter and sort the trips
-        allTrips = sortTrips(filterTrips(allTrips, filter, startTime), sortBy);
+        allTrips = sortTrips(filterTrips(allTrips, flightQuery), sortBy);
 
         //constructing the sublist for the page object
         List<List<Flight>> tripsSublist;
@@ -157,7 +157,7 @@ public class FlightService {
         if((pageNo+1)*pageSize < allTrips.size())
             tripsSublist = allTrips.subList(pageNo * pageSize, (pageNo + 1) * pageSize);
         else
-            tripsSublist = allTrips.subList(pageNo * pageSize, allTrips.size()-1);
+            tripsSublist = allTrips.subList(pageNo * pageSize, allTrips.size());
 
         return new PageImpl<List<Flight>>(tripsSublist, PageRequest.of(pageNo, pageSize), allTrips.size());
     }
@@ -312,29 +312,36 @@ public class FlightService {
     }
 
     //helper method for filtering trips
-    private List<List<Flight>> filterTrips(List<List<Flight>> trips, String filter, LocalDateTime desiredDay){
+    private List<List<Flight>> filterTrips(List<List<Flight>> trips, FlightQuery flightQuery){
 
         LocalDateTime lowerBound;
         LocalDateTime upperBound;
-        switch (filter){
+        switch (flightQuery.getFilter()){
             case "morning":
                 //12:00AM - 11:59AM
-                lowerBound = desiredDay;
-                upperBound = desiredDay.plusMinutes(719);
+                lowerBound = flightQuery.getDepartureDay();
+                upperBound = flightQuery.getDepartureDay().plusMinutes(719);
                 return trips.stream().filter((trip) -> {
                     return  trip.get(0).getDepartureTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().isBefore(upperBound);
                 }).collect(Collectors.toList());
             case "afternoon":
                 //12:00PM - 5:59PM
-                lowerBound = desiredDay.plusMinutes(720);
-                upperBound = desiredDay.plusMinutes(1079);
+                lowerBound = flightQuery.getDepartureDay().plusMinutes(720);
+                upperBound = flightQuery.getDepartureDay().plusMinutes(1079);
                 return trips.stream().filter((trip) -> {
                     return  trip.get(0).getDepartureTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().isBefore(upperBound);
                 }).collect(Collectors.toList());
             case "evening":
                 //6:00PM - 11:59PM
-                lowerBound = desiredDay.plusMinutes(1080);
-                upperBound = desiredDay.plusMinutes(1439);
+                lowerBound = flightQuery.getDepartureDay().plusMinutes(1080);
+                upperBound = flightQuery.getDepartureDay().plusMinutes(1439);
+                return trips.stream().filter((trip) -> {
+                    return  trip.get(0).getDepartureTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().isBefore(upperBound);
+                }).collect(Collectors.toList());
+            case "departureRange":
+                //custom range
+                lowerBound = flightQuery.getLowerBound();
+                upperBound = flightQuery.getUpperBound();
                 return trips.stream().filter((trip) -> {
                     return  trip.get(0).getDepartureTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().isBefore(upperBound);
                 }).collect(Collectors.toList());

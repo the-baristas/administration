@@ -254,7 +254,7 @@ public class FlightController {
             Airport dest = airportService.getAirportByIdOrCity(destinationId)
                     .get(0);
             Page<List<Flight>> trips = flightService.searchFlights(origin, dest,
-                    dateTime, sortBy, flightQuery.getFilter(), pageNo, pageSize);
+                    dateTime, sortBy, flightQuery, pageNo, pageSize);
             return ResponseEntity.ok(trips);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,

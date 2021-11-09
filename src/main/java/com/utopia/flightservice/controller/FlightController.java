@@ -257,6 +257,7 @@ public class FlightController {
                     dateTime, sortBy, flightQuery, pageNo, pageSize);
             return ResponseEntity.ok(trips);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Could not find flights based on query.");
         }

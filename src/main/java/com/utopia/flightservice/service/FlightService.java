@@ -1,6 +1,8 @@
 package com.utopia.flightservice.service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -314,27 +316,33 @@ public class FlightService {
     //helper method for filtering trips
     private List<List<Flight>> filterTrips(List<List<Flight>> trips, FlightQuery flightQuery){
 
+        //Need departureDay at midnight with no additional hours/minutes/etc
+        LocalDateTime departureDayMidnight = flightQuery.getDepartureDay().atZone(ZoneId.systemDefault()).toLocalDateTime().toLocalDate().atStartOfDay();
+
         LocalDateTime lowerBound;
         LocalDateTime upperBound;
         switch (flightQuery.getFilter()){
             case "morning":
                 //12:00AM - 11:59AM
-                lowerBound = flightQuery.getDepartureDay();
-                upperBound = flightQuery.getDepartureDay().plusMinutes(719);
+                lowerBound = departureDayMidnight;
+                upperBound = departureDayMidnight.plusMinutes(719);
                 return trips.stream().filter((trip) -> {
-                    return  trip.get(0).getDepartureTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().isBefore(upperBound);
+                    System.out.println(trip.get(0).getDepartureTime().atOffset(ZoneOffset.UTC).toLocalDateTime());
+                    System.out.println(trip.get(0).getDepartureTime());
+                    System.out.println("-------------------");
+                    return  trip.get(0).getDepartureTime().atOffset(ZoneOffset.UTC).toLocalDateTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().atZone(ZoneId.systemDefault()).toLocalDateTime().isBefore(upperBound);
                 }).collect(Collectors.toList());
             case "afternoon":
                 //12:00PM - 5:59PM
-                lowerBound = flightQuery.getDepartureDay().plusMinutes(720);
-                upperBound = flightQuery.getDepartureDay().plusMinutes(1079);
+                lowerBound = departureDayMidnight.plusMinutes(720);
+                upperBound = departureDayMidnight.plusMinutes(1079);
                 return trips.stream().filter((trip) -> {
-                    return  trip.get(0).getDepartureTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().isBefore(upperBound);
+                    return  trip.get(0).getDepartureTime().atZone(ZoneId.systemDefault()).toLocalDateTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().atZone(ZoneId.systemDefault()).toLocalDateTime().isBefore(upperBound);
                 }).collect(Collectors.toList());
             case "evening":
                 //6:00PM - 11:59PM
-                lowerBound = flightQuery.getDepartureDay().plusMinutes(1080);
-                upperBound = flightQuery.getDepartureDay().plusMinutes(1439);
+                lowerBound = departureDayMidnight.plusMinutes(1080);
+                upperBound = departureDayMidnight.plusMinutes(1439);
                 return trips.stream().filter((trip) -> {
                     return  trip.get(0).getDepartureTime().isAfter(lowerBound) && trip.get(0).getDepartureTime().isBefore(upperBound);
                 }).collect(Collectors.toList());

@@ -748,6 +748,7 @@ class FlightServiceTests {
         Airport endAirport = new Airport("JFK", "New York", true);
 
         FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route startToMiddleRoute = new Route(1, startAirport, middleAirport,
                 true);
@@ -829,6 +830,7 @@ class FlightServiceTests {
         Airport endAirport = new Airport("JFK", "New York", true);
 
         FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route startToMiddleRoute = new Route(1, startAirport, middleAirport,
                 true);
@@ -935,6 +937,7 @@ class FlightServiceTests {
         Airport fourthAirport = new Airport("JFK", "New York", true);
 
         FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route firstToSecondRoute = new Route(1, firstAirport, secondAirport,
                 true);
@@ -1054,6 +1057,7 @@ class FlightServiceTests {
         Airport endAirport = new Airport("JFK", "New York", true);
 
         FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route startToMiddleRoute = new Route(1, startAirport, middleAirport,
                 true);
@@ -1164,6 +1168,7 @@ class FlightServiceTests {
         Airport endAirport = new Airport("JFK", "New York", true);
 
         FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route startToMiddleRoute = new Route(1, startAirport, middleAirport,
                 true);
@@ -1297,6 +1302,7 @@ class FlightServiceTests {
         Airport thirdAirport = new Airport("LAX", "Los Angeles", true);
 
         FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route firstToSecondRoute = new Route(1, firstAirport, secondAirport,
                 true);

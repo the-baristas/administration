@@ -22,6 +22,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.GET, "/flights/health").permitAll()
                 .mvcMatchers(HttpMethod.GET, "/flights").permitAll()
                 .mvcMatchers(HttpMethod.GET, "/flights/search").permitAll()
+                .mvcMatchers(HttpMethod.POST, "/flights/new-search").permitAll()
                 .mvcMatchers(HttpMethod.POST, "/flights/query").permitAll()
                 .mvcMatchers("/v3/api-docs/**", "/swagger-ui/**",
                         "/swagger-ui.html").permitAll()

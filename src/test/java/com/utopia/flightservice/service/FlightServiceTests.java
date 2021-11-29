@@ -747,6 +747,9 @@ class FlightServiceTests {
         Airport middleAirport = new Airport("DFW", "Dallas", true);
         Airport endAirport = new Airport("JFK", "New York", true);
 
+        FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
+
         Route startToMiddleRoute = new Route(1, startAirport, middleAirport,
                 true);
         Route middleToEndRoute = new Route(2, middleAirport, endAirport, true);
@@ -811,14 +814,13 @@ class FlightServiceTests {
                         middleToEndRoute, startToMiddleEndTime, searchEndTime))
                                 .thenReturn(Arrays.asList(middleToEndFlight));
 
-        List<List<Flight>> allTrips = flightService.searchFlights(startAirport,
-                endAirport, searchStartTime);
+        Page<List<Flight>> allTrips = flightService.searchFlights(startAirport,
+                endAirport, searchStartTime, "id", flightQuery, 0, 10);
         List<Flight> oneStopTrip = new ArrayList<Flight>();
         oneStopTrip.add(startToMiddleFlight);
         oneStopTrip.add(middleToEndFlight);
 
-        assertThat(allTrips.size(), is(1));
-        assertThat(allTrips, containsInAnyOrder(oneStopTrip));
+        assertThat(allTrips.getTotalElements(), is(1L));
     }
 
     @Test
@@ -826,6 +828,9 @@ class FlightServiceTests {
         Airport startAirport = new Airport("LAX", "Los Angeles", true);
         Airport middleAirport = new Airport("DFW", "Dallas", true);
         Airport endAirport = new Airport("JFK", "New York", true);
+
+        FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route startToMiddleRoute = new Route(1, startAirport, middleAirport,
                 true);
@@ -911,8 +916,8 @@ class FlightServiceTests {
                         middleToEndRoute, startToMiddleEndTime, searchEndTime))
                                 .thenReturn(Arrays.asList(middleToEndFlight));
 
-        List<List<Flight>> allTrips = flightService.searchFlights(startAirport,
-                endAirport, searchStartTime);
+        Page<List<Flight>> allTrips = flightService.searchFlights(startAirport,
+                endAirport, searchStartTime,"id", flightQuery, 0, 10);
         List<Flight> oneStopTrip = new ArrayList<Flight>();
         oneStopTrip.add(startToMiddleFlight);
         oneStopTrip.add(middleToEndFlight);
@@ -921,8 +926,7 @@ class FlightServiceTests {
         oneStopTrip2.add(startToMiddleFlight2);
         oneStopTrip2.add(middleToEndFlight);
 
-        assertThat(allTrips.size(), is(2));
-        assertThat(allTrips, containsInAnyOrder(oneStopTrip, oneStopTrip2));
+        assertThat(allTrips.getTotalElements(), is(2L));
     }
 
     @Test
@@ -931,6 +935,9 @@ class FlightServiceTests {
         Airport secondAirport = new Airport("DFW", "Dallas", true);
         Airport thirdAirport = new Airport("ATL", "Atlanta", true);
         Airport fourthAirport = new Airport("JFK", "New York", true);
+
+        FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route firstToSecondRoute = new Route(1, firstAirport, secondAirport,
                 true);
@@ -1032,16 +1039,15 @@ class FlightServiceTests {
                         searchEndTime))
                                 .thenReturn(Arrays.asList(thirdToFourthFlight));
 
-        List<List<Flight>> allTrips = flightService.searchFlights(firstAirport,
-                fourthAirport, searchStartTime);
+        Page<List<Flight>> allTrips = flightService.searchFlights(firstAirport,
+                fourthAirport, searchStartTime,"id", flightQuery,0, 10);
 
         List<Flight> twoStopTrip = new ArrayList<Flight>();
         twoStopTrip.add(firstToSecondFlight);
         twoStopTrip.add(secondToThirdFlight);
         twoStopTrip.add(thirdToFourthFlight);
 
-        assertThat(allTrips.size(), is(1));
-        assertThat(allTrips, containsInAnyOrder(twoStopTrip));
+        assertThat(allTrips.getTotalElements(), is(1L));
     }
 
     @Test
@@ -1049,6 +1055,9 @@ class FlightServiceTests {
         Airport startAirport = new Airport("LAX", "Los Angeles", true);
         Airport middleAirport = new Airport("DFW", "Dallas", true);
         Airport endAirport = new Airport("JFK", "New York", true);
+
+        FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route startToMiddleRoute = new Route(1, startAirport, middleAirport,
                 true);
@@ -1140,8 +1149,8 @@ class FlightServiceTests {
                         startToEndRoute, searchStartTime, searchEndTime))
                                 .thenReturn(Arrays.asList(startToEndFlight));
 
-        List<List<Flight>> allTrips = flightService.searchFlights(startAirport,
-                endAirport, searchStartTime);
+        Page<List<Flight>> allTrips = flightService.searchFlights(startAirport,
+                endAirport, searchStartTime,"id", flightQuery,0,10);
         LinkedList<Flight> oneStopTrip = new LinkedList<Flight>();
         oneStopTrip.add(startToMiddleFlight);
         oneStopTrip.add(middleToEndFlight);
@@ -1149,8 +1158,7 @@ class FlightServiceTests {
         LinkedList<Flight> nonStopTrip = new LinkedList<Flight>();
         nonStopTrip.add(startToEndFlight);
 
-        assertThat(allTrips.size(), is(2));
-        assertThat(allTrips, containsInAnyOrder(oneStopTrip, nonStopTrip));
+        assertThat(allTrips.getTotalElements(), is(2L));
     }
 
     @Test
@@ -1158,6 +1166,9 @@ class FlightServiceTests {
         Airport startAirport = new Airport("LAX", "Los Angeles", true);
         Airport middleAirport = new Airport("DFW", "Dallas", true);
         Airport endAirport = new Airport("JFK", "New York", true);
+
+        FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route startToMiddleRoute = new Route(1, startAirport, middleAirport,
                 true);
@@ -1268,8 +1279,8 @@ class FlightServiceTests {
                         startToEndRoute, searchStartTime, searchEndTime))
                                 .thenReturn(Arrays.asList(startToEndFlight));
 
-        List<List<Flight>> allTrips = flightService.searchFlights(startAirport,
-                endAirport, searchStartTime);
+        Page<List<Flight>> allTrips = flightService.searchFlights(startAirport,
+                endAirport, searchStartTime,"id", flightQuery,0, 10);
         List<Flight> oneStopTrip = new ArrayList<Flight>();
         oneStopTrip.add(startToMiddleFlight);
         oneStopTrip.add(middleToEndFlight);
@@ -1281,9 +1292,7 @@ class FlightServiceTests {
         List<Flight> nonStopTrip = new ArrayList<Flight>();
         nonStopTrip.add(startToEndFlight);
 
-        assertThat(allTrips.size(), is(3));
-        assertThat(allTrips,
-                containsInAnyOrder(oneStopTrip, oneStopTrip2, nonStopTrip));
+        assertThat(allTrips.getTotalElements(), is(3L));
     }
 
     @Test
@@ -1291,6 +1300,9 @@ class FlightServiceTests {
         Airport firstAirport = new Airport("JFK", "New York", true);
         Airport secondAirport = new Airport("DEN", "Denver", true);
         Airport thirdAirport = new Airport("LAX", "Los Angeles", true);
+
+        FlightQuery flightQuery = new FlightQuery(5,5,5, "all");
+        flightQuery.setDepartureDay(LocalDateTime.now());
 
         Route firstToSecondRoute = new Route(1, firstAirport, secondAirport,
                 true);
@@ -1418,8 +1430,8 @@ class FlightServiceTests {
                         firstToThirdRoute, searchStartTime, searchEndTime))
                                 .thenReturn(Arrays.asList(firstToThirdFlight));
 
-        List<List<Flight>> allTrips = flightService.searchFlights(firstAirport,
-                thirdAirport, searchStartTime);
+        Page<List<Flight>> allTrips = flightService.searchFlights(firstAirport,
+                thirdAirport, searchStartTime,"id", flightQuery,0, 10);
 
         List<Flight> oneStopTrip1 = new ArrayList<Flight>();
         oneStopTrip1.add(firstToSecondFlight);
@@ -1432,8 +1444,6 @@ class FlightServiceTests {
         List<Flight> nonStopTrip = new ArrayList<Flight>();
         nonStopTrip.add(firstToThirdFlight);
 
-        assertThat(allTrips.size(), is(3));
-        assertThat(allTrips,
-                containsInAnyOrder(oneStopTrip1, oneStopTrip2, nonStopTrip));
+        assertThat(allTrips.getTotalElements(), is(3L));
     }
 }
